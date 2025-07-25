@@ -1,1 +1,60 @@
+# --- Общие ---
+node_modules/
+dist/
+*.log
+*.env
+.env.*
+.DS_Store
+*.local
+npm-debug.log*
+pnpm-lock.yaml
+yarn.lock
+coverage/
 .idea/
+.vscode/
+*.swp
+
+# --- Nuxt (frontend/) ---
+frontend/.nuxt/
+frontend/.output/
+frontend/.vercel/
+frontend/.cache/
+frontend/.vite/
+frontend/.eslintcache
+frontend/public/dist/
+
+# --- NestJS (backend/) ---
+backend/dist/
+backend/.env
+backend/.env.*
+backend/.cache/
+backend/.eslintcache
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- OS / Editor ---
+Thumbs.db
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# --- Optional ---
+*.bak
+*.old
+*.orig
+*.tmp
+
+# --- Local databases ---
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Misc ---
+*.tgz
+*.gz
+*.zip
