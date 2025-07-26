@@ -1,7 +1,7 @@
 <template>
-  <div class="bodyan">
-    <NuxtRouteAnnouncer />
-  </div>
+  <Header></Header>
+  <Main></Main>
+  <Footer></Footer>
 </template>
 
 <script setup lang="ts"></script>
