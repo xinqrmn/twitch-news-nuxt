@@ -2,7 +2,6 @@
   <div class="bodyan">
     <NuxtRouteAnnouncer />
 
-    {{ counter.pidor }} - {{ counter.concha }}
   </div>
 </template>
 

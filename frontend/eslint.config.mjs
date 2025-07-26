@@ -1,12 +1,22 @@
-// @ts-check
-import withNuxt from './.nuxt/eslint.config.mjs'
+import createConfigForNuxt  from '@nuxt/eslint-config'
+import globals from 'globals'
 
-export default withNuxt({
-  root: true,
-  env: {
-    browser: true,
-    node: true,
+export default createConfigForNuxt({
+  languageOptions: {
+    parser: '@typescript-eslint/parser',
+    parserOptions: {
+      project: './tsconfig.json'
+    },
+    globals: {
+      ...globals.browser,
+      ...globals.node,
+    }
   },
+  ignores: [
+    'node_modules',
+    'dist',
+    '.nuxt'
+  ],
   extends: [
     'eslint:recommended',
     'plugin:vue/vue3-recommended',
