@@ -1,22 +1,18 @@
-import createConfigForNuxt  from '@nuxt/eslint-config'
+import createConfigForNuxt from '@nuxt/eslint-config'
 import globals from 'globals'
 
 export default createConfigForNuxt({
   languageOptions: {
     parser: '@typescript-eslint/parser',
     parserOptions: {
-      project: './tsconfig.json'
+      project: './tsconfig.json',
     },
     globals: {
       ...globals.browser,
       ...globals.node,
-    }
+    },
   },
-  ignores: [
-    'node_modules',
-    'dist',
-    '.nuxt'
-  ],
+  ignores: ['node_modules', 'dist', '.nuxt'],
   extends: [
     'eslint:recommended',
     'plugin:vue/vue3-recommended',
