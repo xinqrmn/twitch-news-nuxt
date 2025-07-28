@@ -21,7 +21,7 @@ const topicItems = [
         class="hot-topics__link"
       >
         <li class="hot-topics__item">
-          <img :src=topic.src alt="twitch icon" class="hot-topics__item-logo">
+          <img :src="topic.src" alt="twitch icon" class="hot-topics__item-logo" />
           <p class="hot-topics__item-time">{{ topic.time }}</p>
           <h3 class="hot-topics__item-title">{{ topic.title }}</h3>
         </li>
@@ -31,9 +31,7 @@ const topicItems = [
 </template>
 
 <style scoped lang="scss">
-
 .hot-topics {
-
   &__title {
     margin-bottom: 1rem;
   }
@@ -47,16 +45,14 @@ const topicItems = [
       width: 16px;
       height: 16px;
     }
-
   }
 
-  &__link{
+  &__link {
     display: block;
 
     &:not(:last-child) {
-      margin-bottom: .7rem;
+      margin-bottom: 0.7rem;
     }
   }
 }
-
 </style>

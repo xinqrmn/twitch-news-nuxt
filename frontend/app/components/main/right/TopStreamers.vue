@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import TopStreamersTable from '@/components/main/right/TopStreamersTable.vue'
 
-const props = defineProps<{title: string}>()
+const props = defineProps<{ title: string }>()
 
 const streamers = [
   { id: 123124312, name: 'evelone2004', points: 999 },
@@ -22,7 +22,10 @@ const squads = [
 <template>
   <div class="aside-content">
     <h2 class="title">Топ {{ props.title }}</h2>
-    <TopStreamersTable :data="props.title === 'стримеров' ? streamers : squads" style="margin-bottom: 1rem"></TopStreamersTable>
+    <TopStreamersTable
+      :data="props.title === 'стримеров' ? streamers : squads"
+      style="margin-bottom: 1rem"
+    ></TopStreamersTable>
     <NuxtLink to="#">
       <Button class="btn" variant="outline">Полная таблица</Button>
     </NuxtLink>

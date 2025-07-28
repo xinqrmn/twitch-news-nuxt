@@ -33,7 +33,8 @@ import TopStreamers from '@/components/main/right/TopStreamers.vue'
   padding-bottom: 2rem;
 }
 .main {
-  &-left, &-right {
+  &-left,
+  &-right {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -50,6 +51,5 @@ import TopStreamers from '@/components/main/right/TopStreamers.vue'
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
-
 }
 </style>
