@@ -23,9 +23,9 @@ export default defineNuxtConfig({
       preprocessorOptions: {
         scss: {
           additionalData: '@use "~/assets/styles/_variables.scss" as *;',
-        }
-      }
-    }
+        },
+      },
+    },
   },
   shadcn: {
     prefix: '',

@@ -1,12 +1,7 @@
 <template>
-  <section class="main-section">
-    <Header></Header>
-    <Main></Main>
-    <Footer></Footer>
-  </section>
+  <NuxtPage />
 </template>
 
 <script setup lang="ts"></script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>
