@@ -12,15 +12,17 @@ export default createConfigForNuxt({
       ...globals.node,
     },
   },
-  ignores: ['node_modules', 'dist', '.nuxt'],
   extends: [
     'eslint:recommended',
     'plugin:vue/vue3-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
+  ignores: ['node_modules', 'dist', '.nuxt', 'app/components/ui/**'],
+}).append({
   rules: {
     'vue/multi-word-component-names': 'off',
-    'prettier/prettier': ['error'],
+    'vue/html-self-closing': 'off',
+    'vue/require-default-prop': 'off',
   },
 })

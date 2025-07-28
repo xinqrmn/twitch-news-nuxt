@@ -1,2 +1,17 @@
 @use 'variables' as *;
 @use 'fonts' as *;
+
+.main-section {
+  font-family: $font-main;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: $color-text-main;
+  font-size: 14px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
