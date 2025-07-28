@@ -15,3 +15,24 @@
   max-width: 1300px;
   margin: 0 auto;
 }
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.aside-content {
+  width: 100%;
+  background-color: $color-background-topics;
+  padding: 1rem;
+  border: 1px solid #28282c;
+  border-radius: 5px;
+}
+
+.main-content {
+  width: 100%;
+  background-color: $color-background-topics;
+  padding: 1rem 5rem;
+  border: 1px solid #28282c;
+  border-radius: 5px;
+}

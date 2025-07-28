@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import SocialLink from './Footer/SocialLink.vue'
-import { Separator } from './ui/separator'
+import SocialLink from './SocialLink.vue'
+import { Separator } from '../ui/separator'
 
 const getCurrentYear: () => number = function () {
   return new Date().getFullYear()
@@ -35,7 +35,7 @@ const getCurrentYear: () => number = function () {
   gap: 1rem;
   justify-content: space-around;
   align-items: center;
-  background-color: $color-background-nav;
+  background-color: $color-background-main;
   color: $color-text-main;
   font-family: $font-main;
   text-align: center;
