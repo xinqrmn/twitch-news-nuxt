@@ -36,3 +36,14 @@
   border: 1px solid #28282c;
   border-radius: 5px;
 }
+
+  @media (max-width: 1024px) {
+    .main-content{
+      // width: 100vw;
+      padding: 0.5rem;
+    }
+
+    .container {
+      
+    }
+  }

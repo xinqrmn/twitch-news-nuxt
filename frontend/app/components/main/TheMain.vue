@@ -47,9 +47,25 @@ import TopStreamers from '@/components/main/right/TopStreamers.vue'
   grid-template-columns: 1fr 300px;
   gap: 1rem;
   padding: 1rem;
+}
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .main{
+    &-left{
+      gap: 0.5rem;
+    }
+    &-grid{
+      grid-template-columns: 1fr;
+      padding: 0.5rem;
+    }
+  
+    &-container{
+      padding-top: 2rem;
+    }
+  
+    &-right{
+      display: none;
+    }
   }
 }
 </style>
