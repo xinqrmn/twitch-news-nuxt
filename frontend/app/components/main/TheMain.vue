@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MainHotTopics from '@/components/main/left/MainHotTopics.vue'
 import TopEvents from '@/components/main/left/TopEvents.vue'
+import NewsFeed from '@/components/main/left/NewsFeed.vue'
 
 import TopStreamers from '@/components/main/right/TopStreamers.vue'
 </script>
@@ -12,6 +13,7 @@ import TopStreamers from '@/components/main/right/TopStreamers.vue'
       <section class="main-left">
         <MainHotTopics></MainHotTopics>
         <TopEvents></TopEvents>
+        <NewsFeed></NewsFeed>
       </section>
 
       <!-- Right side -->

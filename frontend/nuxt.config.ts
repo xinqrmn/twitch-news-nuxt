@@ -30,6 +30,9 @@ export default defineNuxtConfig({
       },
     },
   },
+  icon: {
+    mode: 'svg',
+  },
   shadcn: {
     prefix: '',
     componentDir: '~/components/ui',
