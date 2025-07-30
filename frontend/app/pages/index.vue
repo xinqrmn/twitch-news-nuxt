@@ -1,6 +1,6 @@
 <template>
   <section class="main-section">
-    <!-- <TheHeader></TheHeader> -->
+    <TheHeader></TheHeader>
     <TheMain></TheMain>
     <TheFooter></TheFooter>
   </section>

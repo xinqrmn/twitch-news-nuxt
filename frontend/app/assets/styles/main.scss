@@ -37,6 +37,15 @@
   border-radius: 5px;
 }
 
+.mobile-sidemenu{
+  color: $color-text-main;
+  background-color: $color-background-main;
+  border-left-color: $color-background;
+  .ring-offset-background{
+    top: 1.25rem;
+  }
+}
+
   @media (max-width: 1024px) {
     .main-content{
       // width: 100vw;
