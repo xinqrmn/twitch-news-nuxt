@@ -44,6 +44,7 @@ const goToSearch = () => {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 22;
 
   &-container {
     display: flex;
