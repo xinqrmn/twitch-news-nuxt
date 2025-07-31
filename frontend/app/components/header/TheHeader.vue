@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { ref } from 'vue'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { useRouter } from 'vue-router'
@@ -7,9 +7,7 @@ import { useWindowSize } from '@vueuse/core'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -60,11 +58,11 @@ watch(
         <div v-else class="actions-mobile">
           <Sheet trap-focus="false">
             <SheetTrigger as-child>
-              <Button variant="outline" size="icon" as-child>
+              <Button variant="default" size="icon" as-child>
                 <Icon size="2em" name="mdi:menu"></Icon>
               </Button>
             </SheetTrigger>
-            <SheetContent class="mobile-sidemenu">
+            <SheetContent :prevent-auto-focus="true" class="mobile-sidemenu">
               <SheetHeader>
                 <SheetTitle>Меню</SheetTitle>
               </SheetHeader>

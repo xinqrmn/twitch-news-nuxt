@@ -4,6 +4,19 @@ import TopEvents from '@/components/main/left/TopEvents.vue'
 import NewsFeed from '@/components/main/left/NewsFeed.vue'
 
 import TopStreamers from '@/components/main/right/TopStreamers.vue'
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const isMobile = ref(false)
+watch(
+  width,
+  () => {
+    if (width.value < 1024) {
+      isMobile.value = true
+    } else isMobile.value = false
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -13,7 +26,7 @@ import TopStreamers from '@/components/main/right/TopStreamers.vue'
       <section class="main-left">
         <MainHotTopics></MainHotTopics>
         <TopEvents></TopEvents>
-        <NewsFeed></NewsFeed>
+        <NewsFeed :is-mobile="isMobile"></NewsFeed>
       </section>
 
       <!-- Right side -->

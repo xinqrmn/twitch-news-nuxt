@@ -16,6 +16,7 @@ import SheetOverlay from './SheetOverlay.vue'
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes['class']
   side?: 'top' | 'right' | 'bottom' | 'left'
+  preventAutoFocus?: true | false
 }
 
 defineOptions({
@@ -49,6 +50,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
           && 'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t',
         props.class)"
       v-bind="{ ...forwarded, ...$attrs }"
+      @open-auto-focus="(e) => {
+        props.preventAutoFocus ? e.preventDefault() : e
+      }"
     >
       <slot />
 
