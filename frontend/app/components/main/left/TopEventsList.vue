@@ -25,56 +25,133 @@ const events = [
     subTitle: '01/09/2025',
   },
 ]
+
+// Переменная для отслеживания состояния касания
+const isTouched = ref(false)
 </script>
 
 <template>
-  <ul class="events-list">
-    <li v-for="event in events.slice(-3).reverse()" :key="event.id">
-      <NuxtLink class="events-list__item" to="#">
-        <img :src="event.imageSrc" :alt="event.title" class="events-list__img" />
-        <div class="events-list__text">
-          <h3>{{ event.title }}</h3>
-          <span v-if="event.subTitle">{{ event.subTitle }}</span>
-        </div>
-      </NuxtLink>
-    </li>
-  </ul>
+  <div
+    class="events-container"
+    @touchstart="isTouched = true"
+    @touchend="isTouched = false"
+    :class="{ 'events-container--touched': isTouched }"
+  >
+    <ul class="events-list">
+      <li v-for="event in events.slice(-3).reverse()" :key="event.id">
+        <NuxtLink class="events-list__item" to="#">
+          <img :src="event.imageSrc" :alt="event.title" class="events-list__img" />
+          <div class="events-list__text">
+            <h3>{{ event.title }}</h3>
+            <span v-if="event.subTitle">{{ event.subTitle }}</span>
+          </div>
+        </NuxtLink>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.events-list {
+.events-container {
   width: 100%;
+  overflow: hidden;
+
+  @media (max-width: 1024px) {
+    height: 60px;
+    position: relative;
+    cursor: pointer;
+
+    // Скрываем скроллбар
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    // При касании или наведении — активируем ручной скролл
+    &:hover,
+    &.events-container--touched {
+      overflow-x: auto;
+      touch-action: pan-x; // Разрешаем горизонтальный свайп
+
+      .events-list {
+        animation-play-state: paused !important;
+        width: max-content;
+        min-width: 100%;
+        transform: none !important;
+        padding-right: 2rem;
+      }
+    }
+  }
+}
+
+.events-list {
   display: flex;
   align-items: center;
   gap: 2rem;
-  //flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 
-  &__item {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    transition: all 0.2s;
+  @media (max-width: 1024px) {
+    animation: marquee 15s linear infinite;
+    width: 100%;
 
-    &:hover {
-      color: $color-background-primary;
+    &__item {
+      min-width: 220px;
+      flex-shrink: 0;
     }
   }
+}
 
-  &__img {
-    display: block;
-    max-width: 45px;
-    object-fit: cover;
+.events-list__item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  transition: all 0.2s;
+
+  &:hover {
+    color: $color-background-primary;
+  }
+}
+
+.events-list__img {
+  display: block;
+  max-width: 45px;
+  object-fit: cover;
+}
+
+.events-list__text {
+  min-width: max-content;
+
+  h3 {
+    font-size: 14px;
+    margin: 0;
   }
 
-  &__text {
-    min-width: max-content;
+  span {
+    font-size: 12px;
+    color: #666;
+  }
+}
 
-    h3 {
-      font-size: 14px;
-    }
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% - 2rem));
+  }
+}
 
-    span {
-      font-size: 12px;
+@media (max-width: 1024px) {
+  .events-container {
+    contain: strict;
+
+    .events-list {
+      will-change: transform;
+      backface-visibility: hidden;
     }
   }
 }

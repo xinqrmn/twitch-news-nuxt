@@ -27,7 +27,20 @@ import TopEventsList from '@/components/main/left/TopEventsList.vue'
     padding: 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-self: center;
+  }
+  @media (max-width: 1024px) {
+    max-height: unset;
+    flex-direction: column;
+    height: max-content;
+    overflow-x: hidden;
+    gap: 0.5rem;
+    &__title {
+      width: 100%;
+      padding: 0.5rem;
+      max-height: fit-content;
+      justify-self: flex-start;
+    }
   }
 }
 </style>

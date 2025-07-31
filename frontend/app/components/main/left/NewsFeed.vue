@@ -9,6 +9,9 @@ type SelectedCat = 'recommended' | 'article' | 'news'
 const news = useMockNews()
 const active = ref<'list' | 'module'>('list')
 const selectedCat = ref<SelectedCat>('recommended')
+const props = defineProps<{
+  isMobile: boolean
+}>()
 
 const handleToggleActive = (str: 'list' | 'module') => {
   active.value = str
@@ -25,12 +28,22 @@ const filteredNews = computed(() => {
     }
   })
 })
+
+watch(
+  () => props.isMobile,
+  () => {
+    if (props.isMobile) {
+      active.value = 'module'
+    } else active.value = 'list'
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="news-feed__navigation">
     <NewsFeedNavigation @update:selected-cat="selectedCat = $event"></NewsFeedNavigation>
-    <div class="news-feed__box">
+    <div v-if="!props.isMobile" class="news-feed__box">
       <Icon
         class="news-feed__view"
         name="mdi:format-list-bulleted"
@@ -98,6 +111,11 @@ const filteredNews = computed(() => {
         justify-content: space-between;
         height: auto;
       }
+    }
+  }
+  @media (max-width: 1024px) {
+    &__navigation {
+      padding: 0.2rem 0.5rem;
     }
   }
 }
