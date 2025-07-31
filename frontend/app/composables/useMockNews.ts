@@ -42,3 +42,11 @@ export const useMockNews = () => {
     },
   ]
 }
+
+const useStrapiNews = async () => {
+  const { data, error } = await useFetch('http://localhost:1337/api/news-posts?populate=image')
+  console.log(data.value)
+  console.log(error.value)
+}
+
+useStrapiNews()
