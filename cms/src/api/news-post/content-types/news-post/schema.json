@@ -23,9 +23,6 @@
         "Обзор"
       ]
     },
-    "tags": {
-      "type": "string"
-    },
     "image": {
       "type": "media",
       "multiple": false,
@@ -44,6 +41,14 @@
     },
     "views": {
       "type": "integer"
+    },
+    "tags": {
+      "type": "string",
+      "required": true
+    },
+    "contents": {
+      "type": "richtext",
+      "required": true
     }
   }
 }

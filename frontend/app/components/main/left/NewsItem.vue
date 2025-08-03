@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
+import type { IStrapiImage } from '@/types/strapi'
 
 interface INewsItem {
   id: number
   title: string
   category: string
-  tags: string[]
-  image: string
+  tags: string
+  image: IStrapiImage
   date: string
   comments: number
   views: number
@@ -16,6 +17,17 @@ const props = defineProps<{
   item: INewsItem
   typeView: 'list' | 'module'
 }>()
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).replace(',', '')
+  }
 </script>
 
 <template>
@@ -33,7 +45,7 @@ const props = defineProps<{
       }"
     >
       <img
-        :src="props.item.image"
+        :src="$config.public.strapiBaseUrl + props.item.image.url"
         alt="news image"
         class="news-item__img w-full h-full object-cover transition-all duration-300"
       />
@@ -41,7 +53,7 @@ const props = defineProps<{
 
     <div>
       <div class="news-item__data text-sm text-muted-foreground flex gap-2 mb-2">
-        <span class="news-item__content">{{ props.item.date }}</span>
+        <span class="news-item__content">{{ formatDate(props.item.date) }}</span>
         <Icon name="mdi:circle-medium" />
         <span class="news-item__content">
           {{ props.item.views }}
@@ -61,7 +73,7 @@ const props = defineProps<{
       <div class="news-item__badges">
         <Badge class="news-item__badges--cat" variant="secondary">{{ props.item.category }}</Badge>
         <Badge
-          v-for="tag in props.item.tags"
+          v-for="tag in props.item.tags.split(',')"
           :key="tag"
           variant="outline"
           class="news-item__badges--tag"

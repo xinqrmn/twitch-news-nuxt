@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { useMockNews } from '@/composables/useMockNews'
+// import { useMockNews } from '@/composables/useMockNews'
 import NewsItem from '@/components/main/left/NewsItem.vue'
 import NewsFeedNavigation from '@/components/main/left/NewsFeedNavigation.vue'
 import { computed } from 'vue'
+import type { StrapiResponse, NewsPosts } from '~/types/strapi'
+import { useRuntimeConfig } from '#app'
 
 type SelectedCat = 'recommended' | 'article' | 'news'
 
-const news = useMockNews()
+// const news = useMockNews()
+const { data, pending, error } = useFetch<StrapiResponse<NewsPosts>>('/api/news-posts', {
+  baseURL: useRuntimeConfig().public.strapiBaseUrl,
+  params: {
+    fields: ['title', 'category', 'date', 'comments', 'views', 'tags'],
+    populate: 'image',
+  },
+})
+const news = computed(() => data.value?.data || [])
+console.log(news)
+
 const active = ref<'list' | 'module'>('list')
 const selectedCat = ref<SelectedCat>('recommended')
 
@@ -15,7 +27,7 @@ const handleToggleActive = (str: 'list' | 'module') => {
 }
 
 const filteredNews = computed(() => {
-  return news.filter((item) => {
+  return news.value.filter((item) => {
     if (selectedCat.value === 'recommended') {
       return item
     } else if (selectedCat.value === 'article') {
@@ -56,7 +68,7 @@ const filteredNews = computed(() => {
       'grid md:grid-cols-2 xl:grid-cols-3': active === 'module',
     }"
   >
-    <NewsItem v-for="item in filteredNews" :key="item.id" :item="item" :type-view="active" />
+    <NewsItem v-for="item in filteredNews" :key="item.id" :item="item" :type-view="active" @click="console.log(item.documentId)"/>
   </TransitionGroup>
 </template>
 

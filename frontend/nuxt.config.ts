@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_API_BASE_URL || 'http://localhost:3000/api',
+      strapiBaseUrl: process.env.STRAPI_BASE_URL || 'http://localhost:1337/'
     },
   },
   css: ['~/assets/styles/main.scss', '~/assets/styles/tailwind.css'],
