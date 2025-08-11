@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     },
   },
   devServer: {
-    host: '0.0.0.0' // This makes the dev server accessible from other devices on the network
+    host: '0.0.0.0', // This makes the dev server accessible from other devices on the network
   },
   css: ['~/assets/styles/main.scss', '~/assets/styles/tailwind.css'],
   vite: {

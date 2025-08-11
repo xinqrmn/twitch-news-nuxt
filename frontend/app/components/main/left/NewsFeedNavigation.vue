@@ -38,15 +38,15 @@ const changeCat = (value: SelectedCat) => {
 }
 
 @media (max-width: 1024px) {
-  .tabs{
+  .tabs {
     gap: 0.5rem;
   }
 
-  [data-slot='tabs']{
+  [data-slot='tabs'] {
     width: 100%;
     // justify-content: space-between;
   }
-  [data-slot='tabs-list']{
+  [data-slot='tabs-list'] {
     width: 100%;
     // justify-content: space-between;
   }

@@ -12,27 +12,29 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="nav">
-    <NavigationMenu :style="{maxWidth: props.isMobile ? 'unset' : 'max-content'}">
-      <NavigationMenuList :class="[props.isMobile ? 'nav-mobile' : 'nav-list']">
-        <NavigationMenuItem>
-          <NuxtLink to="#">
-            <NavigationMenuLink>Новости</NavigationMenuLink>
-          </NuxtLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NuxtLink to="#">
-            <NavigationMenuLink>Стримеры</NavigationMenuLink>
-          </NuxtLink>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
-  </div>
+  <client-only>
+    <div class="nav">
+      <NavigationMenu :style="{ maxWidth: props.isMobile ? 'unset' : 'max-content' }">
+        <NavigationMenuList :class="[props.isMobile ? 'nav-mobile' : 'nav-list']">
+          <NavigationMenuItem>
+            <NuxtLink to="/">
+              <NavigationMenuLink>Новости</NavigationMenuLink>
+            </NuxtLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NuxtLink to="/streamers">
+              <NavigationMenuLink>Стримеры</NavigationMenuLink>
+            </NuxtLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
+  </client-only>
 </template>
 
 <style scoped lang="scss">
 .nav {
-  width: 100%;                
+  width: 100%;
   flex-grow: 1;
   @media (max-width: 1024px) {
     & div {
@@ -49,9 +51,11 @@ const props = defineProps<{
   width: 100%;
   padding: 0 16px;
   flex-direction: column;
+
   li {
     width: 100%;
-    a{
+
+    a {
       font-size: 16px;
       padding-left: 0;
     }

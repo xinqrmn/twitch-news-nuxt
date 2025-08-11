@@ -1,15 +1,9 @@
 <template>
-  <section class="main-section">
-    <TheHeader></TheHeader>
-    <TheMain></TheMain>
-    <TheFooter></TheFooter>
-  </section>
+  <TheMain></TheMain>
 </template>
 
 <script setup lang="ts">
-import TheHeader from '@/components/header/TheHeader.vue'
-import TheMain from '@/components/main/TheMain.vue'
-import TheFooter from '@/components/footer/TheFooter.vue'
+import TheMain from '~/components/main/TheMain.vue'
 </script>
 
 <style lang="scss"></style>

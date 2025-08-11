@@ -1,7 +1,5 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <p>Streamers</p>
 </template>
 
 <script setup lang="ts"></script>

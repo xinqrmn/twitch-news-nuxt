@@ -10,6 +10,15 @@
   font-size: 14px;
 }
 
+.main-container {
+  flex-grow: 1;
+  background: $color-background;
+  //background: url('/images/main-bg.png') no-repeat #000 fixed;
+  //background-size: cover;
+  padding-top: 12rem;
+  padding-bottom: 2rem;
+}
+
 .container {
   width: 100%;
   max-width: 1300px;
@@ -37,22 +46,21 @@
   border-radius: 5px;
 }
 
-.mobile-sidemenu{
+.mobile-sidemenu {
   color: $color-text-main;
   background-color: $color-background-main;
   border-left-color: $color-background;
-  .ring-offset-background{
+  .ring-offset-background {
     top: 1.25rem;
   }
 }
 
-  @media (max-width: 1024px) {
-    .main-content{
-      // width: 100vw;
-      padding: 0.5rem;
-    }
-
-    .container {
-      
-    }
+@media (max-width: 1024px) {
+  .main-content {
+    // width: 100vw;
+    padding: 0.5rem;
   }
+
+  .container {
+  }
+}

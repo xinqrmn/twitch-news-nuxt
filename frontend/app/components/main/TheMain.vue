@@ -20,33 +20,23 @@ watch(
 </script>
 
 <template>
-  <main class="main-container">
-    <div class="container main-grid">
-      <!-- Left side -->
-      <section class="main-left">
-        <MainHotTopics></MainHotTopics>
-        <TopEvents></TopEvents>
-        <NewsFeed :is-mobile="isMobile"></NewsFeed>
-      </section>
+  <div class="container main-grid">
+    <!-- Left side -->
+    <section class="main-left">
+      <MainHotTopics></MainHotTopics>
+      <TopEvents></TopEvents>
+      <NewsFeed :is-mobile="isMobile"></NewsFeed>
+    </section>
 
-      <!-- Right side -->
-      <aside class="main-right">
-        <TopStreamers title="стримеров"></TopStreamers>
-        <TopStreamers title="сквадов"></TopStreamers>
-      </aside>
-    </div>
-  </main>
+    <!-- Right side -->
+    <aside class="main-right">
+      <TopStreamers title="стримеров"></TopStreamers>
+      <TopStreamers title="сквадов"></TopStreamers>
+    </aside>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.main-container {
-  flex-grow: 1;
-  background: $color-background;
-  //background: url('/images/main-bg.png') no-repeat #000 fixed;
-  //background-size: cover;
-  padding-top: 12rem;
-  padding-bottom: 2rem;
-}
 .main {
   &-left,
   &-right {
@@ -65,20 +55,20 @@ watch(
 }
 
 @media (max-width: 1024px) {
-  .main{
-    &-left{
+  .main {
+    &-left {
       gap: 0.5rem;
     }
-    &-grid{
+    &-grid {
       grid-template-columns: 1fr;
       padding: 0.5rem;
     }
-  
-    &-container{
+
+    &-container {
       padding-top: 2rem;
     }
-  
-    &-right{
+
+    &-right {
       display: none;
     }
   }

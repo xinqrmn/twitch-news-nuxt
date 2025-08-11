@@ -56,7 +56,7 @@ const topicItems = [
   }
   @media (max-width: 1024px) {
     &__title {
-    margin-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
     }
   }
 }
