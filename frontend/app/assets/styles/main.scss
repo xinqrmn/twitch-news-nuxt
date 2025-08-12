@@ -30,26 +30,27 @@
   font-weight: 700;
 }
 
-.aside-content {
-  width: 100%;
-  background-color: $color-background-topics;
-  padding: 1rem;
-  border: 1px solid #28282c;
-  border-radius: 5px;
-}
-
 .main-content {
   width: 100%;
   background-color: $color-background-topics;
   padding: 1rem 5rem;
-  border: 1px solid #28282c;
+  border: $color-background-topics-border;
   border-radius: 5px;
+
+  &--right {
+    width: 100%;
+    background-color: $color-background-topics;
+    padding: 1rem;
+    border: $color-background-topics-border;
+    border-radius: 5px;
+  }
 }
 
 .mobile-sidemenu {
   color: $color-text-main;
   background-color: $color-background-main;
   border-left-color: $color-background;
+
   .ring-offset-background {
     top: 1.25rem;
   }

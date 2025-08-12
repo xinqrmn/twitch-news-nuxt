@@ -41,7 +41,7 @@ watch(
 </script>
 
 <template>
-  <div class="news-feed__navigation">
+  <div class="news-feed__navigation main-content">
     <NewsFeedNavigation @update:selected-cat="selectedCat = $event"></NewsFeedNavigation>
     <div v-if="!props.isMobile" class="news-feed__box">
       <Icon
@@ -79,9 +79,6 @@ watch(
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: $color-background-topics;
-    border: 1px solid $color-background-topics-border;
-    border-radius: 5px;
     padding: 0.2rem 1rem;
   }
 

@@ -20,7 +20,7 @@ const squads = [
 </script>
 
 <template>
-  <div class="aside-content">
+  <div class="main-content--right">
     <h2 class="title">Топ {{ props.title }}</h2>
     <TopStreamersTable
       :data="props.title === 'стримеров' ? streamers : squads"
