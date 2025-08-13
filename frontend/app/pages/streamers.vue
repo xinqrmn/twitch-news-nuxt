@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="streamers">
     <StreamersTable></StreamersTable>
   </div>
 </template>
@@ -10,8 +10,6 @@ import StreamersTable from '~/components/streamers/StreamersTable.vue'
 
 <style lang="scss">
 .streamers {
-  &__title {
-    margin-bottom: 1rem;
-  }
+  grid-column: 1 / -1;
 }
 </style>

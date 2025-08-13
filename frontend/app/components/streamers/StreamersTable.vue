@@ -8,31 +8,54 @@ import {
   TableRow,
 } from '~/components/ui/table'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from '~/components/ui/pagination'
-import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
-import { StreamersData } from '~/composables/useTwitchAnalytics'
+import { ref, watch, onMounted } from 'vue'
 
-console.log(StreamersData)
-// logo
-// displayName
-// followers
-// followersGained
-// streamedMinutes
-// maxViewers
-// avgViewers
-// twitchUrl
+const streamers = ref([])
+const page = ref(1)
+const maxPages = ref(10)
+const limit = ref(10)
+
+async function fetchStreamers() {
+  const res = await $fetch('/api/streamers', {
+    params: {
+      days: 7,
+      region: 227,
+      page: page.value,
+      sortColumn: 3,
+      sortDirection: 'desc',
+      offset: (page.value - 1) * limit.value,
+      limit: limit.value,
+    },
+  })
+  streamers.value =
+    res?.data.map((item) => ({
+      streamedMinutes: item.streamedminutes,
+      maxViewers: item.maxviewers,
+      avgViewers: item.avgviewers,
+      followers: item.followers,
+      followersGained: item.followersgained,
+      logo: item.logo,
+      twitchUrl: item.twitchurl,
+      displayName: item.displayname,
+      id: item.id,
+      position: item.rownum,
+    })) || []
+  console.log(streamers.value)
+}
+
+const changePage = (p: number) => {
+  if (p < 1 || p > limit.value) return
+  page.value = p
+}
+
+watch([page, limit], fetchStreamers)
+onMounted(fetchStreamers)
 
 // https://sullygnome.com/api/tables/channeltables/getchannels/7(Это за сколько дней)/227(это ру регион)/1(1 страница серверной пагинации)/3/desc/0/10(сколько показывать)
 </script>
@@ -41,21 +64,19 @@ console.log(StreamersData)
   <div class="main-content">
     <div class="class streamers__inner">
       <h2 class="title">Топ Стримеров</h2>
-      <Select>
+      <Select v-model="limit">
         <SelectTrigger>
-          <SelectValue placeholder="Select a fruit" />
+          <SelectValue placeholder="Выберите кол-во" />
         </SelectTrigger>
         <SelectContent>
-          <SelectGroup>
-            <SelectItem value="10"> 10 </SelectItem>
-            <SelectItem value="25"> 25 </SelectItem>
-            <SelectItem value="50"> 50 </SelectItem>
-          </SelectGroup>
+          <SelectItem v-for="perView in [10, 25, 50]" :key="perView" :value="perView"
+            >{{ perView }}
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>
 
-    <Table>
+    <Table class="mb-3">
       <TableHeader>
         <TableRow>
           <TableHead>#</TableHead>
@@ -69,12 +90,18 @@ console.log(StreamersData)
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="(streamer, index) in StreamersData" :key="streamer.displayName">
-          <TableCell>{{ index + 1 }}</TableCell>
+        <TableRow v-for="streamer in streamers" :key="streamer.id">
+          <TableCell>{{ streamer.position }}</TableCell>
           <TableCell>
-            <img :src="streamer.logo" :alt="`${streamer.displayName + 'logo'}`" />
+            <NuxtLink :to="streamer.twitchUrl" target="_blank">
+              <img :src="streamer.logo" :alt="`${streamer.displayName + 'logo'}`" />
+            </NuxtLink>
           </TableCell>
-          <TableCell>{{ streamer.displayName }}</TableCell>
+          <TableCell>
+            <NuxtLink :to="streamer.twitchUrl" target="_blank">
+              {{ streamer.displayName }}
+            </NuxtLink>
+          </TableCell>
           <TableCell>{{ streamer.followers }}</TableCell>
           <TableCell>{{ streamer.followersGained }}</TableCell>
           <TableCell>{{ streamer.streamedMinutes }}</TableCell>
@@ -84,21 +111,21 @@ console.log(StreamersData)
       </TableBody>
     </Table>
 
-    <Pagination class="mt-4">
-      <PaginationContent>
-        <PaginationPrevious />
+    <use-clinet>
+      <Pagination :items-per-page="10" :total="100">
+        <PaginationContent>
+          <PaginationPrevious @click="changePage(page - 1)" />
 
-        <PaginationItem>1</PaginationItem>
-        <PaginationItem>1</PaginationItem>
-        <PaginationItem>1</PaginationItem>
-        <PaginationItem>1</PaginationItem>
-        <PaginationItem>1</PaginationItem>
-        <PaginationItem>1</PaginationItem>
-        <PaginationItem>1</PaginationItem>
+          <template v-for="p in maxPages" :key="p">
+            <PaginationItem :value="p" :is-active="p === page" @click="changePage(p)">
+              {{ p }}
+            </PaginationItem>
+          </template>
 
-        <PaginationNext />
-      </PaginationContent>
-    </Pagination>
+          <PaginationNext @click="changePage(page + 1)" />
+        </PaginationContent>
+      </Pagination>
+    </use-clinet>
   </div>
 </template>
 
@@ -108,7 +135,6 @@ console.log(StreamersData)
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-bottom: 1rem;
   }
 }
@@ -129,16 +155,16 @@ table {
       transition: all 0.2s;
 
       &:nth-child(odd) {
-        background-color: rgba($color-background-primary, 0);
+        background-color: rgba($color-background, 0);
       }
 
       &:nth-child(even) {
-        background-color: rgba($color-background-primary, 0);
+        background-color: rgba($color-background, 0);
       }
 
       &:hover {
-        background-color: rgba($color-background-primary, 0.4);
-        color: #fff;
+        background-color: rgba($color-background, 0.4);
+        color: $color-background-primary;
       }
     }
   }
