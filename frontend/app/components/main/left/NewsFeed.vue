@@ -4,6 +4,9 @@ import NewsItem from '@/components/main/left/NewsItem.vue'
 import NewsFeedNavigation from '@/components/main/left/NewsFeedNavigation.vue'
 import { computed } from 'vue'
 import type { TabsItem } from '@nuxt/ui'
+import { useGlobals } from '~/stores/globals'
+
+const globals = useGlobals()
 
 const items = [
   {
@@ -23,10 +26,6 @@ type SelectedCat = 'recommended' | 'article' | 'news'
 const news = useMockNews()
 const active = ref<'list' | 'module'>('list')
 const selectedCat = ref<SelectedCat>('recommended')
-const props = defineProps<{
-  isMobile: boolean
-}>()
-
 const handleToggleActive = (str: 'list' | 'module') => {
   active.value = str
 }
@@ -43,24 +42,16 @@ const filteredNews = computed(() => {
   })
 })
 
-watch(
-  () => props.isMobile,
-  () => {
-    if (props.isMobile) {
-      active.value = 'module'
-    } else active.value = 'list'
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
   <div class="news-feed__navigation main-content">
     <NewsFeedNavigation @update:selected-cat="selectedCat = $event"></NewsFeedNavigation>
     <UTabs
+      v-if="!globals.isMobile"
       :items="items"
       class="gap-0 nav"
-      defaultValue="list"
+      default-value="list"
       @update:model-value="handleToggleActive"
     ></UTabs>
   </div>

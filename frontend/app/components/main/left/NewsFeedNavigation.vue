@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
+import { useGlobals } from '~/stores/globals';
 
+const globals = useGlobals()
 const items = [
   {
     label: 'Рекомендации',
@@ -35,7 +37,8 @@ const changeCat = (value: SelectedCat) => {
   <UTabs
     :items="items"
     class="gap-0 nav"
-    defaultValue="recommended"
+    :class="{'w-full': globals.isMobile}"
+    default-value="recommended"
     @update:model-value="changeCat"
   ></UTabs>
 </template>

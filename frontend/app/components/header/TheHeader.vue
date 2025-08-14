@@ -47,7 +47,12 @@ watch(
           <UButton variant="solid" class="font-normal text-white">Войти</UButton>
         </div>
         <div v-else class="actions-mobile">
-          <USlideover title="Menu">
+          <USlideover
+            :ui="{
+            content: 'w-4/5' 
+          }"
+            title="Menu"
+          >
             <UButton variant="ghost" size="xl" icon="mdi:menu"></UButton>
 
             <template #body>
