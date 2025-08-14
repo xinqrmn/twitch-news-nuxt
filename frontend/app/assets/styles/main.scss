@@ -34,14 +34,16 @@
   width: 100%;
   background-color: $color-background-topics;
   padding: 1rem 5rem;
-  border: $color-background-topics-border;
+  // border: $color-background-topics-border;
+  border: 1px solid $color-background-topics-border;
   border-radius: 5px;
 
   &--right {
     width: 100%;
     background-color: $color-background-topics;
     padding: 1rem;
-    border: $color-background-topics-border;
+    // border: $color-background-topics-border;
+    border: 1px solid $color-background-topics-border;
     border-radius: 5px;
   }
 }

@@ -1,21 +1,91 @@
 <script setup lang="ts">
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table'
 import { ref, watch, onMounted } from 'vue'
+import type { TableColumn } from '@nuxt/ui'
 
-const streamers = ref([])
+const streamersTable = useTemplateRef('streamersTable')
+const UAvatar = resolveComponent('UAvatar')
+
 const page = ref(1)
-const maxPages = ref(10)
+const maxPages = ref(100)
+const tableLoading = ref<boolean>(true)
 const limits = ref([10, 25, 50])
 const limit = ref(10)
 
+type RawStreamerInfo = {
+  id: number
+  rownum: number
+  twitchurl: string
+  logo: string
+  displayname: string
+  followers: number
+  followersgained: number
+  streamedminutes: number
+  maxviewers: number
+  avgviewers: number
+}
+
+type StreamerInfo = {
+  position: number
+  twitchUrl: string
+  logo: { src: string }
+  displayName: string
+  followers: number
+  followersGained: number
+  streamedMinutes: number
+  maxViewers: number
+  avgViewers: number
+}
+const streamers = ref<StreamerInfo[]>([])
+
+const tableColumns: TableColumn<StreamerInfo>[] = [
+  {
+    accessorKey: 'position',
+    header: '#',
+    cell: ({ row }) => `#${row.getValue('position')}`,
+  },
+  {
+    accessorKey: 'displayName',
+    header: 'Имя',
+    cell: ({ row }) => {
+      return h('div', { class: 'flex items-center gap-3' }, [
+        h(UAvatar, {
+          ...row.original.logo,
+          size: 'lg',
+        }),
+        h('div', undefined, [
+          h('p', { class: 'font-medium text-highlighted' }, row.original.displayName),
+        ]),
+      ])
+    },
+  },
+  {
+    accessorKey: 'followers',
+    header: 'Сабы всего',
+    cell: ({ row }) => `${row.getValue('followers')}`,
+  },
+  {
+    accessorKey: 'followersGained',
+    header: 'Сабы за 7 дней',
+    cell: ({ row }) => `${row.getValue('followersGained')}`,
+  },
+  {
+    accessorKey: 'streamedMinutes',
+    header: 'Время в потоке',
+    cell: ({ row }) => `${row.getValue('streamedMinutes') + ' мин.'}`,
+  },
+  {
+    accessorKey: 'maxViewers',
+    header: 'Max зрителей',
+    cell: ({ row }) => `${row.getValue('maxViewers')}`,
+  },
+  {
+    accessorKey: 'avgViewers',
+    header: 'Avg зрителей',
+    cell: ({ row }) => `${row.getValue('avgViewers')}`,
+  },
+]
 async function fetchStreamers() {
+  tableLoading.value = true
   const res = await $fetch('/api/streamers', {
     params: {
       days: 7,
@@ -26,21 +96,23 @@ async function fetchStreamers() {
       offset: (page.value - 1) * limit.value,
       limit: limit.value,
     },
+  }).then((res) => {
+    streamers.value =
+      res.data.map((item: RawStreamerInfo) => ({
+        streamedMinutes: item.streamedminutes,
+        maxViewers: item.maxviewers,
+        avgViewers: item.avgviewers,
+        followers: item.followers,
+        followersGained: item.followersgained,
+        logo: { src: item.logo },
+        twitchUrl: item.twitchurl,
+        displayName: item.displayname,
+        position: item.rownum,
+      })) || []
+    console.log(streamers.value)
+    tableLoading.value = false
   })
-  streamers.value =
-    res?.data.map((item) => ({
-      streamedMinutes: item.streamedminutes,
-      maxViewers: item.maxviewers,
-      avgViewers: item.avgviewers,
-      followers: item.followers,
-      followersGained: item.followersgained,
-      logo: item.logo,
-      twitchUrl: item.twitchurl,
-      displayName: item.displayname,
-      id: item.id,
-      position: item.rownum,
-    })) || []
-  console.log(streamers.value)
+
 }
 
 const changePage = (p: number) => {
@@ -59,59 +131,34 @@ onMounted(fetchStreamers)
     <div class="class streamers__inner">
       <h2 class="title">Топ Стримеров</h2>
 
-      <USelect v-model="limit" variant="outline" color="primary" :items="limits"></USelect>
+      <div>
+        Количество элементов: 
+        <USelect v-model="limit" variant="outline" color="primary" :items="limits"></USelect>
+      </div>
     </div>
-
-    <Table class="mb-3">
-      <TableHeader>
-        <TableRow>
-          <TableHead>#</TableHead>
-          <TableHead class="min-w-12">Лого</TableHead>
-          <TableHead>Имя</TableHead>
-          <TableHead>Сабы всего</TableHead>
-          <TableHead>Сабы за 7 дней</TableHead>
-          <TableHead>Время в потоке</TableHead>
-          <TableHead>Max зрителей</TableHead>
-          <TableHead>Avg зрителей</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow v-for="streamer in streamers" :key="streamer.id">
-          <TableCell>{{ streamer.position }}</TableCell>
-          <TableCell>
-            <NuxtLink :to="streamer.twitchUrl" target="_blank">
-              <img :src="streamer.logo" :alt="`${streamer.displayName + 'logo'}`" />
-            </NuxtLink>
-          </TableCell>
-          <TableCell>
-            <NuxtLink :to="streamer.twitchUrl" target="_blank">
-              {{ streamer.displayName }}
-            </NuxtLink>
-          </TableCell>
-          <TableCell>{{ streamer.followers }}</TableCell>
-          <TableCell>{{ streamer.followersGained }}</TableCell>
-          <TableCell>{{ streamer.streamedMinutes }}</TableCell>
-          <TableCell>{{ streamer.maxViewers }}</TableCell>
-          <TableCell>{{ streamer.avgViewers }}</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-
-    <use-clinet>
-      <Pagination :items-per-page="10" :total="100">
-        <PaginationContent>
-          <PaginationPrevious @click="changePage(page - 1)" />
-
-          <template v-for="p in maxPages" :key="p">
-            <PaginationItem :value="p" :is-active="p === page" @click="changePage(p)">
-              {{ p }}
-            </PaginationItem>
-          </template>
-
-          <PaginationNext @click="changePage(page + 1)" />
-        </PaginationContent>
-      </Pagination>
-    </use-clinet>
+    <div class="streamers__table">
+      <UTable
+        ref="streamersTable"
+        sticky
+        class="flex-1 max-h-[38rem]"
+        :data="streamers"
+        :columns="tableColumns"
+        :loading="tableLoading === true"
+      >
+      <template #empty>
+        <img src="https://www.meme-arsenal.com/memes/64283ac08d8bb5ce15183505adfad503.jpg" alt="увы" style="width: 100%; object-fit: contain; max-height: 500px;">
+      </template>
+    </UTable>
+      <div class="flex justify-center border-t border-default pt-4">
+        <UPagination
+          v-model:page="page"
+          :default-page="1"
+          :items-per-page="limit"
+          :total="maxPages"
+          @update:page="changePage"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -123,40 +170,7 @@ onMounted(fetchStreamers)
     justify-content: space-between;
     margin-bottom: 1rem;
   }
-}
-
-table {
-  img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-  }
-
-  tbody,
-  thead {
-    tr {
-      color: #fff;
-      transition: all 0.2s;
-
-      &:nth-child(odd) {
-        background-color: rgba($color-background, 0);
-      }
-
-      &:nth-child(even) {
-        background-color: rgba($color-background, 0);
-      }
-
-      &:hover {
-        background-color: rgba($color-background, 0.4);
-        color: $color-background-primary;
-      }
-    }
-  }
-
-  thead tr th {
-    color: #fff;
+  &__table{
   }
 }
 </style>

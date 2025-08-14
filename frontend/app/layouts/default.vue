@@ -19,7 +19,7 @@ import TheFooter from '~/components/footer/TheFooter.vue'
 .main-grid {
   background: $color-background-main;
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 330px;
   gap: 1rem;
   padding: 1rem;
 }
