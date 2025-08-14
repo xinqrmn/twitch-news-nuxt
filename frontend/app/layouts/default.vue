@@ -22,5 +22,8 @@ import TheFooter from '~/components/footer/TheFooter.vue'
   grid-template-columns: 1fr 300px;
   gap: 1rem;
   padding: 1rem;
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
