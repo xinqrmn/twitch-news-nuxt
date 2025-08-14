@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@theme static {
+  --font-sans: 'Public Sans', sans-serif;
+
+  --breakpoint-3xl: 1920px;
+
+  --color-twitch: oklch(66.986% 0.20528 299.17);
+  --color-twitch-50: oklch(100% 0 none);
+  --color-twitch-100: oklch(100% 0 none);
+  --color-twitch-200: oklch(95.026% 0.02951 305.12);
+  --color-twitch-300: oklch(85.442% 0.08707 302.58);
+  --color-twitch-400: oklch(66.986% 0.20528 299.17);
+  --color-twitch-500: oklch(75.986% 0.14763 301.51);
+  --color-twitch-600: oklch(56.635% 0.26704 293.98);
+  --color-twitch-700: oklch(50.383% 0.29366 285.38);
+  --color-twitch-800: oklch(41.916% 0.24354 285.85);
+  --color-twitch-900: oklch(33.103% 0.19061 287.23);
+  --color-twitch-950: oklch(28.481% 0.1628 288.38);
+
+  --ui-bg-elevated: #2c2c31;
+  --ui-border-accented: transparent;
+  --ui-color-neutral: red;
+}
+
+:root {
+  --ui-text-dimmed: #777;
+  --ui-text-muted: #777;
+  --ui-text-inverted: #fff;
+}
+.dark {
+  --ui-bg: #1f1f23;
+  --ui-border: #28282c;
+}

@@ -33,9 +33,9 @@ const isTouched = ref(false)
 <template>
   <div
     class="events-container"
+    :class="{ 'events-container--touched': isTouched }"
     @touchstart="isTouched = true"
     @touchend="isTouched = false"
-    :class="{ 'events-container--touched': isTouched }"
   >
     <ul class="events-list">
       <li v-for="event in events.slice(-3).reverse()" :key="event.id">

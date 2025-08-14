@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Badge } from '@/components/ui/badge'
-
 interface INewsItem {
   id: number
   title: string
@@ -59,15 +57,10 @@ const props = defineProps<{
       </h3>
 
       <div class="news-item__badges">
-        <Badge class="news-item__badges--cat" variant="secondary">{{ props.item.category }}</Badge>
-        <Badge
-          v-for="tag in props.item.tags"
-          :key="tag"
-          variant="outline"
-          class="news-item__badges--tag"
-        >
+        <UBadge class="news-item__badges--cat" variant="solid">{{ props.item.category }}</UBadge>
+        <UBadge v-for="tag in props.item.tags" :key="tag" variant="outline">
           {{ tag }}
-        </Badge>
+        </UBadge>
       </div>
     </div>
   </div>
@@ -114,29 +107,7 @@ const props = defineProps<{
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-
-    &--tag,
-    &--cat {
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    &--cat {
-      &:hover {
-        background: transparent;
-        border: 1px solid $color-background-primary;
-        color: $color-background-primary;
-      }
-    }
-
-    &--tag {
-      color: #fff;
-
-      &:hover {
-        background: $color-background-primary;
-        border: 1px solid $color-background-primary;
-      }
-    }
+    border: 1px solid transparent;
   }
 }
 </style>

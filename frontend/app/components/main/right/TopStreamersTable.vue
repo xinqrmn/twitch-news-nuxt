@@ -1,54 +1,48 @@
 <script setup lang="ts">
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { UAvatar } from '#components'
+import type { TableColumn } from '@nuxt/ui'
 
 interface IData {
   id: number
   name: string
   points: number
+  image: string
+  position: number
 }
 
 const props = defineProps<{ data: IData[] }>()
-
+const tableStyles = { td: 'py-2 text-center', th: 'text-center', thead: 'border-b-3 border-solid border-twitch-400' }
+const tableColumns: TableColumn<IData>[] = [
+  {
+    accessorKey: 'position',
+    header: '#',
+    cell: ({ row }) => `${row.getValue('position')}`,
+  },
+  {
+    accessorKey: 'name',
+    header: 'Имя',
+    cell: ({ row }) => {
+      return h('div', { class: 'flex items-center gap-3' }, [
+        h(UAvatar, {
+          src: row.original.image,
+          size: 'lg',
+        }),
+        h('div', undefined, [h('p', { class: 'font-medium text-highlighted' }, row.original.name)]),
+      ])
+    },
+  },
+  {
+    accessorKey: 'points',
+    header: 'Поинты',
+    cell: ({ row }) => `${row.getValue('points')}`,
+  },
+]
 const sortedArr = [...props.data].sort((a, b) => b.points - a.points)
+//#, name, points
 </script>
 
 <template>
-  <Table>
-    <TableHeader>
-      <TableRow class="table__row">
-        <TableHead>#</TableHead>
-        <TableHead>Лого</TableHead>
-        <TableHead>Имя</TableHead>
-        <TableHead>Поинты</TableHead>
-      </TableRow>
-    </TableHeader>
-    <TableBody>
-      <TableRow v-for="(item, index) in sortedArr" :key="item.id" class="table__row">
-        <TableCell class="table__pos">{{ index + 1 }}</TableCell>
-        <TableCell class="table__image">
-          <NuxtLink :to="`https://www.twitch.tv/${item.name}`" target="_blank">
-            <img
-              :src="`/images/streamers/${item.name.toLowerCase().replaceAll(' ', '')}.png`"
-              :alt="`${item.name} logo`"
-            />
-          </NuxtLink>
-        </TableCell>
-        <TableCell class="table__name">
-          <NuxtLink :to="`https://www.twitch.tv/${item.name}`" target="_blank">
-            {{ item.name }}
-          </NuxtLink>
-        </TableCell>
-        <TableCell class="table__points">{{ item.points }}</TableCell>
-      </TableRow>
-    </TableBody>
-  </Table>
+  <UTable :data="props.data" :columns="tableColumns" :ui="tableStyles"></UTable>
 </template>
 
 <style lang="scss" scoped>

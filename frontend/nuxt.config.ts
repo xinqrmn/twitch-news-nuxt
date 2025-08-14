@@ -3,23 +3,16 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/image',
-    '@nuxt/content',
-    '@nuxt/icon',
-    '@pinia/nuxt',
-    'shadcn-nuxt',
-  ],
+  modules: ['@nuxt/eslint', '@nuxt/image', '@nuxt/icon', '@pinia/nuxt', '@nuxt/ui'],
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_API_BASE_URL || 'http://localhost:3000/api',
     },
   },
   devServer: {
-    host: '0.0.0.0' // This makes the dev server accessible from other devices on the network
+    host: '0.0.0.0', // This makes the dev server accessible from other devices on the network
   },
-  css: ['~/assets/styles/main.scss', '~/assets/styles/tailwind.css'],
+  css: ['~/assets/styles/main.scss', '~/assets/styles/main.css'],
   vite: {
     plugins: [tailwindcss()],
     css: {
@@ -32,9 +25,5 @@ export default defineNuxtConfig({
   },
   icon: {
     mode: 'svg',
-  },
-  shadcn: {
-    prefix: '',
-    componentDir: '~/components/ui',
   },
 })
