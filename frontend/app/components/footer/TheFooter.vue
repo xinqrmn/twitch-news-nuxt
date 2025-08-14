@@ -9,7 +9,7 @@
       <NuxtLink to="/">Контакты</NuxtLink>
       <NuxtLink to="/">Реклама</NuxtLink>
     </div>
-    <Separator />
+    <USeparator />
     <div class="footer__copyright">
       <p class="copyright">© {{ getCurrentYear() }} Twitch News - Твич Новости</p>
     </div>
@@ -18,7 +18,6 @@
 
 <script setup lang="ts">
 import SocialLink from './SocialLink.vue'
-import { Separator } from '../ui/separator'
 
 const getCurrentYear: () => number = function () {
   return new Date().getFullYear()

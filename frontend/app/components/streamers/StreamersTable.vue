@@ -7,18 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
 import { ref, watch, onMounted } from 'vue'
 
 const streamers = ref([])
 const page = ref(1)
 const maxPages = ref(10)
+const limits = ref([10, 25, 50])
 const limit = ref(10)
 
 async function fetchStreamers() {
@@ -64,16 +58,8 @@ onMounted(fetchStreamers)
   <div class="main-content">
     <div class="class streamers__inner">
       <h2 class="title">Топ Стримеров</h2>
-      <Select v-model="limit">
-        <SelectTrigger>
-          <SelectValue placeholder="Выберите кол-во" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem v-for="perView in [10, 25, 50]" :key="perView" :value="perView"
-            >{{ perView }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
+
+      <USelect v-model="limit" variant="outline" color="primary" :items="limits"></USelect>
     </div>
 
     <Table class="mb-3">

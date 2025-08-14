@@ -3,6 +3,20 @@ import { useMockNews } from '@/composables/useMockNews'
 import NewsItem from '@/components/main/left/NewsItem.vue'
 import NewsFeedNavigation from '@/components/main/left/NewsFeedNavigation.vue'
 import { computed } from 'vue'
+import type { TabsItem } from '@nuxt/ui'
+
+const items = [
+  {
+    label: '',
+    value: 'list',
+    icon: 'mdi:format-list-bulleted',
+  },
+  {
+    label: '',
+    value: 'module',
+    icon: 'mdi:view-grid',
+  },
+] satisfies TabsItem[]
 
 type SelectedCat = 'recommended' | 'article' | 'news'
 
@@ -43,22 +57,12 @@ watch(
 <template>
   <div class="news-feed__navigation main-content">
     <NewsFeedNavigation @update:selected-cat="selectedCat = $event"></NewsFeedNavigation>
-    <div v-if="!props.isMobile" class="news-feed__box">
-      <Icon
-        class="news-feed__view"
-        name="mdi:format-list-bulleted"
-        :class="{ 'news-feed__view--active': active === 'list' }"
-        @click="handleToggleActive('list')"
-      />
-
-      <Icon
-        class="news-feed__view"
-        name="mdi:view-grid"
-        style="height: 18px; width: 18px"
-        :class="{ 'news-feed__view--active': active === 'module' }"
-        @click="handleToggleActive('module')"
-      />
-    </div>
+    <UTabs
+      :items="items"
+      class="gap-0 nav"
+      defaultValue="list"
+      @update:model-value="handleToggleActive"
+    ></UTabs>
   </div>
   <TransitionGroup
     name="fade"
@@ -74,28 +78,20 @@ watch(
 </template>
 
 <style scoped lang="scss">
+.nav {
+  --ui-bg-elevated: transparent;
+
+  button {
+    outline: none;
+  }
+}
+
 .news-feed {
   &__navigation {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.2rem 1rem;
-  }
-
-  &__box {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-  }
-
-  &__view {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-
-    &--active {
-      color: $color-background-primary;
-    }
   }
 
   &__inner {
@@ -110,6 +106,7 @@ watch(
       }
     }
   }
+
   @media (max-width: 1024px) {
     &__navigation {
       padding: 0.2rem 0.5rem;

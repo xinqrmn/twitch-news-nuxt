@@ -1,5 +1,23 @@
 <script setup lang="ts">
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { TabsItem } from '@nuxt/ui'
+
+const items = [
+  {
+    label: 'Рекомендации',
+    value: 'recommended',
+    icon: 'material-symbols:recommend-outline-sharp',
+  },
+  {
+    label: 'Статьи',
+    value: 'article',
+    icon: 'material-symbols:article-outline-rounded',
+  },
+  {
+    label: 'Новости',
+    value: 'news',
+    icon: 'material-symbols:newspaper',
+  },
+] satisfies TabsItem[]
 
 type SelectedCat = 'recommended' | 'article' | 'news'
 
@@ -8,47 +26,26 @@ const emit = defineEmits<{
 }>()
 
 const changeCat = (value: SelectedCat) => {
+  console.log(value)
   emit('update:selectedCat', value)
 }
 </script>
 
 <template>
-  <Tabs default-value="recommended" @update:model-value="changeCat">
-    <TabsList class="tabs">
-      <TabsTrigger class="tabs__trigger" value="recommended"> Рекомендации </TabsTrigger>
-      <TabsTrigger class="tabs__trigger" value="article"> Статьи </TabsTrigger>
-      <TabsTrigger class="tabs__trigger" value="news"> Новости </TabsTrigger>
-    </TabsList>
-  </Tabs>
+  <UTabs
+    :items="items"
+    class="gap-0 nav"
+    defaultValue="recommended"
+    @update:model-value="changeCat"
+  ></UTabs>
 </template>
 
 <style scoped lang="scss">
-.tabs {
-  gap: 1rem;
-  background-color: transparent;
+.nav {
+  --ui-bg-elevated: transparent;
 
-  &__trigger {
-    color: #fff;
-    cursor: pointer;
-
-    &[data-state='active'] {
-      background: $color-background-primary;
-    }
-  }
-}
-
-@media (max-width: 1024px) {
-  .tabs {
-    gap: 0.5rem;
-  }
-
-  [data-slot='tabs'] {
-    width: 100%;
-    // justify-content: space-between;
-  }
-  [data-slot='tabs-list'] {
-    width: 100%;
-    // justify-content: space-between;
+  button {
+    outline: none;
   }
 }
 </style>

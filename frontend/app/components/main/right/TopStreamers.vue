@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
 import TopStreamersTable from '@/components/main/right/TopStreamersTable.vue'
 
 const props = defineProps<{ title: string }>()
@@ -26,22 +25,8 @@ const squads = [
       :data="props.title === 'стримеров' ? streamers : squads"
       style="margin-bottom: 1rem"
     ></TopStreamersTable>
-    <NuxtLink to="#">
-      <Button class="btn" variant="outline">Полная таблица</Button>
-    </NuxtLink>
+    <UButton to="/streamers" class="w-full justify-center" variant="ghost">Полная таблица</UButton>
   </div>
 </template>
 
-<style scoped lang="scss">
-.btn {
-  width: 100%;
-  cursor: pointer;
-  background-color: $color-background-topics;
-
-  &:hover {
-    border-color: $color-background-main;
-    background-color: $color-background-main;
-    color: $color-background-primary;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
