@@ -80,12 +80,13 @@ watch(
 
           <UAvatar
             v-if="isLogin"
+            class="rounded-md"
             src="https://github.com/benjamincanac.png"
             :chip="{ inset: true }"
           />
 
           <UModal v-else title="Авторизация">
-            <UButton icon="mdi:account-outline"></UButton>
+            <UButton variant="outline" icon="mdi:login">Войти</UButton>
 
             <template #body> sda </template>
           </UModal>
