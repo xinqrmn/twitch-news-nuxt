@@ -47,7 +47,7 @@ const tableColumns: TableColumn<StreamerInfo>[] = [
     accessorKey: 'displayName',
     header: 'Имя',
     cell: ({ row }) => {
-      return h('div', { class: 'flex items-center gap-3' }, [
+      return h('a', { class: 'flex items-center gap-3', href: `/streamers/${row.original.displayName}` }, [
         h(UAvatar, {
           ...row.original.logo,
           size: 'lg',
