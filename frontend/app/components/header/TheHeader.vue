@@ -5,6 +5,7 @@ import { useWindowSize } from '@vueuse/core'
 
 const { width } = useWindowSize()
 const isMobile = ref(false)
+const isLogin = ref(false)
 const search = ref<string>('')
 const router = useRouter()
 
@@ -13,6 +14,33 @@ const goToSearch = () => {
     router.push({ name: 'search', query: { q: search.value } })
   }
 }
+
+const searchTerm = ref('')
+
+const { data: users, status } = await useFetch('https://jsonplaceholder.typicode.com/users', {
+  key: 'command-palette-users',
+  params: { q: searchTerm },
+  transform: (data: { id: number; name: string; email: string }[]) => {
+    return (
+      data?.map((user) => ({
+        id: user.id,
+        label: user.name,
+        suffix: user.email,
+        avatar: { src: `https://i.pravatar.cc/120?img=${user.id}` },
+      })) || []
+    )
+  },
+  lazy: true,
+})
+
+const groups = computed(() => [
+  {
+    id: 'users',
+    label: searchTerm.value ? `Users matching “${searchTerm.value}”...` : 'Users',
+    items: users.value || [],
+    ignoreFilter: true,
+  },
+])
 
 watch(
   width,
@@ -36,21 +64,38 @@ watch(
 
       <div class="header-actions">
         <div v-if="!isMobile" class="actions-desktop">
-          <UInput
-            v-model="search"
-            color="primary"
-            variant="subtle"
-            placeholder="Поиск..."
-            class="w-48"
-            @keyup.enter="goToSearch"
+          <UModal>
+            <UButton label="Поиск..." variant="outline" icon="i-lucide-search" />
+
+            <template #content>
+              <UCommandPalette
+                v-model:search-term="searchTerm"
+                :loading="status === 'pending'"
+                :groups="groups"
+                placeholder="Поиск..."
+                class="h-80"
+              />
+            </template>
+          </UModal>
+
+          <UAvatar
+            v-if="isLogin"
+            class="rounded-md"
+            src="https://github.com/benjamincanac.png"
+            :chip="{ inset: true }"
           />
-          <UButton variant="solid" class="font-normal text-white">Войти</UButton>
+
+          <UModal v-else title="Авторизация">
+            <UButton variant="outline" icon="mdi:login">Войти</UButton>
+
+            <template #body> sda </template>
+          </UModal>
         </div>
         <div v-else class="actions-mobile">
           <USlideover
             :ui="{
-            content: 'w-4/5' 
-          }"
+              content: 'w-4/5',
+            }"
             title="Menu"
           >
             <UButton variant="ghost" size="xl" icon="mdi:menu"></UButton>

@@ -2,7 +2,6 @@
 import MainHotTopics from '@/components/main/left/MainHotTopics.vue'
 import TopEvents from '@/components/main/left/TopEvents.vue'
 import NewsFeed from '@/components/main/left/NewsFeed.vue'
-
 import TopStreamers from '@/components/main/right/TopStreamers.vue'
 import { useWindowSize } from '@vueuse/core'
 

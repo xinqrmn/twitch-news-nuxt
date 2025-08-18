@@ -36,6 +36,7 @@ const changeCat = (value: SelectedCat) => {
 <template>
   <UTabs
     :items="items"
+    variant="link"
     class="gap-0 nav"
     :class="{'w-full': globals.isMobile}"
     default-value="recommended"

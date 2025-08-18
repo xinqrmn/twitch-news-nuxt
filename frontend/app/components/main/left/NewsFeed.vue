@@ -50,6 +50,7 @@ const filteredNews = computed(() => {
     <UTabs
       v-if="!globals.isMobile"
       :items="items"
+      variant="link"
       class="gap-0 nav"
       default-value="list"
       @update:model-value="handleToggleActive"
