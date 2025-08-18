@@ -1,8 +1,8 @@
 <template>
-  <div class="main-content--right">
-      <p class="text-sm">{{ props.stats.viewers }}</p>
-      <p class="text-2xl">{{ props.stats.followers }}</p>
-      <p class="text-2xl">{{ props.stats.subs }}</p>
+  <div>
+      viewers: <p class="text-sm">{{ props.stats.viewers }}</p>
+      followers: <p class="text-2xl">{{ props.stats.followers }}</p>
+      subs: <p class="text-2xl">{{ props.stats.subs }}</p>
   </div>
 </template>
 

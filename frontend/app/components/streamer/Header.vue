@@ -1,25 +1,44 @@
 <template>
-  <div class="flex items-center gap-6 bg-neutral-900 p-6 rounded-2xl shadow-lg main-content">
-    <img :src="streamer.avatar" class="h-full" :alt="streamer.displayName + 'logo'" />
-
-    <div class="flex-1 space-y-2">
-      <h1 class="text-3xl font-bold">{{ streamer.displayName }}</h1>
-
-      <div class="flex gap-4 items-center text-sm text-gray-400">
-        <span :class="streamer.isLive ? 'text-green-400' : 'text-red-400'">
-          {{ streamer.isLive ? 'LIVE' : 'Offline' }}
-        </span>
-        <span>Язык: {{ streamer.language }}</span>
-        <span>Создан: {{ streamer.createdAt }} ({{ streamer.accountAge }})</span>
+  <div class="flex-col items-center gap-6 p-3 rounded-2xl streamer">
+    <div class="flex gap-6">
+      <div>
+        <div class="rounded-[5px] overflow-hidden">
+          <img :src="streamer.avatar" class="h-full" :alt="streamer.displayName + 'logo'" />
+        </div>
+        <div class="flex gap-3 w-full justify-between">
+          <UButton variant="ghost" icon="mdi:arrow-left-top" to="/streamers"></UButton>
+          <UButton variant="ghost" icon="mdi:share-variant-outline" to="/streamers"></UButton>
+          <UButton variant="ghost" icon="mdi:chat-plus-outline" to="/streamers"></UButton>
+        </div>
       </div>
+      <div class="flex flex-col justify-between">
+        <div>
+          <h4 class="text-[1rem] text-gray-600">{{ streamer.name }}</h4>
+          <h1 class="text-3xl font-bold">{{ streamer.displayName }}</h1>
+        </div>
 
-      <div class="flex gap-3 mt-2">
-        <UButton color="primary" @click="watchStream">Смотреть</UButton>
-        <UButton variant="outline" @click="addToFavorites"> Добавить в избранное </UButton>
+        <div class="flex gap-4 items-center text-sm text-gray-400">
+          <UBadge
+            :color="streamer.isLive ? 'success' : 'error'"
+            :icon="streamer.isLive ? 'mdi:circle' : 'mdi:web-off'"
+            size="md"
+            variant="subtle"
+            :ui="{leadingIcon: `size-3 ${streamer.isLive ? 'animate-pulse' : ''}`}"
+          >
+            {{ streamer.isLive ? 'LIVE' : 'Offline' }}
+          </UBadge>
+          <span>Язык: {{ streamer.language }}</span>
+          <span>Создан: {{ streamer.createdAt }} ({{ streamer.accountAge }})</span>
+        </div>
+
+        <div class="flex gap-3">
+          <UButton color="primary" @click="watchStream">Смотреть</UButton>
+          <UButton variant="outline" @click="addToFavorites"> Добавить в избранное </UButton>
+        </div>
+        <p class="text-sm text-gray-400 p-1.5">
+          {{ streamer.followersOnSite }} человек следят на нашем сайте
+        </p>
       </div>
-      <p class="text-sm text-gray-400 mt-1">
-        {{ streamer.followersOnSite }} человек следят на нашем сайте
-      </p>
     </div>
   </div>
 </template>
@@ -34,3 +53,11 @@ const addToFavorites = () => {
   console.log('Добавили в избранное')
 }
 </script>
+
+<style lang="scss" scoped>
+.streamer {
+  background-color: $color-background-topics;
+  border: 1px solid $color-background-topics-border;
+  border-radius: 5px;
+}
+</style>

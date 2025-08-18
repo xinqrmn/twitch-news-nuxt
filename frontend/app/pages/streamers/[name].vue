@@ -17,17 +17,13 @@ const { data: streamer } = await useFetch(`/api/streamers/${name}`)
 </script>
 
 <template>
-    <section class="main-left">
+    <section class="col-span-full">
       <Header :streamer="streamer"></Header>
+      <Stats :stats="streamer!.stats"></Stats>
       <!--    <Bio :bio="streamer.bio"></Bio>-->
       <!--    <Related :related="streamer.related"></Related>-->
       <!--    <News :news="streamer.news"></News>-->
     </section>
-
-    <aside class="main-right">
-      <Stats :stats="streamer.stats"></Stats>
-      <!--    <Media :media="streamer.media"></Media>-->
-    </aside>
 </template>
 
 <style scoped lang="scss">
