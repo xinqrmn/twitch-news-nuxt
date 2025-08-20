@@ -1,14 +1,14 @@
 <template>
-  <div class="flex-col items-center gap-6 p-3 rounded-2xl streamer">
+  <div class="flex-col items-center gap-6 p-3 rounded-2xl mb-4 streamer">
     <div class="flex gap-6">
       <div>
         <div class="rounded-[5px] overflow-hidden">
           <img :src="streamer.avatar" class="h-full" :alt="streamer.displayName + 'logo'" />
         </div>
         <div class="flex gap-3 w-full justify-between">
-          <UButton variant="ghost" icon="mdi:arrow-left-top" to="/streamers"></UButton>
+          <UButton variant="ghost" icon="line-md:arrow-small-left" to="/streamers"></UButton>
           <UButton variant="ghost" icon="mdi:share-variant-outline" to="/streamers"></UButton>
-          <UButton variant="ghost" icon="mdi:chat-plus-outline" to="/streamers"></UButton>
+          <UButton variant="ghost" icon="line-md:chat-round" to="/streamers"></UButton>
         </div>
       </div>
       <div class="flex flex-col justify-between">
@@ -23,7 +23,7 @@
             :icon="streamer.isLive ? 'mdi:circle' : 'mdi:web-off'"
             size="md"
             variant="subtle"
-            :ui="{leadingIcon: `size-3 ${streamer.isLive ? 'animate-pulse' : ''}`}"
+            :ui="{ leadingIcon: `size-3 ${streamer.isLive ? 'animate-pulse' : ''}` }"
           >
             {{ streamer.isLive ? 'LIVE' : 'Offline' }}
           </UBadge>
@@ -44,7 +44,12 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ streamer: any }>()
+import type { IStreamer } from '~/types/streamer'
+
+const props = defineProps<{
+  streamer: IStreamer
+  article: string | undefined
+}>()
 
 const watchStream = () => {
   window.open(`https://twitch.tv/${props.streamer.displayName}`, '_blank')

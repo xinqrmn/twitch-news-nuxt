@@ -128,7 +128,7 @@ onMounted(fetchStreamers)
 
 <template>
   <div class="main-content">
-    <div class="class streamers__inner">
+    <div class="flex mb-4 items-center justify-between">
       <h2 class="title">Топ Стримеров</h2>
 
       <div>
@@ -136,7 +136,7 @@ onMounted(fetchStreamers)
         <USelect v-model="limit" variant="outline" color="primary" :items="limits"></USelect>
       </div>
     </div>
-    <div class="streamers__table">
+    <div class="">
       <UTable
         ref="streamersTable"
         sticky
@@ -146,7 +146,7 @@ onMounted(fetchStreamers)
         :loading="tableLoading === true"
       >
       <template #empty>
-        <img src="https://www.meme-arsenal.com/memes/64283ac08d8bb5ce15183505adfad503.jpg" alt="увы" style="width: 100%; object-fit: contain; max-height: 500px;">
+        <img src="https://www.meme-arsenal.com/memes/f8f6e7873be56ba281665a5a5bb838c4.jpg" alt="увы" class="w-full object-contain max-h-[500px]">
       </template>
     </UTable>
       <div class="flex justify-center border-t border-default pt-4">
@@ -163,14 +163,4 @@ onMounted(fetchStreamers)
 </template>
 
 <style scoped lang="scss">
-.streamers {
-  &__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-  &__table{
-  }
-}
 </style>
