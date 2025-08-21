@@ -1,4 +1,5 @@
 export interface IStreamerVideo {
+  videoId: number
   imageUrl: string
   category: string
   title: string

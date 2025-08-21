@@ -46,8 +46,8 @@ const mainClass = computed(() => {
   &--streamer {
     flex-grow: 1;
     background: $color-background;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     height: 100%;
     max-height: 100vh;
   }
