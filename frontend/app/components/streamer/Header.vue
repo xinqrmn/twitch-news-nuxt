@@ -1,25 +1,17 @@
 <template>
-  <div class="flex-col items-center gap-6 p-3 rounded-2xl mb-4 streamer">
-    <div class="flex gap-6">
-      <div>
-        <div class="rounded-[5px] overflow-hidden">
-          <img :src="streamer.avatar" class="h-full" :alt="streamer.displayName + 'logo'" />
-        </div>
-        <div class="flex gap-3 w-full justify-between">
-          <UButton variant="ghost" icon="line-md:arrow-small-left" to="/streamers"></UButton>
-          <UButton variant="ghost" icon="mdi:share-variant-outline" to="/streamers"></UButton>
-          <UButton variant="ghost" icon="line-md:chat-round" to="/streamers"></UButton>
-        </div>
-      </div>
-      <div class="flex flex-col justify-between">
-        <div>
-          <h4 class="text-[1rem] text-gray-600">{{ streamer.name }}</h4>
+  <div class="main-content--right mb-4 flex items-center gap-4">
+    <div class="rounded-[5px] overflow-hidden">
+      <img :src="streamer.avatar" class="h-full" :alt="streamer.displayName + 'logo'" />
+    </div>
+    <div class="flex justify-between gap-6 w-full">
+      <div class="">
+        <UButton variant="link" class="text-[1rem] text-gray-700 p-0 mb-0">{{
+          streamer.name
+        }}</UButton>
+        <div class="flex items-center gap-2 mb-2">
           <h1 class="text-3xl font-bold">{{ streamer.displayName }}</h1>
-        </div>
-
-        <div class="flex gap-4 items-center text-sm text-gray-400">
           <UBadge
-            :color="streamer.isLive ? 'success' : 'error'"
+            :color="streamer.isLive ? 'error' : 'neutral'"
             :icon="streamer.isLive ? 'mdi:circle' : 'mdi:web-off'"
             size="md"
             variant="subtle"
@@ -27,17 +19,35 @@
           >
             {{ streamer.isLive ? 'LIVE' : 'Offline' }}
           </UBadge>
-          <span>Язык: {{ streamer.language }}</span>
-          <span>Создан: {{ streamer.createdAt }} ({{ streamer.accountAge }})</span>
         </div>
+        <div class="text-gray-400">
+          <div class="mb-2 flex gap-2">
+            <span>Язык: {{ streamer.language }}</span>
+            <span>Создан: {{ streamer.createdAt }} ({{ streamer.accountAge }})</span>
+          </div>
+          <UBadge variant="outline" trailing-icon="mdi:cards-heart">{{ streamer.followersOnSite }}</UBadge>
+        </div>
+      </div>
 
-        <div class="flex gap-3">
+      <div class="flex gap-3 flex-col justify-center">
+        <div class="flex items-center gap-3">
           <UButton color="primary" @click="watchStream">Смотреть</UButton>
-          <UButton variant="outline" @click="addToFavorites"> Добавить в избранное </UButton>
+          <UButton variant="outline" icon="mdi:cards-heart-outline" @click="addToFavorites">
+            Добавить в избранное
+          </UButton>
         </div>
-        <p class="text-sm text-gray-400 p-1.5">
-          {{ streamer.followersOnSite }} человек следят на нашем сайте
-        </p>
+        <div class="flex gap-3 w-full">
+          <UButton variant="outline" icon="simple-icons:telegram" to="/streamers"></UButton>
+          <UButton variant="outline" icon="simple-icons:steam" to="/streamers"></UButton>
+          <UButton variant="outline" icon="simple-icons:twitch" to="/streamers"></UButton>
+          <UButton
+            variant="outline"
+            icon="mdi:share-variant-outline"
+            to="/"
+            class="w-full justify-center"
+            >Поделиться
+          </UButton>
+        </div>
       </div>
     </div>
   </div>
@@ -59,10 +69,4 @@ const addToFavorites = () => {
 }
 </script>
 
-<style lang="scss" scoped>
-.streamer {
-  background-color: $color-background-topics;
-  border: 1px solid $color-background-topics-border;
-  border-radius: 5px;
-}
-</style>
+<style lang="scss" scoped></style>

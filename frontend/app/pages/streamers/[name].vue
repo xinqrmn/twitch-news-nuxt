@@ -5,6 +5,7 @@ import Bio from '~/components/streamer/bio/Bio.vue'
 
 import type { TabsItem } from '@nuxt/ui'
 import type { IStreamer } from '~/types/streamer'
+import type { IStreamerVideos } from '~/types/streamerVideos'
 
 const items = [
   {
@@ -27,6 +28,7 @@ useHead({
 })
 
 const { data: streamer } = await useFetch<IStreamer>(`/api/streamers/${name}`)
+const { data: streamerVideos } = await useFetch<IStreamerVideos>(`/api/streamersVideos/${name}`)
 </script>
 
 <template>
@@ -34,7 +36,7 @@ const { data: streamer } = await useFetch<IStreamer>(`/api/streamers/${name}`)
     <Header :streamer="streamer" :article="streamer.bio?.article"></Header>
     <UTabs :items="items" class="gap-4">
       <template #statistics="{ item }">
-        <Stats :stats="streamer.stats" />
+        <Stats :stats="streamer.stats" :videos="streamerVideos?.videos" />
       </template>
 
       <template #biography="{ item }">

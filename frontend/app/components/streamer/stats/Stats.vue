@@ -5,16 +5,20 @@
     <StatsItem title="MAX зрителей за стрим" icon="mdi:trophy-outline" :data="props.stats?.maxViewers" />
     <StatsItem title="Часов в потоке" icon="mdi:watch" :data="props.stats?.streamedHours" />
 
-    <StatsLastVideos />
+    <StatsLastVideos :videos="videos"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { IStreamerStats } from '~/types/streamer'
+import type { IStreamerVideo } from '~/types/streamerVideos'
 import StatsItem from '~/components/streamer/stats/StatsItem.vue'
 import StatsLastVideos from '~/components/streamer/stats/StatsLastVideos.vue'
 
-const props = defineProps<{ stats: IStreamerStats | undefined }>()
+const props = defineProps<{
+  stats: IStreamerStats | undefined,
+  videos: IStreamerVideo | undefined,
+}>()
 </script>
 
 <style scoped lang="scss">
