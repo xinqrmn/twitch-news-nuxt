@@ -5,8 +5,6 @@ import StatsVideosItem from '~/components/streamer/stats/StatsVideosItem.vue'
 const props = defineProps<{
   videos: IStreamerVideo[] | undefined
 }>()
-
-console.log(props.videos)
 </script>
 
 <template>
@@ -15,7 +13,6 @@ console.log(props.videos)
       <UCarousel
         v-if="props.videos?.length"
         :items="props.videos"
-        loop
         :autoplay="{delay: 3000}"
         auto-height
         arrows
