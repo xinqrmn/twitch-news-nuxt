@@ -71,3 +71,13 @@ export interface IStreamerVideos {
   displayName: string
   videos: IStreamerVideo[]
 }
+
+export interface IBioItem {
+  description: string
+  images: string[]
+  info: IBioData[]
+}
+export interface IBioData {
+  type: string
+  payload: string
+}
