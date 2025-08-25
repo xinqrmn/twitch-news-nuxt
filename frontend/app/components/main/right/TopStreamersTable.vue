@@ -11,7 +11,11 @@ interface IData {
 }
 
 const props = defineProps<{ data: IData[] }>()
-const tableStyles = { td: 'py-2 text-center', th: 'text-center', thead: 'border-b-3 border-solid border-twitch-400' }
+const tableStyles = {
+  td: 'py-2 text-center',
+  th: 'text-center',
+  thead: 'border-b-3 border-solid border-twitch-400',
+}
 const tableColumns: TableColumn<IData>[] = [
   {
     accessorKey: 'position',
@@ -37,7 +41,7 @@ const tableColumns: TableColumn<IData>[] = [
     cell: ({ row }) => `${row.getValue('points')}`,
   },
 ]
-const sortedArr = [...props.data].sort((a, b) => b.points - a.points)
+// const sortedArr = [...props.data].sort((a, b) => b.points - a.points)
 //#, name, points
 </script>
 

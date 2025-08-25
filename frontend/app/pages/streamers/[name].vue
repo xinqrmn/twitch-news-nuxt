@@ -4,19 +4,18 @@ import Stats from '~/components/streamer/stats/Stats.vue'
 import Bio from '~/components/streamer/bio/Bio.vue'
 
 import type { TabsItem } from '@nuxt/ui'
-import type { IStreamer } from '~/types/streamer'
-import type { IStreamerVideos } from '~/types/streamerVideos'
+import type { IStreamerVideos, IStreamer } from '~/types/streamer'
 
 const items = [
-  {
-    label: 'Статистика',
-    icon: 'mdi:database-outline',
-    slot: 'statistics' as const,
-  },
   {
     label: 'Биография',
     icon: 'mdi:account-outline',
     slot: 'biography' as const,
+  },
+  {
+    label: 'Статистика',
+    icon: 'mdi:database-outline',
+    slot: 'statistics' as const,
   },
 ] satisfies TabsItem[]
 
@@ -35,12 +34,13 @@ const { data: streamerVideos } = await useFetch<IStreamerVideos>(`/api/streamers
   <section v-if="streamer" class="col-span-full">
     <Header :streamer="streamer" :article="streamer.bio?.article"></Header>
     <UTabs :items="items" class="gap-4">
-      <template #statistics="{ item }">
-        <Stats :stats="streamer.stats" :videos="streamerVideos?.videos" />
-      </template>
-
+      <!--      eslint-disable-next-line-->
       <template #biography="{ item }">
         <Bio :bio="streamer.bio" />
+      </template>
+      <!--      eslint-disable-next-line-->
+      <template #statistics="{ item }">
+        <Stats :stats="streamer.stats" :videos="streamerVideos?.videos" />
       </template>
     </UTabs>
   </section>

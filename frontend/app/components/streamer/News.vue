@@ -1,11 +1,5 @@
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
+<template>News</template>
 
-<template>
-News
-</template>
-
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

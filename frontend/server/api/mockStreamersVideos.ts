@@ -1,4 +1,4 @@
-import type { IStreamerVideos } from '~/types/streamerVideos'
+import type { IStreamerVideos } from '~/types/streamer'
 
 export const mockStreamersVideos: IStreamerVideos[] = [
   {

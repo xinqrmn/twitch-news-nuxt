@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IStreamerVideo } from '~/types/streamerVideos'
+import type { IStreamerVideo } from '~/types/streamer'
 import { secondsToTime, formatNumber } from '#imports'
 
 const props = defineProps<{

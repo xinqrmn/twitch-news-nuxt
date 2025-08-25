@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 import { useWindowSize } from '@vueuse/core'
 
 const { width } = useWindowSize()
 const isMobile = ref(false)
 const isLogin = ref(false)
 const search = ref<string>('')
-const router = useRouter()
+// const router = useRouter()
 
-const goToSearch = () => {
-  if (search.value.trim()) {
-    router.push({ name: 'search', query: { q: search.value } })
-  }
-}
+// const goToSearch = () => {
+//   if (search.value.trim()) {
+//     router.push({ name: 'search', query: { q: search.value } })
+//   }
+// }
 
 const searchTerm = ref('')
 

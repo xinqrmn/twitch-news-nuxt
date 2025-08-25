@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
-import { useGlobals } from '~/stores/globals';
+import { useGlobals } from '~/stores/globals'
 
 const globals = useGlobals()
 const items = [
@@ -38,7 +38,7 @@ const changeCat = (value: SelectedCat) => {
     :items="items"
     variant="link"
     class="gap-0 nav"
-    :class="{'w-full': globals.isMobile}"
+    :class="{ 'w-full': globals.isMobile }"
     default-value="recommended"
     @update:model-value="changeCat"
   ></UTabs>

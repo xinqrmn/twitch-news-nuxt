@@ -1,4 +1,4 @@
-import { mockStreamersVideos } from "../mockStreamersVideos"
+import { mockStreamersVideos } from '../mockStreamersVideos'
 
 export default defineEventHandler((event) => {
   const { name } = getRouterParams(event) as { name: string }
@@ -8,7 +8,7 @@ export default defineEventHandler((event) => {
   if (!streamerVideos) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Streamer not found",
+      statusMessage: 'Streamer not found',
     })
   }
 

@@ -1,11 +1,10 @@
 <script setup lang="ts">
-
+import BioText from '~/components/streamer/bio/BioText.vue'
 </script>
 
 <template>
-Bio
+  <!--  <BioSlider />-->
+  <BioText></BioText>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

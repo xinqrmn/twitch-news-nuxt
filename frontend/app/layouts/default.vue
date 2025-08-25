@@ -48,8 +48,6 @@ const mainClass = computed(() => {
     background: $color-background;
     padding-top: 1rem;
     padding-bottom: 1rem;
-    height: 100%;
-    max-height: 100vh;
   }
 }
 </style>

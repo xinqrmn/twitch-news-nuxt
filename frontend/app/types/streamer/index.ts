@@ -48,3 +48,26 @@ export interface IStreamer {
   news?: IStreamerNews[]
   related?: IStreamerRelated[]
 }
+
+export interface IStreamerBio {
+  birthDate?: string
+  country: string
+  mainGame?: string
+  description: string
+  images: string[]
+}
+
+export interface IStreamerVideo {
+  videoId: number
+  imageUrl: string
+  category: string
+  title: string
+  duration: number
+  watches: number
+  date: Date
+}
+
+export interface IStreamerVideos {
+  displayName: string
+  videos: IStreamerVideo[]
+}

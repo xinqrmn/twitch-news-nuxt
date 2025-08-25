@@ -5,9 +5,12 @@
     </div>
     <div class="flex justify-between gap-6 w-full">
       <div class="">
-        <UButton variant="link" class="text-[1rem] text-gray-700 p-0 mb-0">{{
-          streamer.name
-        }}</UButton>
+        <UTooltip text="* Признан иноагентом в РФ">
+          <UButton variant="link" class="text-[1rem] text-gray-700 p-0 mb-0 zapret"
+            >{{ streamer.name }}
+            <span>*</span>
+          </UButton>
+        </UTooltip>
         <div class="flex items-center gap-2 mb-2">
           <h1 class="text-3xl font-bold">{{ streamer.displayName }}</h1>
           <UBadge
@@ -25,14 +28,21 @@
             <span>Язык: {{ streamer.language }}</span>
             <span>Создан: {{ streamer.createdAt }} ({{ streamer.accountAge }})</span>
           </div>
-          <UBadge variant="outline" trailing-icon="mdi:cards-heart">{{ streamer.followersOnSite }}</UBadge>
+          <UBadge variant="outline" trailing-icon="mdi:cards-heart"
+            >{{ streamer.followersOnSite }}
+          </UBadge>
         </div>
       </div>
 
       <div class="flex gap-3 flex-col justify-center">
         <div class="flex items-center gap-3">
           <UButton color="primary" @click="watchStream">Смотреть</UButton>
-          <UButton variant="outline" icon="mdi:cards-heart-outline" @click="addToFavorites">
+          <UButton
+            variant="outline"
+            icon="mdi:cards-heart-outline"
+            class="w-full justify-center"
+            @click="addToFavorites"
+          >
             Добавить в избранное
           </UButton>
         </div>
@@ -40,14 +50,20 @@
           <UButton variant="outline" icon="simple-icons:telegram" to="/streamers"></UButton>
           <UButton variant="outline" icon="simple-icons:steam" to="/streamers"></UButton>
           <UButton variant="outline" icon="simple-icons:twitch" to="/streamers"></UButton>
-          <UButton
-            variant="outline"
-            icon="mdi:share-variant-outline"
-            to="/"
-            class="w-full justify-center"
-            >Поделиться
-          </UButton>
+          <UTooltip text="Организация meta запрещена на территории РФ">
+            <UButton variant="outline" icon="simple-icons:instagram" to="/streamers"></UButton>
+          </UTooltip>
+          <UButton variant="outline" icon="simple-icons:kick" to="/streamers"></UButton>
+          <UButton variant="outline" icon="simple-icons:tiktok" to="/streamers"></UButton>
+          <UButton variant="outline" icon="simple-icons:vk" to="/streamers"></UButton>
         </div>
+        <UButton
+          variant="outline"
+          icon="mdi:share-variant-outline"
+          to="/"
+          class="w-full justify-center"
+          >Поделиться
+        </UButton>
       </div>
     </div>
   </div>
@@ -69,4 +85,10 @@ const addToFavorites = () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.zapret {
+  span {
+    color: red;
+  }
+}
+</style>
