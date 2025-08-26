@@ -17,12 +17,13 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div
+  <NuxtLink
     class="news-item p-3 shadow hover:shadow-md transition"
     :class="{
       'news-item--list': props.typeView === 'list',
       'news-item--module': props.typeView === 'module',
     }"
+    to="/article/test"
   >
     <div
       class="news-item__img-wrapper overflow-hidden rounded-md mb-3"
@@ -63,7 +64,7 @@ const props = defineProps<{
         </UBadge>
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <style scoped lang="scss">
