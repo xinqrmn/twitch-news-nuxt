@@ -81,3 +81,15 @@ export interface IBioData {
   type: string
   payload: string
 }
+
+export interface IBioNewsItem {
+  id: number
+  title: string
+  category: string
+  tags: string[]
+  image: string
+  date: string
+  comments: number
+  views: number
+  link: string
+}

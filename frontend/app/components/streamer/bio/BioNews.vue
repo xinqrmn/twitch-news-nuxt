@@ -2,39 +2,16 @@
   <div class="main-content">
     <h3 class="title mb-4">Новости со стримером</h3>
     <div class="flex items-center gap-4 w-full">
-      <NuxtLink v-for="item in news" :key="item.id" class="w-1/4 main-content--right" to="/">
-        <img
-          :src="'/' + item.image"
-          :alt="item.image"
-          class="block object-cover mb-2 max-h-[120px] w-full"
-        />
-        <div class="text-sm text-muted-foreground flex gap-2 mb-2 items-center">
-          <span class="">{{ item.date }}</span>
-          <Icon name="mdi:circle-medium" />
-          <span class="flex items-center gap-2">
-            {{ item.views }}
-            <Icon name="mdi:eye" />
-          </span>
-          <Icon name="mdi:circle-medium" />
-          <span class="flex items-center gap-2">
-            {{ item.comments }}
-            <Icon name="mdi:comment" />
-          </span>
-        </div>
-        <h2 class="mb-2">{{ item.title }}</h2>
-        <div class="flex items-center gap-2">
-          <UBadge variant="solid">{{ item.category }}</UBadge>
-          <UBadge v-for="tag in item.tags" :key="tag" variant="outline">
-            {{ tag }}
-          </UBadge>
-        </div>
-      </NuxtLink>
+      <BioNewsItem v-for="(item, index) in news" :key="item.id + index" :item="item" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const news = [
+import type { IBioNewsItem } from '~/types/streamer'
+import BioNewsItem from './BioNewsItem.vue'
+
+const news: IBioNewsItem[] = [
   {
     id: 4,
     title: 'Ibai побил мировой рекорд Twitch — 9.300.000 зрителей на «La Velada del Año V»',
@@ -44,6 +21,7 @@ const news = [
     date: '22.07 в 15:00',
     comments: 12,
     views: 10,
+    link: '/',
   },
   {
     id: 5,
@@ -54,6 +32,7 @@ const news = [
     date: '21.07 в 15:00',
     comments: 12,
     views: 10,
+    link: '/',
   },
   {
     id: 6,
@@ -64,6 +43,7 @@ const news = [
     date: '26.07 в 15:00',
     comments: 12,
     views: 10,
+    link: '/',
   },
   {
     id: 7,
@@ -74,6 +54,7 @@ const news = [
     date: '29.07 в 15:00',
     comments: 12,
     views: 10,
+    link: '/',
   },
 ]
 </script>

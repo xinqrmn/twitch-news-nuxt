@@ -7,7 +7,7 @@
         arrows
         dots
         loop
-        :autoplay="{ delay: 2000 }"
+        :autoplay="{ delay: 5000 }"
         class="w-full"
         :ui="{
           container: 'transition-[height]',
@@ -24,43 +24,11 @@
     <!-- Основная информация -->
     <div class="main-content">
       <h3 class="title mb-4">Основная информация</h3>
-      <!-- <div class="info-grid">
-        <div class="info-item">
-          <UIcon name="mdi:calendar" class="info-icon" />
-          <span class="info-label">Дата рождения:</span>
-          <span class="info-value">{{ bioData.birthDate }}</span>
-        </div>
-        <div class="info-item">
-          <UIcon name="mdi:gamepad-variant" class="info-icon" />
-          <span class="info-label">Основная игра:</span>
-          <span class="info-value">{{ bioData.mainGame }}</span>
-        </div>
-        <div class="info-item">
-          <UIcon name="mdi:map-marker" class="info-icon" />
-          <span class="info-label">Страна:</span>
-          <span class="info-value">{{ bioData.country }}</span>
-        </div>
-        <div class="info-item">
-          <UIcon name="mdi:city-variant-outline" class="info-icon" />
-          <span class="info-label">Город проживания:</span>
-          <span class="info-value">Геленджик</span>
-        </div>
-        <div class="info-item">
-          <UIcon name="mdi:weight-kilogram" class="info-icon" />
-          <span class="info-label">Вес:</span>
-          <span class="info-value">52 kg</span>
-        </div>
-        <div class="info-item">
-          <UIcon name="mdi:human-male-height-variant" class="info-icon" />
-          <span class="info-label">Рост:</span>
-          <span class="info-value">192 см</span>
-        </div>
-      </div> -->
       <div class="info-grid">
         <BioInfo
           v-for="(item, index) in mockBio.info"
           :key="mockBio.info[index]!.type"
-          :data="mockBio.info[index] as IBioData"
+          :data="item"
         ></BioInfo>
       </div>
     </div>
@@ -75,7 +43,6 @@
 </template>
 
 <script setup lang="ts">
-import type { IBioData } from '~/types/streamer'
 import BioInfo from './BioInfo.vue'
 // import type { IStreamerBio } from '~/types/streamer/streamer'
 //
