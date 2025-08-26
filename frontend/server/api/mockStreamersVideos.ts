@@ -39,7 +39,7 @@ export const mockStreamersVideos: IStreamerVideos[] = [
         imageUrl:
           'https://static-cdn.jtvnw.net/cf_vods/d3fi1amfgojobc/1f0e1ad3432243f23a5e_evelone2004_314635630438_1755451067//thumb/thumb0-320x180.jpg',
         category: 'Counter-Strike',
-        title: 'хуй',
+        title: 'Взял топ 1',
         duration: 540,
         date: new Date('2025-08-18'),
         watches: 2752458,
@@ -49,7 +49,7 @@ export const mockStreamersVideos: IStreamerVideos[] = [
         imageUrl:
           'https://static-cdn.jtvnw.net/cf_vods/d3fi1amfgojobc/e167f0078d0ae82bbd7e_evelone2004_314615349989_1755183401//thumb/thumb0-320x180.jpg',
         category: 'Counter-Strike',
-        title: 'сосал',
+        title: 'Кукинг',
         duration: 68,
         date: new Date('2025-08-17'),
         watches: 1952458,

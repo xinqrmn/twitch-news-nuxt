@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const topicItems = [
-  { id: 1231238, time: '12:00', src: '/images/twitch.svg', title: 'хз отсосал эвелону!!!!!!' },
-  { id: 1231675, time: '12:10', src: '/images/kick.svg', title: 'хз отсосал эвелону!!!!!!' },
-  { id: 1231123, time: '12:20', src: '/images/kick.svg', title: 'Коря отсосал эвелону!!!!!!' },
-  { id: 2346345, time: '12:30', src: '/images/twitch.svg', title: 'Ликс отсосал эвелону!!!!!!' },
-  { id: 4456856, time: '12:40', src: '/images/kick.svg', title: 'Бустер отсосал эвелону!!!!!!' },
-  { id: 7895673, time: '12:50', src: '/images/w.svg', title: 'Эвелон отсосал эвелону!!!!!!' },
-  { id: 2367831, time: '13:00', src: '/images/twitch.svg', title: 'хз отсосал эвелону!!!!!!' },
+  { id: 1231238, time: '12:00', src: '/images/twitch.svg', title: 'Крупный турнир по Dota 2 стартует сегодня' },
+  { id: 1231675, time: '12:10', src: '/images/kick.svg', title: 'Казино Stake подписали мелстроя' },
+  { id: 1231123, time: '12:20', src: '/images/kick.svg', title: 'Kick раздаёт деньги' },
+  { id: 2346345, time: '12:30', src: '/images/twitch.svg', title: 'Кукинг Эвелона с Генсухой' },
+  { id: 4456856, time: '12:40', src: '/images/kick.svg', title: 'На Kick добавили жёсткие правила для стримеров' },
+  { id: 7895673, time: '12:50', src: '/images/w.svg', title: 'Стримеры массово переходят в W.tv' },
+  { id: 2367831, time: '13:00', src: '/images/twitch.svg', title: 'Твич хотят запретить в рф' },
 ]
 </script>
 
