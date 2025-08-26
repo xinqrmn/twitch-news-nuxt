@@ -47,15 +47,19 @@ const tableColumns: TableColumn<StreamerInfo>[] = [
     accessorKey: 'displayName',
     header: 'Имя',
     cell: ({ row }) => {
-      return h('div', { class: 'flex items-center gap-3' }, [
-        h(UAvatar, {
-          ...row.original.logo,
-          size: 'lg',
-        }),
-        h('div', undefined, [
-          h('p', { class: 'font-medium text-highlighted' }, row.original.displayName),
-        ]),
-      ])
+      return h(
+        'a',
+        { class: 'flex items-center gap-3', href: `/streamers/${row.original.displayName}` },
+        [
+          h(UAvatar, {
+            ...row.original.logo,
+            size: 'lg',
+          }),
+          h('div', undefined, [
+            h('p', { class: 'font-medium text-highlighted' }, row.original.displayName),
+          ]),
+        ]
+      )
     },
   },
   {
@@ -86,7 +90,9 @@ const tableColumns: TableColumn<StreamerInfo>[] = [
 ]
 async function fetchStreamers() {
   tableLoading.value = true
+  // eslint-disable-next-line
   const res = await $fetch('/api/streamers', {
+    // EsLint ignore
     params: {
       days: 7,
       region: 227,
@@ -112,7 +118,6 @@ async function fetchStreamers() {
     console.log(streamers.value)
     tableLoading.value = false
   })
-
 }
 
 const changePage = (p: number) => {
@@ -128,15 +133,15 @@ onMounted(fetchStreamers)
 
 <template>
   <div class="main-content">
-    <div class="class streamers__inner">
+    <div class="flex mb-4 items-center justify-between">
       <h2 class="title">Топ Стримеров</h2>
 
       <div>
-        Количество элементов: 
+        Количество элементов:
         <USelect v-model="limit" variant="outline" color="primary" :items="limits"></USelect>
       </div>
     </div>
-    <div class="streamers__table">
+    <div class="">
       <UTable
         ref="streamersTable"
         sticky
@@ -145,10 +150,14 @@ onMounted(fetchStreamers)
         :columns="tableColumns"
         :loading="tableLoading === true"
       >
-      <template #empty>
-        <img src="https://www.meme-arsenal.com/memes/64283ac08d8bb5ce15183505adfad503.jpg" alt="увы" style="width: 100%; object-fit: contain; max-height: 500px;">
-      </template>
-    </UTable>
+        <template #empty>
+          <img
+            src="https://www.meme-arsenal.com/memes/f8f6e7873be56ba281665a5a5bb838c4.jpg"
+            alt="увы"
+            class="w-full object-contain max-h-[500px]"
+          />
+        </template>
+      </UTable>
       <div class="flex justify-center border-t border-default pt-4">
         <UPagination
           v-model:page="page"
@@ -162,15 +171,4 @@ onMounted(fetchStreamers)
   </div>
 </template>
 
-<style scoped lang="scss">
-.streamers {
-  &__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-  &__table{
-  }
-}
-</style>
+<style scoped lang="scss"></style>

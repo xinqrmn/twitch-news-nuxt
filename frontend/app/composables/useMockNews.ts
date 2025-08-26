@@ -34,7 +34,7 @@ export const useMockNews = () => {
       id: 4,
       title: 'Ibai побил мировой рекорд Twitch — 9.300.000 зрителей на «La Velada del Año V»',
       category: 'Новость',
-      tags: ['CS2', 'IEM'],
+      tags: ['CS2', 'IEM', 'Evelone'],
       image: 'images/news/news4.jpg',
       date: '28.07 в 15:00',
       comments: 12,

@@ -41,7 +41,6 @@ const filteredNews = computed(() => {
     }
   })
 })
-
 </script>
 
 <template>

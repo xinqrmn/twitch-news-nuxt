@@ -6,6 +6,10 @@
 
 <script setup lang="ts">
 import StreamersTable from '~/components/streamers/StreamersTable.vue'
+
+useHead({
+  title: 'TwitchNews | Стримеры',
+})
 </script>
 
 <style lang="scss">
