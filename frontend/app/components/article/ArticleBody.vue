@@ -1,71 +1,41 @@
 <script setup lang="ts">
-interface ArticleBlock {
-  type: 'h2' | 'h3' | 'p' | 'img' | 'blockquote' | 'a' | 'separator'
-  content: string
-  alt?: string
-  caption?: string
-  cite?: string
-  href?: string
-}
+import markdownit from 'markdown-it'
+// interface ArticleBlock {
+//   type: 'h2' | 'h3' | 'p' | 'img' | 'blockquote' | 'a' | 'separator'
+//   content: string
+//   alt?: string
+//   caption?: string
+//   cite?: string
+//   href?: string
+// }
 
-defineProps<{
-  blocks: ArticleBlock[]
+const md = new markdownit({
+  html: true, // разрешаем html внутри md
+  linkify: true, // автоматом преобразует ссылки
+  typographer: true, // красивые кавычки и тире
+})
+
+const props = defineProps<{
+  // blocks: ArticleBlock[]
+  data: string
 }>()
+
+const rendered = computed(() => (props.data ? md.render(props.data) : ''))
 </script>
 
 <template>
-  <p>Body</p>
-
-  <!--  <div class="article-body">-->
-  <!--    <div class="content-container">-->
-  <!--      <div-->
-  <!--        v-for="(block, index) in blocks"-->
-  <!--        :key="index"-->
-  <!--        class="content-block"-->
-  <!--        :class="`block-${block.type}`"-->
-  <!--      >-->
-  <!--        &lt;!&ndash; Заголовок H2 &ndash;&gt;-->
-  <!--        <h2 v-if="block.type === 'h2'" class="heading-2">{{ block.content }}</h2>-->
-
-  <!--        &lt;!&ndash; Заголовок H3 &ndash;&gt;-->
-  <!--        <h3 v-if="block.type === 'h3'" class="heading-3">{{ block.content }}</h3>-->
-
-  <!--        &lt;!&ndash; Параграф &ndash;&gt;-->
-  <!--        <p v-if="block.type === 'p'" class="paragraph">{{ block.content }}</p>-->
-
-  <!--        &lt;!&ndash; Изображение &ndash;&gt;-->
-  <!--        <div v-if="block.type === 'img'" class="image-wrapper">-->
-  <!--          <img-->
-  <!--            :src="block.content"-->
-  <!--            :alt="block.alt || 'Изображение в статье'"-->
-  <!--            class="article-image"-->
-  <!--          />-->
-  <!--          <p v-if="block.caption" class="image-caption">{{ block.caption }}</p>-->
-  <!--        </div>-->
-
-  <!--        &lt;!&ndash; Цитата &ndash;&gt;-->
-  <!--        <blockquote v-if="block.type === 'blockquote'" class="quote">-->
-  <!--          {{ block.content }}-->
-  <!--          <cite v-if="block.cite" class="quote-cite">— {{ block.cite }}</cite>-->
-  <!--        </blockquote>-->
-
-  <!--        &lt;!&ndash; Ссылка &ndash;&gt;-->
-  <!--        <div v-if="block.type === 'a'" class="link-wrapper">-->
-  <!--          <a-->
-  <!--            :href="block.href"-->
-  <!--            target="_blank"-->
-  <!--            rel="noopener noreferrer"-->
-  <!--            class="article-link"-->
-  <!--          >-->
-  <!--            {{ block.content || block.href }}-->
-  <!--          </a>-->
-  <!--        </div>-->
-
-  <!--        &lt;!&ndash; Разделитель &ndash;&gt;-->
-  <!--        <div v-if="block.type === 'separator'" class="separator"></div>-->
-  <!--      </div>-->
-  <!--    </div>-->
-  <!--  </div>-->
+  <div
+    class="prose
+    prose-headings:text-white
+    text-white 
+      max-w-4/5 m-auto 
+      w-full 
+      prose-a:text-white prose-a:hover:text-twitch-400
+      prose-blockquote:text-twitch-400 prose-blockquote:text-lg prose-blockquote:border-l-twitch-400
+      prose-li:marker:text-twitch-400
+      "
+    v-html="rendered"
+  ></div>
 </template>
 
 <style scoped lang="scss">

@@ -5,7 +5,8 @@ export interface Article {
   createdAt: string
   author: string
   badges: Array<{ type: string; text: string }>
-  blocks: ArticleBlock[]
+  // blocks: ArticleBlock[]
+  content: string
   tags: string[]
 }
 
