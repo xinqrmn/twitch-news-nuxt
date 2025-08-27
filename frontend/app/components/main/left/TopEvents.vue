@@ -14,7 +14,7 @@ import TopEventsList from '@/components/main/left/TopEventsList.vue'
   max-height: 5rem;
   width: 100%;
   background-color: $color-background-topics;
-  border: 1px solid $color-background-primary;
+  border: 1px solid $color-primary;
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -23,7 +23,7 @@ import TopEventsList from '@/components/main/left/TopEventsList.vue'
   &__title {
     height: 100%;
     min-width: max-content;
-    background: $color-background-primary;
+    background: $color-primary;
     padding: 1rem;
     display: flex;
     align-items: center;

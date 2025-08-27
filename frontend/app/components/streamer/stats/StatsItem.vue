@@ -23,7 +23,7 @@ const props = defineProps<{
   gap: 0.3rem;
 
   svg {
-    color: $color-background-primary;
+    color: $color-primary;
   }
 }
 </style>

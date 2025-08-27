@@ -1,5 +1,16 @@
+export interface Article {
+  title: string
+  subtitle?: string
+  coverImage: string
+  createdAt: string
+  author: string
+  badges: Array<{ type: string; text: string }>
+  blocks: ArticleBlock[]
+  tags: string[]
+}
+
 export interface ArticleBlock {
-  type: 'h2' | 'h3' | 'p' | 'img' | 'blockquote' | 'a'
+  type: 'h2' | 'h3' | 'p' | 'img' | 'blockquote' | 'a' | 'separator'
   content: string
   alt?: string
   caption?: string
@@ -7,17 +18,13 @@ export interface ArticleBlock {
   href?: string
 }
 
-export interface ArticleBadge {
-  type: string
-  text: string
-}
-
-export interface Article {
-  title: string
+export interface Comment {
+  id: number
+  author: string
+  avatar: string
+  content: string
   createdAt: string
-  author?: string
-  badges?: ArticleBadge[]
-  blocks: ArticleBlock[]
-  tags?: string[]
-  socialShare?: boolean
+  likes: number
+  isLiked: boolean
+  replies?: Comment[]
 }

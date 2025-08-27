@@ -100,7 +100,7 @@ const props = defineProps<{
     transition: all 0.2s;
 
     &:hover {
-      color: $color-background-primary;
+      color: $color-primary;
     }
   }
 

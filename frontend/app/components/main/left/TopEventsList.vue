@@ -112,7 +112,7 @@ const isTouched = ref(false)
   transition: all 0.2s;
 
   &:hover {
-    color: $color-background-primary;
+    color: $color-primary;
   }
 }
 
