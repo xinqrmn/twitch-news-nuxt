@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import markdownit from 'markdown-it'
+// import PromoButton from '~/components/article/PromoButton.vue'
 // interface ArticleBlock {
 //   type: 'h2' | 'h3' | 'p' | 'img' | 'blockquote' | 'a' | 'separator'
 //   content: string
@@ -8,6 +9,36 @@ import markdownit from 'markdown-it'
 //   cite?: string
 //   href?: string
 // }
+
+const items = [
+  'https://avatars.mds.yandex.net/i?id=130498fcea06062435a9a636b8cd9b4e_l-5644946-images-thumbs&n=13',
+  'https://avatars.mds.yandex.net/i?id=966354b41d1bdca216b4705e31a0f2ae_l-10752166-images-thumbs&n=13',
+  'https://wallsdesk.com/wp-content/uploads/2016/12/Pictures-of-Manhattan-Bridge.jpg',
+  'https://avatars.mds.yandex.net/i?id=c472dfb2ff9a2c0ca894f459a06f8966_l-5419733-images-thumbs&n=13',
+  'https://sun9-45.userapi.com/4iwAiEXMOkRfXF2IqxOwUE6J4VOaSmqdKYIc3Q/vX1Uk9DZO1g.jpg',
+  'https://wallpapers.com/images/hd/beautiful-sunset-pictures-ubxtuvfhpoampb6d.jpg',
+]
+
+const carousel = useTemplateRef('carousel')
+const activeIndex = ref(0)
+
+function onClickPrev() {
+  activeIndex.value--
+}
+
+function onClickNext() {
+  activeIndex.value++
+}
+
+function onSelect(index: number) {
+  activeIndex.value = index
+}
+
+function select(index: number) {
+  activeIndex.value = index
+
+  carousel.value?.emblaApi?.scrollTo(index)
+}
 
 const md = new markdownit({
   html: true, // разрешаем html внутри md
@@ -24,18 +55,53 @@ const rendered = computed(() => (props.data ? md.render(props.data) : ''))
 </script>
 
 <template>
-  <div
-    class="prose
-    prose-headings:text-white
-    text-white 
-      max-w-4/5 m-auto 
-      w-full 
-      prose-a:text-white prose-a:hover:text-twitch-400
-      prose-blockquote:text-twitch-400 prose-blockquote:text-lg prose-blockquote:border-l-twitch-400
-      prose-li:marker:text-twitch-400
-      "
-    v-html="rendered"
-  ></div>
+  <div class="max-w-4/5 m-auto w-full mb-4 flex flex-col gap-4 col-span-full">
+    <div
+      class="prose max-w-full prose-headings:text-white text-white prose-a:text-white prose-a:hover:text-twitch-400 prose-blockquote:text-twitch-400 prose-blockquote:text-lg prose-blockquote:border-l-twitch-400 prose-li:marker:text-twitch-400"
+      style="width: 100%"
+      v-html="rendered"
+    ></div>
+
+    <!--    <PromoButton accent-color="#FFA500" title="Залутать фрибетик" logo="/images/events/winline-logo.png" url="https://winline.ru/"></PromoButton>-->
+
+    <UButton class="mr-auto" trailing-icon="mdi:arrow-right">Узнать больше</UButton>
+    <UButton class="m-auto" variant="outline" trailing-icon="mdi:arrow-right"
+      >Узнать больше
+    </UButton>
+    <UButton class="ml-auto" variant="link" trailing-icon="mdi:arrow-right">Узнать больше</UButton>
+
+    <UCarousel
+      ref="carousel"
+      v-slot="{ item }"
+      arrows
+      :items="items"
+      :prev="{ onClick: onClickPrev }"
+      :next="{ onClick: onClickNext }"
+      class="w-full"
+      @select="onSelect"
+    >
+      <img
+        :src="item"
+        class="w-full block object-cover max-h-[500px] h-full rounded-[5px]"
+        alt="test"
+      />
+    </UCarousel>
+    <div class="flex gap-4 justify-between h-[70px] max-w-s mx-auto">
+      <div
+        v-for="(item, index) in items"
+        :key="index"
+        class="size-11 opacity-25 hover:opacity-100 transition-opacity w-16 h-12"
+        :class="{ 'opacity-100': activeIndex === index }"
+        @click="select(index)"
+      >
+        <img :src="item" class="block object-cover h-full w-full rounded-lg" alt="test"/>
+      </div>
+    </div>
+
+    <video class="w-full" controls>
+      <source src="/videos/big-test.mp4" type="video/mp4" />
+    </video>
+  </div>
 </template>
 
 <style scoped lang="scss">
