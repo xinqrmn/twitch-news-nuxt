@@ -44,7 +44,7 @@ const formatDate = (dateString: string) => {
           </UBadge>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex gap-4 article-author">
           <span>{{ formatDate(createdAt) }}</span>
           <span>Автор: {{ author }}</span>
         </div>
@@ -97,6 +97,20 @@ const formatDate = (dateString: string) => {
   margin-bottom: 0.5rem;
   line-height: 1.2;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.article-author {
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0;
+    span{
+      text-align: right;
+      font-size: 0.65rem;
+    }
+  }
 }
 
 .subtitle {

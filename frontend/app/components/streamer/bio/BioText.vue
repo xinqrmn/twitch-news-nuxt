@@ -18,7 +18,7 @@
           next: 'h-fit rounded-[5px] bg-twitch-400',
         }"
       >
-        <img :src="item" alt="dsad" class="block object-cover h-full w-full rounded-[5px]" />
+        <img :src="item" alt="dsad" class="block object-cover h-full w-full rounded-[5px] mb-4 md:mb-0" />
       </UCarousel>
     </div>
     <!-- Основная информация -->
@@ -99,12 +99,29 @@ const bioData = mockBio
   grid-template-columns: 300px 1fr;
   // grid-template-rows: repeat(2, 1fr);
   gap: 1rem;
+    @media (max-width: 768px) {
+    grid-template-columns: 1fr; // одна колонка
+    grid-template-rows: auto; // высота под контент
+  }
 }
 
 .bio-slider {
   grid-row: 1/3;
   justify-items: center;
   // align-content: center;
+    @media (max-width: 768px) {
+    grid-row: auto; // автоматический ряд в одной колонке
+    justify-self: center;
+    :deep(div[role=tablist]) {
+      position: relative;
+    }
+    :deep(button[aria-label=Next]){
+      display: none;
+    }
+    :deep(button[aria-label=Prev]){
+      display: none;
+    }
+  }
 }
 
 .info-grid {

@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-4 gap-4 h-full">
+  <div class="grid md:grid-cols-4 grid-cols-2 gap-4 h-full">
     <StatsItem
       title="Фолловеры"
       icon="mdi:account-supervisor-outline"
@@ -17,7 +17,7 @@
     />
     <StatsItem title="Часов в потоке" icon="mdi:watch" :data="props.stats?.streamedHours" />
 
-    <StatsLastVideos :videos="videos" />
+    <StatsLastVideos :videos="videos" class="videos"/>
   </div>
 </template>
 
@@ -32,4 +32,8 @@ const props = defineProps<{
 }>()
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.videos{
+  grid-column: 1 / -1;
+}
+</style>

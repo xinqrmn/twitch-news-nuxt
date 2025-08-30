@@ -86,15 +86,15 @@ const rendered = computed(() => (props.data ? md.render(props.data) : ''))
         alt="test"
       />
     </UCarousel>
-    <div class="flex gap-4 justify-between h-[70px] max-w-s mx-auto">
+    <div class="flex justify-center gap-4 overflow-x-auto max-w-[90dvw] w-full">
       <div
         v-for="(item, index) in items"
         :key="index"
-        class="size-11 opacity-25 hover:opacity-100 transition-opacity w-16 h-12"
+        class="flex-shrink-0 w-16 h-12 opacity-25 hover:opacity-100 transition-opacity rounded-lg"
         :class="{ 'opacity-100': activeIndex === index }"
         @click="select(index)"
       >
-        <img :src="item" class="block object-cover h-full w-full rounded-lg" alt="test"/>
+        <img :src="item" class="block object-cover w-full h-full rounded-lg" alt="test" />
       </div>
     </div>
 

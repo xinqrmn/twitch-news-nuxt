@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <h3 class="title mb-4">Новости со стримером</h3>
-    <div class="flex items-center gap-4 w-full">
+    <div class="flex items-center gap-4 md:w-full w-[90dvw] overflow-auto">
       <BioNewsItem v-for="(item, index) in news" :key="item.id + index" :item="item" />
     </div>
   </div>

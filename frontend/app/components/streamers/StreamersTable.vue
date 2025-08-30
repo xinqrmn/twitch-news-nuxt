@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
+import { useGlobals } from '~/stores/globals'
 
 const streamersTable = useTemplateRef('streamersTable')
 const UAvatar = resolveComponent('UAvatar')
+
+const globals = useGlobals()
 
 const page = ref(1)
 const maxPages = ref(100)
@@ -135,13 +138,14 @@ onMounted(fetchStreamers)
   <div class="main-content">
     <div class="flex mb-4 items-center justify-between">
       <h2 class="title">Топ Стримеров</h2>
-
       <div>
-        Количество элементов:
-        <USelect v-model="limit" variant="outline" color="primary" :items="limits"></USelect>
+        {{ globals.isMobile ? 'Элементы:' : 'Количество элементов:' }}
+        <USelect v-model="limit" variant="outline" color="primary" :items="limits" />
       </div>
     </div>
-    <div class="">
+
+    <!-- Desktop Table -->
+    <div v-if="!globals.isMobile" class="desktop-table">
       <UTable
         ref="streamersTable"
         sticky
@@ -158,17 +162,97 @@ onMounted(fetchStreamers)
           />
         </template>
       </UTable>
-      <div class="flex justify-center border-t border-default pt-4">
-        <UPagination
-          v-model:page="page"
-          :default-page="1"
-          :items-per-page="limit"
-          :total="maxPages"
-          @update:page="changePage"
-        />
-      </div>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div v-else class="mobile-cards">
+      <img
+        v-if="tableLoading"
+        src="https://www.meme-arsenal.com/memes/f8f6e7873be56ba281665a5a5bb838c4.jpg"
+        alt="увы"
+        class="w-full object-contain max-h-[500px]"
+      />
+      <UCard v-for="s in streamers" :key="s.position" ref="streamerCards" class="mb-3">
+        <template #header>
+          <NuxtLink :to="`/streamers/${s.displayName}`">
+            <div class="flex items-center gap-3">
+              <UAvatar :src="s.logo.src" size="lg" />
+              <div>
+                <p class="font-semibold text-highlighted">{{ s.displayName }}</p>
+                <p>Сабы всего: {{ s.followers }}</p>
+              </div>
+            </div>
+          </NuxtLink>
+        </template>
+
+        <div class="w-full grid grid-rows-2 grid-cols-2 gap-2">
+          <div class="mobile-card--info">
+            <UIcon name="mdi:account-group-outline" size="20" />
+            <div>
+              <p class="font-semibold">Сабы за 7 дней:</p>
+              <p>{{ s.followersGained }}</p>
+            </div>
+          </div>
+          <div class="mobile-card--info">
+            <UIcon name="mdi:timer-outline" size="20" />
+            <div>
+              <p class="font-semibold">Время в потоке:</p>
+              <p>{{ s.streamedMinutes }} мин.</p>
+            </div>
+          </div>
+          <div class="mobile-card--info">
+            <UIcon name="iconoir:user-crown" size="20" />
+            <div>
+              <p class="font-semibold">Max зрителей:</p>
+              <p>{{ s.maxViewers }}</p>
+            </div>
+          </div>
+          <div class="mobile-card--info">
+            <UIcon name="mdi:account-badge-outline" size="20" />
+            <div>
+              <p class="font-semibold">Avg зрителей:</p>
+              <p>{{ s.avgViewers }}</p>
+            </div>
+          </div>
+        </div>
+      </UCard>
+    </div>
+
+    <div class="flex justify-center border-t border-default pt-4">
+      <UPagination
+        v-model:page="page"
+        :default-page="1"
+        :items-per-page="limit"
+        :total="maxPages"
+        @update:page="changePage"
+      />
     </div>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.main-content {
+  @media (max-width: 768px) {
+    .mobile-cards {
+      UCard {
+        cursor: pointer;
+
+        .pl-20 {
+          padding-left: 5rem; // отступ для текста в Collapse
+        }
+      }
+    }
+  }
+}
+
+.mobile-card {
+  &--info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid $color-background-topics-border;
+  }
+}
+</style>

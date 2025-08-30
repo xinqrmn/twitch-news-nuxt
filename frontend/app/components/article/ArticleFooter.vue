@@ -83,7 +83,7 @@ const addComment = () => {
     </div>
 
     <!-- Комментарии -->
-    <div>
+    <div class="w-full">
       <h3 class="section-title">Комментарии ({{ comments.length }})</h3>
 
       <!-- Форма добавления комментария -->
@@ -175,6 +175,9 @@ const addComment = () => {
   max-width: 80%;
   margin: 0 auto;
   padding-bottom: 2rem;
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 }
 
 .section-title {
