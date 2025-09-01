@@ -18,12 +18,4 @@ const props = defineProps<{
 }>()
 </script>
 
-<style lang="scss" scoped>
-//.btn {
-//  transition: all 0.2s;
-//
-//  &:hover {
-//    background-color: $color-background-primary;
-//  }
-//}
-</style>
+<style lang="scss" scoped></style>

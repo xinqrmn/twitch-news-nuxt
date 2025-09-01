@@ -78,7 +78,7 @@ const tableColumns: TableColumn<IData>[] = [
 
       &:hover {
         //text-decoration: underline;
-        color: $color-background-primary;
+        color: $color-primary;
       }
     }
   }

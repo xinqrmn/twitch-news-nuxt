@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { IStreamerVideo } from '~/types/streamer'
 import StatsVideosItem from '~/components/streamer/stats/StatsVideosItem.vue'
+import { useGlobals } from '~/stores/globals';
+
+const globals = useGlobals()
 
 const props = defineProps<{
   videos: IStreamerVideo[] | undefined
@@ -15,12 +18,12 @@ const props = defineProps<{
       :items="props.videos"
       :autoplay="{ delay: 3000 }"
       auto-height
-      arrows
+      :arrows="!globals.isMobile"
       :prev="{ variant: 'ghost', color: 'primary' }"
       :next="{ variant: 'ghost', color: 'primary' }"
       class="w-full flex flex-nowrap gap-4"
       :ui="{
-        item: 'basis-1/5',
+        item: 'md:basis-1/5 basis-1/2',
         controls: 'absolute -top-6 right-12',
         prev: 'h-fit rounded-[5px]',
         next: 'h-fit rounded-[5px]',
