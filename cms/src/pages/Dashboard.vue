@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
-import Button from "primevue/button";
-import Card from "primevue/card";
-import { useRouter } from "vue-router";
+import { useAuthStore } from '@/stores/auth'
+import Button from 'primevue/button'
+import Card from 'primevue/card'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
-const authStore = useAuthStore();
+const router = useRouter()
+const authStore = useAuthStore()
 
 const logout = () => {
-  authStore.logout();
-  router.push("/login");
-};
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <template>
