@@ -6,6 +6,9 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import configuration, { IDatabase } from './common/configuration'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 import { DataSource } from 'typeorm'
+import { AuthModule } from './modules/auth/auth.module'
+import { UsersModule } from './modules/users/users.module'
+import { RolesModule } from './modules/roles/roles.module'
 
 @Module({
   imports: [
@@ -47,6 +50,9 @@ import { DataSource } from 'typeorm'
         return await new DataSource(options!).initialize()
       },
     }),
+    AuthModule,
+    UsersModule,
+    RolesModule
   ],
   controllers: [AppController],
   providers: [AppService],
