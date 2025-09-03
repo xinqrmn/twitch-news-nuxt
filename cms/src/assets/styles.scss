@@ -1,2 +1,28 @@
 @use 'primeicons/primeicons.css';
 @use '@/assets/layout/layout';
+
+:root {
+  --p-primary-50: #f9f5ff;
+  --p-primary-100: #f1e7ff;
+  --p-primary-200: #e5d4ff;
+  --p-primary-300: #d0b2ff;
+  --p-primary-400: #a970ff;
+  --p-primary-500: #9751fb;
+  --p-primary-600: #7f2eef;
+  --p-primary-700: #6c1ed2;
+  --p-primary-800: #5d1eab;
+  --p-primary-900: #4d198a;
+}
+
+.app-dark {
+  --p-primary-50: #f9f5ff;
+  --p-primary-100: #f1e7ff;
+  --p-primary-200: #e5d4ff;
+  --p-primary-300: #d0b2ff;
+  --p-primary-400: #a970ff;
+  --p-primary-500: #9751fb;
+  --p-primary-600: #7f2eef;
+  --p-primary-700: #6c1ed2;
+  --p-primary-800: #5d1eab;
+  --p-primary-900: #4d198a;
+}
