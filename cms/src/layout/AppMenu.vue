@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import AppMenuItem from '@/layout/AppMenuItem.vue'
 
 const model = ref([
   {
@@ -9,32 +10,32 @@ const model = ref([
   {
     label: 'UI Components',
     items: [
-      { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
-      { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
-      { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
-      { label: 'Table', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
-      { label: 'List', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
-      { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-      { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
-      { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-      { label: 'Media', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
-      { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/uikit/menu' },
-      { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/uikit/message' },
-      { label: 'File', icon: 'pi pi-fw pi-file', to: '/uikit/file' },
-      { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/uikit/charts' },
-      { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/uikit/timeline' },
-      { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/uikit/misc' },
+      { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/' },
+      { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/' },
+      { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/', class: 'rotated-icon' },
+      { label: 'Table', icon: 'pi pi-fw pi-table', to: '/' },
+      { label: 'List', icon: 'pi pi-fw pi-list', to: '/' },
+      { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/' },
+      { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/' },
+      { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/' },
+      { label: 'Media', icon: 'pi pi-fw pi-image', to: '/' },
+      { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/' },
+      { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/' },
+      { label: 'File', icon: 'pi pi-fw pi-file', to: '/' },
+      { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/' },
+      { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/' },
+      { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/' },
     ],
   },
   {
     label: 'Pages',
     icon: 'pi pi-fw pi-briefcase',
-    to: '/pages',
+    to: '/',
     items: [
       {
         label: 'Landing',
         icon: 'pi pi-fw pi-globe',
-        to: '/landing',
+        to: '/',
       },
       {
         label: 'Auth',
@@ -43,34 +44,34 @@ const model = ref([
           {
             label: 'Login',
             icon: 'pi pi-fw pi-sign-in',
-            to: '/auth/login',
+            to: '/',
           },
           {
             label: 'Error',
             icon: 'pi pi-fw pi-times-circle',
-            to: '/auth/error',
+            to: '/',
           },
           {
             label: 'Access Denied',
             icon: 'pi pi-fw pi-lock',
-            to: '/auth/access',
+            to: '/',
           },
         ],
       },
       {
         label: 'Crud',
         icon: 'pi pi-fw pi-pencil',
-        to: '/pages/crud',
+        to: '/',
       },
       {
         label: 'Not Found',
         icon: 'pi pi-fw pi-exclamation-circle',
-        to: '/pages/notfound',
+        to: '/',
       },
       {
         label: 'Empty',
         icon: 'pi pi-fw pi-circle-off',
-        to: '/pages/empty',
+        to: '/',
       },
     ],
   },
@@ -124,12 +125,12 @@ const model = ref([
       {
         label: 'Documentation',
         icon: 'pi pi-fw pi-book',
-        to: '/documentation',
+        to: '/',
       },
       {
         label: 'View Source',
         icon: 'pi pi-fw pi-github',
-        url: 'https://github.com/primefaces/sakai-vue',
+        url: 'https://github.com/xinqrmn/twitch-news-nuxt',
         target: '_blank',
       },
     ],
@@ -140,9 +141,7 @@ const model = ref([
 <template>
   <ul class="layout-menu">
     <template v-for="item in model" :key="item">
-      <li v-if="!item.separator">
-        {{ item.label }}
-      </li>
+      <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
       <li v-if="item.separator" class="menu-separator"></li>
     </template>
   </ul>
