@@ -11,8 +11,9 @@ const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 
-const handleLogin = () => {
-  if (authStore.login(username.value, password.value)) {
+const handleLogin = async () => {
+  const res = await authStore.login(username.value, password.value)
+  if (res) {
     toast.add({
       severity: 'success',
       summary: 'Успешно!',

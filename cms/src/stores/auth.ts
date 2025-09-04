@@ -1,47 +1,30 @@
-<<<<<<< Updated upstream
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { api, setToken } from '../utils/requestHandler'
 
-export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    isAuthenticated: false,
-  }),
-  actions: {
-    login(username: string, password: string) {
-      // Здесь будет реальный API вызов
-      if (username === 'admin' && password === '1234') {
-        this.isAuthenticated = true
-        return true
-      }
+export const useAuthStore = defineStore('auth', () => {
+  const isAuthenticated = ref(false)
+
+  async function login(username: string, password: string): Promise<boolean> {
+    const { data, error } = await api.post<any>('/auth/login', {
+      email: username.toString(),
+      password,
+    })
+    if (error) {
       return false
-    },
-    logout() {
-      this.isAuthenticated = false
-    },
-  },
-=======
-import {defineStore} from 'pinia'
-import axios from 'axios'
-
-export const useAuthStore = defineStore('auth', {
-    state: () => ({
-        isAuthenticated: false
-    }),
-    actions: {
-        async login(username: string, password: string) {
-            // Здесь будет реальный API вызов
-            console.log(username.toString(), password)
-            const data = await fetch('http://localhost:9000/api/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({email: username.toString(), password: password})
-            })
-            const hello = await axios.get('http://localhost:9000/api')
-            console.log(hello, 'hello')
-            console.log(data, 'asdasdasdasd')
-            // this.isAuthenticated = true
-        },
-        logout() {
-            // this.isAuthenticated = false
-        }
     }
->>>>>>> Stashed changes
+    if (data?.success) {
+      setToken(data?.data.access_token)
+      isAuthenticated.value = true
+      return true
+    }
+    return false
+  }
+
+  function logout() {
+    setToken(null)
+    isAuthenticated.value = false
+  }
+
+  return { isAuthenticated, login, logout }
 })
