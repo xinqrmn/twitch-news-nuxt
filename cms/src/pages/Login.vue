@@ -48,13 +48,19 @@ const { isDarkTheme, toggleDarkMode } = useLayout()
       <template #content>
         <div class="p-fluid">
           <form @submit.prevent="handleLogin">
-            <FloatLabel variant="on" class="mb-8">
-              <InputText v-model="username" class="w-full" id="username" />
-              <label for="username">Логин</label>
+            <FloatLabel variant="on" class="mb-8 login-input">
+              <InputText v-model="username" class="w-full" inputId="username" variant="outlined" />
+              <label class="auth-label" id="loginLabel" for="username">Логин</label>
             </FloatLabel>
             <FloatLabel variant="on" class="mb-8 w-full login-input">
-              <Password v-model="password" toggleMask :feedback="false" id="password" />
-              <label for="password">Пароль</label>
+              <Password
+                v-model="password"
+                toggleMask
+                :feedback="false"
+                inputId="password"
+                variant="outlined"
+              />
+              <label class="auth-label" id="loginLabel" for="password">Пароль</label>
             </FloatLabel>
             <Button type="submit" prevent label="Войти" class="w-full" />
           </form>
@@ -67,8 +73,14 @@ const { isDarkTheme, toggleDarkMode } = useLayout()
 <style lang="scss">
 .login-input {
   .p-password,
+  .p-inputtext,
   .p-password-input {
     width: 100%;
+    background-color: transparent;
+  }
+
+  & > #loginLabel.auth-label {
+    background-color: var(--p-card-background);
   }
 }
 </style>
