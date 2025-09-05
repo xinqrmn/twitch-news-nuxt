@@ -4,11 +4,23 @@ import helmet from 'helmet'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { IApp } from './common/configuration'
+import { ConsoleLogger, ValidationPipe } from '@nestjs/common'
+import { json, urlencoded } from 'express'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    logger: new ConsoleLogger({
+      prefix: 'TN-Nest',
+    }),
+  })
+
+  app.useGlobalPipes(new ValidationPipe())
+
+  app.enableCors()
 
   const config = app.get(ConfigService).getOrThrow<IApp>('app')
+
+  app.setGlobalPrefix('api')
 
   const documentationConfig = new DocumentBuilder()
     .setTitle('Twitch-News-Nest')
@@ -19,9 +31,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document)
 
   app.use(helmet())
+  app.use(json())
+  app.use(urlencoded({ extended: true }))
   await app.listen(config.port, config.address, () =>
-    console.info(`Server started on port: ${config.port} in ${process.env.NODE_ENV} mode`),
-  );
+    console.info(`Server started on port: ${config.port} in ${process.env.NODE_ENV} mode`)
+  )
 }
+
 // eslint-disable-next-line
 bootstrap()

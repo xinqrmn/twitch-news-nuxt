@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
@@ -6,6 +6,10 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import configuration, { IDatabase } from './common/configuration'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 import { DataSource } from 'typeorm'
+import { AuthModule } from './modules/auth/auth.module'
+import { UsersModule } from './modules/users/users.module'
+import { RolesModule } from './modules/roles/roles.module'
+import { AppLoggerMiddleware } from './app.interceptor'
 
 @Module({
   imports: [
@@ -47,8 +51,15 @@ import { DataSource } from 'typeorm'
         return await new DataSource(options!).initialize()
       },
     }),
+    AuthModule,
+    UsersModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AppLoggerMiddleware).forRoutes('*')
+  }
+}
