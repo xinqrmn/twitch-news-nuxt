@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { api, setToken } from '../utils/requestHandler'
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(false)
+  const isAuthenticated = ref(!!localStorage.getItem('access_token'))
 
   async function login(username: string, password: string): Promise<boolean> {
     const { data, error } = await api.post<any>('/auth/login', {

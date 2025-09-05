@@ -4,15 +4,18 @@ import { Role } from '../roles/roles.entity'
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
-  @Column({unique: true})
-  email: string;
+  @Column({ unique: true })
+  email: string
+
+  @Column({ unique: true, nullable: true })
+  username: string
 
   @Column()
-  password: string;
+  password_hash: string
 
-  @ManyToMany(() => Role, {eager: true})
+  @ManyToMany(() => Role, { eager: true })
   @JoinTable()
   roles: Role[]
 }
