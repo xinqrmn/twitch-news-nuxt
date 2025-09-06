@@ -7,6 +7,7 @@ import {
   Req,
   UseGuards,
   HttpException,
+  Get,
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UsersService } from './users.service'
@@ -36,7 +37,7 @@ export class UsersController {
     description: 'Пользователь с таким username или email уже существует',
   })
   async create(@Body() userRegisterDto: userRegisterDto) {
-		await this.usersService.createUser(userRegisterDto)
+    await this.usersService.createUser(userRegisterDto)
     return Respond.ok()
   }
 
@@ -49,7 +50,7 @@ export class UsersController {
       'Требуется токен авторизации. Только пользователи с ролью `admin` могут создавать пользователя с заданием ролей',
   })
   @ApiResponse({ status: 200, description: 'Пользователь успешно создан' })
-	@ApiResponse({status: 401, description: 'Создающий не авторизован'})
+  @ApiResponse({ status: 401, description: 'Создающий не авторизован' })
   @ApiResponse({
     status: 403,
     description: 'Пользователь с таким username или email уже существует',
@@ -63,7 +64,27 @@ export class UsersController {
     if (!roles.includes('admin')) {
       throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
     }
-		await this.usersService.createUserWithRoles(userRegisterWithRolesDto)
+    await this.usersService.createUserWithRoles(userRegisterWithRolesDto)
     return Respond.ok()
+  }
+
+  @Get('get')
+  @UseGuards(UsersController.JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Получение списка всех пользователей',
+    description:
+      'Требуется токен авторизации. Только пользователи с ролью `admin` могут получать список всех пользователей',
+  })
+  @ApiResponse({ status: 200, description: 'Список получен' })
+  @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
+  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
+  async getAllUsers(@Req() req: Request & { user?: { roles?: string[] } }) {
+    const roles: string[] = req.user?.roles ?? []
+    if (!roles.includes('admin')) {
+      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+    const users = await this.usersService.getAllUsers()
+    return Respond.one(users)
   }
 }

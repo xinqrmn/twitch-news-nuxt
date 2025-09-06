@@ -111,4 +111,23 @@ export class UsersService implements OnModuleInit {
       return
     })
   }
+
+  async getAllUsers(): Promise<{ id: number; email: string; username: string; roles: string[] }[]> {
+    type role = {
+      id: number
+      name: string
+    }
+
+    const users = await this.userRepo.find({
+      relations: ['roles'],
+      select: ['id', 'email', 'username'],
+    })
+
+    return users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      roles: user.roles ? user.roles.map((role: role) => role.name) : [],
+    }))
+  }
 }
