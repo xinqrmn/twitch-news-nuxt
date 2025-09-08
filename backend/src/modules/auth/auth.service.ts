@@ -13,6 +13,9 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email)
+    if (!user || user.del === 1) {
+      return undefined
+    }
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       return user
     }
@@ -23,7 +26,11 @@ export class AuthService {
     if (!user) {
       throw new HttpException('Проверьте введенные данные', HttpStatus.FORBIDDEN)
     }
-    const payload = { email: user.email, roles: user.roles.map((r) => r.name) }
+    const payload = {
+      email: user.email,
+      username: user.username,
+      roles: user.roles.map((r) => r.name),
+    }
     return {
       access_token: this.jwtService.sign(payload),
     }

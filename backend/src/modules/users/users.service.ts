@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, EntityManager, Repository } from 'typeorm'
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { User } from './users.entity'
 import { Role } from '../roles/roles.entity'
 import * as bcrypt from 'bcrypt'
@@ -39,7 +40,7 @@ export class UsersService implements OnModuleInit {
   }
 
   async findByEmail(email: string) {
-    return this.connection.manager.findOne(User, { where: { email } })
+    return this.connection.manager.findOne(User, { where: { email, del: 0 } })
   }
 
   async createUser(
@@ -121,6 +122,7 @@ export class UsersService implements OnModuleInit {
     const users = await this.userRepo.find({
       relations: ['roles'],
       select: ['id', 'email', 'username'],
+      where: { del: 0 },
     })
 
     return users.map((user) => ({
@@ -129,5 +131,34 @@ export class UsersService implements OnModuleInit {
       username: user.username,
       roles: user.roles ? user.roles.map((role: role) => role.name) : [],
     }))
+  }
+
+  async softDeleteUserById(
+    userIdToDelete: number,
+    requestingUser: { id: number; roles?: string[] },
+    manager: EntityManager = this.connection.manager
+  ): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      const isAdmin = (requestingUser.roles ?? []).includes('admin')
+      const isSelf = requestingUser.id === userIdToDelete
+
+      if (!(!isAdmin || !isSelf)) {
+        throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
+      }
+
+      const user = await m.findOne(User, { where: { id: userIdToDelete } })
+      if (!user) {
+        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+      }
+
+      if (user.del === 1) {
+        return
+      }
+
+      const updatePayload: QueryDeepPartialEntity<User> = { del: 1 }
+      await m.update(User, { id: userIdToDelete }, updatePayload)
+
+      return
+    })
   }
 }

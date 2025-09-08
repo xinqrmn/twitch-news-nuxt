@@ -21,15 +21,9 @@ function createClient(): AxiosInstance {
   instance.interceptors.request.use((config) => config)
 
   instance.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    async (error: AxiosError) => {
-      const status = error.response?.status
-      if (status === 401) {
-        router.push('/login')
-      }
-      if (status === 403) {
-        router.go(-1)
-      }
+    (res: AxiosResponse) => res,
+    (error: AxiosError) => {
+      if (error.response?.status === 401) router.push('/login')
       return Promise.reject(error)
     }
   )
@@ -57,7 +51,9 @@ function toApiError(e: unknown): ApiError {
   return { code, message, status }
 }
 
-export async function requestHandler<T = unknown>(config: AxiosRequestConfig): Promise<ApiResult<T>> {
+export async function requestHandler<T = unknown>(
+  config: AxiosRequestConfig
+): Promise<ApiResult<T>> {
   const client = getClient()
   try {
     const response = await client.request<T>(config)

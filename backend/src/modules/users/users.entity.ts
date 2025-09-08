@@ -15,6 +15,9 @@ export class User {
   @Column()
   password_hash: string
 
+  @Column({ type: 'int', default: 0 })
+  del: number
+
   @ManyToMany(() => Role, { eager: true })
   @JoinTable()
   roles: Role[]

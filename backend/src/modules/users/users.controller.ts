@@ -8,6 +8,8 @@ import {
   UseGuards,
   HttpException,
   Get,
+  Param,
+  Delete,
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UsersService } from './users.service'
@@ -86,5 +88,29 @@ export class UsersController {
     }
     const users = await this.usersService.getAllUsers()
     return Respond.one(users)
+  }
+
+  @Delete('delete/:id')
+  @UseGuards(UsersController.JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Мягкое удаление пользователя (del=1)',
+    description:
+      'Требуется токен авторизации. Удалить пользователя может только сам пользователь или пользователь с ролью `admin`',
+  })
+  @ApiResponse({ status: 200, description: 'Пользователь помечен как удаленный' })
+  @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  async deleteUser(
+    @Param('id') id: number,
+    @Req() req: Request & { user: { roles: string[]; id: number } }
+  ) {
+    await this.usersService.softDeleteUserById(id, {
+      id: req.user.id,
+      roles: req.user.roles ?? [],
+    })
+
+    return Respond.ok()
   }
 }

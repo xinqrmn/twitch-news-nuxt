@@ -1,9 +1,20 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Res } from '@nestjs/common'
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Res,
+  Get,
+  UseGuards,
+  Req,
+} from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { ApiTags } from '@nestjs/swagger'
 import { LoginDto } from './dto/login.dto'
 import { Respond } from 'src/common/response/response'
 import { Response } from 'express'
+import { AuthGuard } from '@nestjs/passport'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -36,5 +47,16 @@ export class AuthController {
       path: '/',
     })
     return Respond.ok()
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  me(@Req() req: { user?: { email?: string; roles?: string[]; username?: string } }) {
+    return Respond.one({
+      email: req.user?.email,
+      roles: req.user?.roles ?? [],
+      username: req.user?.username,
+    })
   }
 }
