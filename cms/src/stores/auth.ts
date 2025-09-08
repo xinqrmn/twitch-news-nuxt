@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { api, setToken } from '../utils/requestHandler'
+import { api } from '../utils/requestHandler'
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(!!localStorage.getItem('access_token'))
+  const isAuthenticated = ref(document.cookie.indexOf('access_token') !== -1)
 
   async function login(username: string, password: string): Promise<boolean> {
     const { data, error } = await api.post<any>('/auth/login', {
@@ -14,16 +14,17 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
     if (data?.success) {
-      setToken(data?.data.access_token)
       isAuthenticated.value = true
       return true
     }
     return false
   }
 
-  function logout() {
-    setToken(null)
-    isAuthenticated.value = false
+  async function logout() {
+    const { data, error } = await api.post<any>('/auth/logout')
+    if (data?.success) {
+      isAuthenticated.value = false
+    }
   }
 
   return { isAuthenticated, login, logout }

@@ -6,19 +6,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000
 let axiosInstance: AxiosInstance | null = null
 let onUnauthorized: (() => void) | null = null
 
-function getToken(): string | null {
-  try {
-    return localStorage.getItem('access_token')
-  } catch {
-    return null
-  }
-}
-
-export function setToken(token: string | null): void {
-  if (token) localStorage.setItem('access_token', token)
-  else localStorage.removeItem('access_token')
-}
-
 function createClient(): AxiosInstance {
   const instance = axios.create({
     baseURL: API_BASE_URL,
@@ -26,25 +13,17 @@ function createClient(): AxiosInstance {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    withCredentials: false,
+    withCredentials: true,
     timeout: 30000,
   })
 
-  instance.interceptors.request.use((config) => {
-    const token = getToken()
-    if (token) {
-      config.headers = config.headers ?? {}
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  })
+  instance.interceptors.request.use((config) => config)
 
   instance.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
       const status = error.response?.status
       if (status === 401) {
-        setToken(null)
         if (onUnauthorized) onUnauthorized()
       }
       return Promise.reject(error)

@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { IApp } from './common/configuration'
 import { ConsoleLogger, ValidationPipe } from '@nestjs/common'
+import * as cookieParser from 'cookie-parser'
 import { json, urlencoded } from 'express'
 
 async function bootstrap() {
@@ -16,7 +17,10 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe())
 
-  app.enableCors()
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
 
   const config = app.get(ConfigService).getOrThrow<IApp>('app')
 
@@ -32,6 +36,7 @@ async function bootstrap() {
 
   app.use(helmet())
   app.use(json())
+  app.use(cookieParser())
   app.use(urlencoded({ extended: true }))
   await app.listen(config.port, config.address, () =>
     console.info(`Server started on port: ${config.port} in ${process.env.NODE_ENV} mode`)
