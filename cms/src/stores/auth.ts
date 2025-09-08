@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { api } from '../utils/requestHandler'
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(document.cookie.indexOf('access_token') !== -1)
+  // const isAuthenticated = ref(document.cookie.indexOf('access_token') !== -1)
+
+  // watch(isAuthenticated, () => console.log(isAuthenticated.value))
 
   async function login(username: string, password: string): Promise<boolean> {
     const { data, error } = await api.post<any>('/auth/login', {
@@ -14,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
     if (data?.success) {
-      isAuthenticated.value = true
+      // isAuthenticated.value = true
       return true
     }
     return false
@@ -23,9 +25,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     const { data, error } = await api.post<any>('/auth/logout')
     if (data?.success) {
-      isAuthenticated.value = false
+      // isAuthenticated.value = false
     }
   }
 
-  return { isAuthenticated, login, logout }
+  return { login, logout }
 })
