@@ -1,38 +1,266 @@
-import { Injectable, OnModuleInit } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+import { DataSource, EntityManager, Repository } from 'typeorm'
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { User } from './users.entity'
 import { Role } from '../roles/roles.entity'
 import * as bcrypt from 'bcrypt'
+import { userRegisterDto } from './dto/user-register.dto'
+import { userRegisterWithRolesDto } from './dto/user-register-with-roles.dto'
+import { userUpdateDto } from './dto/user-update.dto'
 
 @Injectable()
 export class UsersService implements OnModuleInit {
   constructor(
+    @InjectDataSource()
+    private readonly connection: DataSource,
     @InjectRepository(User) private userRepo: Repository<User>,
-    @InjectRepository(Role) private roleRepo: Repository<Role>,
-  ) {
-  }
+    @InjectRepository(Role) private roleRepo: Repository<Role>
+  ) {}
 
   async onModuleInit() {
-    const adminRole = await this.roleRepo.findOne({ where: { name: 'admin' } })
+    const adminRole = await this.connection.manager.findOne(Role, { where: { name: 'admin' } })
     if (!adminRole) {
-      await this.roleRepo.save({name: 'admin'})
+      await this.connection.manager.save(Role, { name: 'admin' })
     }
 
-    const adminUser = await this.userRepo.findOne({ where: { email: 'admin@cms.com' } })
+    const adminUser = await this.connection.manager.findOne(User, {
+      where: { email: 'admin@cms.com' },
+    })
     if (!adminUser) {
       const passwordHash = await bcrypt.hash('admin123', 10)
-      const role = await this.roleRepo.findOne({ where: { name: 'admin' } })
-      await this.userRepo.save({
+      const role = await this.connection.manager.findOne(Role, { where: { name: 'admin' } })
+      await this.connection.manager.save(User, {
         email: 'admin@cms.com',
-        password: passwordHash,
-        roles: [role!]
+        username: 'admin',
+        password_hash: passwordHash,
+        image_url: 'https://www.meme-arsenal.com/memes/f8f6e7873be56ba281665a5a5bb838c4.jpg',
+        roles: [role!],
       })
       console.log('Admin user created: admin@cms.com / admin123')
     }
   }
 
   async findByEmail(email: string) {
-    return this.userRepo.findOne({ where: { email } })
+    return this.connection.manager.findOne(User, { where: { email, del: 0 } })
+  }
+
+  async createUser(
+    dto: userRegisterDto,
+    manager: EntityManager = this.connection.manager
+  ): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      const userExists = await m.findOne(User, {
+        where: [{ username: dto.username }, { email: dto.email }],
+      })
+
+      if (userExists) {
+        throw new HttpException('Пользователь уже существует!', HttpStatus.FORBIDDEN)
+      }
+
+      const passwordHash = await bcrypt.hash(dto.password, 10)
+
+      let userRole = await m.findOne(Role, { where: { name: 'user' } })
+      if (!userRole) {
+        userRole = await m.save(Role, { name: 'user' })
+      }
+
+      const user = m.create(User, {
+        email: dto.email,
+        username: dto.username,
+        password_hash: passwordHash,
+        image_url: dto.image_url ?? null,
+        roles: [userRole],
+      })
+
+      await m.save(User, user)
+
+      return
+    })
+  }
+
+  async createUserWithRoles(
+    dto: userRegisterWithRolesDto,
+    manager: EntityManager = this.connection.manager
+  ): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      const userExists = await m.findOne(User, {
+        where: [{ username: dto.username }, { email: dto.email }],
+      })
+
+      if (userExists) {
+        throw new HttpException('Пользователь уже существует!', HttpStatus.FORBIDDEN)
+      }
+
+      const passwordHash = await bcrypt.hash(dto.password, 10)
+
+      const roles: Role[] = []
+      for (const roleName of dto.roles) {
+        let role = await m.findOne(Role, { where: { name: roleName } })
+        if (!role) {
+          role = await m.save(Role, { name: roleName })
+        }
+        roles.push(role)
+      }
+
+      const user = m.create(User, {
+        email: dto.email,
+        username: dto.username,
+        password_hash: passwordHash,
+        image_url: dto.image_url ?? null,
+        roles,
+      })
+
+      await m.save(User, user)
+
+      return
+    })
+  }
+
+  async getUserById(userId: number): Promise<{
+    id: number
+    username: string
+    email: string
+    image_url: string | null
+    created_at: Date
+    updated_at: Date
+    roles: string[]
+  }> {
+    const user = await this.userRepo.findOne({
+      relations: ['roles'],
+      select: ['id', 'email', 'username', 'image_url', 'created_at', 'updated_at'],
+      where: { id: userId, del: 0 },
+    })
+
+    if (!user) throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      image_url: user.image_url ?? null,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      roles: user.roles ? user.roles.map((role: { name: string }) => role.name) : [],
+    }
+  }
+
+  async getUserProfileByUsername(username: string): Promise<object> {
+    const user = await this.userRepo.findOne({
+      relations: ['roles'],
+      select: ['id', 'username', 'image_url', 'created_at'],
+      where: { username: username, del: 0 },
+    })
+
+    if (!user) throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+    return {
+      id: user.id,
+      username: user.username,
+      image_url: user.image_url ?? null,
+      roles: user.roles ? user.roles.map((role: { name: string }) => role.name) : [],
+    }
+  }
+
+  async getAllUsers(): Promise<
+    {
+      id: number
+      email: string
+      username: string
+      image_url: string | null
+      created_at: Date
+      updated_at: Date
+      roles: string[]
+    }[]
+  > {
+    type role = {
+      id: number
+      name: string
+    }
+
+    const users = await this.userRepo.find({
+      relations: ['roles'],
+      select: ['id', 'email', 'username', 'image_url', 'created_at', 'updated_at'],
+      where: { del: 0 },
+    })
+
+    return users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      image_url: user.image_url ?? null,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      roles: user.roles ? user.roles.map((role: role) => role.name) : [],
+    }))
+  }
+
+  async softDeleteUserById(
+    userIdToDelete: number,
+    requestingUser: { id: number; roles?: string[] },
+    manager: EntityManager = this.connection.manager
+  ): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      const isAdmin = (requestingUser.roles ?? []).includes('admin')
+      const isSelf = requestingUser.id === userIdToDelete
+
+      if (!(!isAdmin || !isSelf)) {
+        throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
+      }
+
+      const user = await m.findOne(User, { where: { id: userIdToDelete } })
+      if (!user) {
+        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+      }
+
+      if (user.del === 1) {
+        return
+      }
+
+      const updatePayload: QueryDeepPartialEntity<User> = { del: 1 }
+      await m.update(User, { id: userIdToDelete }, updatePayload)
+
+      return
+    })
+  }
+
+  async editUserById(
+    dto: userUpdateDto,
+    userId: number,
+    requestingUser: { id: number; roles?: string[] },
+    manager: EntityManager = this.connection.manager
+  ): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      const isAdmin = (requestingUser.roles ?? []).includes('admin')
+      const isSelf = requestingUser.id === userId
+
+      if (!(isAdmin || isSelf)) {
+        throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
+      }
+
+      const user = await m.findOne(User, { where: { id: userId } })
+      if (!user) {
+        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+      }
+
+      if (user.del === 1) {
+        return
+      }
+
+      const updatePayload: QueryDeepPartialEntity<User> = {}
+      if (dto.email !== undefined) updatePayload.email = dto.email
+      if ((dto.password as string) !== undefined) {
+        updatePayload.password_hash = await bcrypt.hash(dto.password, 10)
+      }
+      if (dto.image_url !== undefined) {
+        updatePayload.image_url = dto.image_url
+      }
+
+      if (Object.keys(updatePayload).length === 0) {
+        return
+      }
+
+      await m.update(User, { id: userId }, updatePayload)
+
+      return
+    })
   }
 }
