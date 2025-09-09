@@ -7,6 +7,7 @@ import { Role } from '../roles/roles.entity'
 import * as bcrypt from 'bcrypt'
 import { userRegisterDto } from './dto/user-register.dto'
 import { userRegisterWithRolesDto } from './dto/user-register-with-roles.dto'
+import { userUpdateDto } from './dto/user-update.dto'
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -33,6 +34,7 @@ export class UsersService implements OnModuleInit {
         email: 'admin@cms.com',
         username: 'admin',
         password_hash: passwordHash,
+        image_url: 'https://www.meme-arsenal.com/memes/f8f6e7873be56ba281665a5a5bb838c4.jpg',
         roles: [role!],
       })
       console.log('Admin user created: admin@cms.com / admin123')
@@ -67,6 +69,7 @@ export class UsersService implements OnModuleInit {
         email: dto.email,
         username: dto.username,
         password_hash: passwordHash,
+        image_url: dto.image_url ?? null,
         roles: [userRole],
       })
 
@@ -104,6 +107,7 @@ export class UsersService implements OnModuleInit {
         email: dto.email,
         username: dto.username,
         password_hash: passwordHash,
+        image_url: dto.image_url ?? null,
         roles,
       })
 
@@ -113,7 +117,60 @@ export class UsersService implements OnModuleInit {
     })
   }
 
-  async getAllUsers(): Promise<{ id: number; email: string; username: string; roles: string[] }[]> {
+  async getUserById(userId: number): Promise<{
+    id: number
+    username: string
+    email: string
+    image_url: string | null
+    created_at: Date
+    updated_at: Date
+    roles: string[]
+  }> {
+    const user = await this.userRepo.findOne({
+      relations: ['roles'],
+      select: ['id', 'email', 'username', 'image_url', 'created_at', 'updated_at'],
+      where: { id: userId, del: 0 },
+    })
+
+    if (!user) throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      image_url: user.image_url ?? null,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      roles: user.roles ? user.roles.map((role: { name: string }) => role.name) : [],
+    }
+  }
+
+  async getUserProfileByUsername(username: string): Promise<object> {
+    const user = await this.userRepo.findOne({
+      relations: ['roles'],
+      select: ['id', 'username', 'image_url', 'created_at'],
+      where: { username: username, del: 0 },
+    })
+
+    if (!user) throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+    return {
+      id: user.id,
+      username: user.username,
+      image_url: user.image_url ?? null,
+      roles: user.roles ? user.roles.map((role: { name: string }) => role.name) : [],
+    }
+  }
+
+  async getAllUsers(): Promise<
+    {
+      id: number
+      email: string
+      username: string
+      image_url: string | null
+      created_at: Date
+      updated_at: Date
+      roles: string[]
+    }[]
+  > {
     type role = {
       id: number
       name: string
@@ -121,7 +178,7 @@ export class UsersService implements OnModuleInit {
 
     const users = await this.userRepo.find({
       relations: ['roles'],
-      select: ['id', 'email', 'username'],
+      select: ['id', 'email', 'username', 'image_url', 'created_at', 'updated_at'],
       where: { del: 0 },
     })
 
@@ -129,6 +186,9 @@ export class UsersService implements OnModuleInit {
       id: user.id,
       email: user.email,
       username: user.username,
+      image_url: user.image_url ?? null,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
       roles: user.roles ? user.roles.map((role: role) => role.name) : [],
     }))
   }
@@ -157,6 +217,48 @@ export class UsersService implements OnModuleInit {
 
       const updatePayload: QueryDeepPartialEntity<User> = { del: 1 }
       await m.update(User, { id: userIdToDelete }, updatePayload)
+
+      return
+    })
+  }
+
+  async editUserById(
+    dto: userUpdateDto,
+    userId: number,
+    requestingUser: { id: number; roles?: string[] },
+    manager: EntityManager = this.connection.manager
+  ): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      const isAdmin = (requestingUser.roles ?? []).includes('admin')
+      const isSelf = requestingUser.id === userId
+
+      if (!(isAdmin || isSelf)) {
+        throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
+      }
+
+      const user = await m.findOne(User, { where: { id: userId } })
+      if (!user) {
+        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
+      }
+
+      if (user.del === 1) {
+        return
+      }
+
+      const updatePayload: QueryDeepPartialEntity<User> = {}
+      if (dto.email !== undefined) updatePayload.email = dto.email
+      if ((dto.password as string) !== undefined) {
+        updatePayload.password_hash = await bcrypt.hash(dto.password, 10)
+      }
+      if (dto.image_url !== undefined) {
+        updatePayload.image_url = dto.image_url
+      }
+
+      if (Object.keys(updatePayload).length === 0) {
+        return
+      }
+
+      await m.update(User, { id: userId }, updatePayload)
 
       return
     })

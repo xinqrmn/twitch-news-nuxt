@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsEmail, IsNotEmpty, IsString, MinLength, ArrayNotEmpty, ArrayUnique } from 'class-validator'
+import {
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsOptional,
+  IsUrl,
+  MaxLength,
+} from 'class-validator'
 
 export class userRegisterWithRolesDto {
   @ApiProperty({ type: String, required: true, format: 'email' })
@@ -19,6 +30,18 @@ export class userRegisterWithRolesDto {
   @MinLength(4)
   @IsNotEmpty()
   password: string
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'URL изображения пользователя',
+    maxLength: 2048,
+  })
+  @IsOptional()
+  @IsString()
+  @IsUrl()
+  @MaxLength(2048)
+  image_url?: string
 
   @ApiProperty({ type: [String], required: true, description: 'Список ролей (имена ролей)' })
   @IsArray()

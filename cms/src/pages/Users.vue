@@ -46,7 +46,25 @@
       <template #content>
         <DataTable :value="users" tableStyle="min-width: 50rem" :loading="tableLoading">
           <Column field="id" header="ID"></Column>
-          <Column field="username" header="Имя пользователя"></Column>
+          <Column field="username" header="Имя пользователя">
+            <template #body="{ data }">
+              <div class="flex items-center">
+                <Avatar
+                  class="mr-2 rounded-md overflow-hidden"
+                  v-if="data?.image_url"
+                  size="normal"
+                  :image="data.image_url"
+                />
+                <Avatar
+                  class="mr-2 rounded-md overflow-hidden"
+                  v-else
+                  size="normal"
+                  icon="pi pi-user"
+                />
+                <span class="text-semibold">{{ data.username }}</span>
+              </div>
+            </template>
+          </Column>
           <Column field="email" header="E-mail"></Column>
           <Column field="roles" header="Роли">
             <template #body="slotProps">
@@ -58,13 +76,15 @@
               />
             </template>
           </Column>
+          <Column field="created_at" header="Дата создания"></Column>
+          <Column field="updated_at" (header="Дата посл. редактирования"></Column>
           <Column class="w-24 !text-end">
             <template #body="{ data }">
               <div class="flex flex-row gap-2">
                 <Button
                   icon="pi pi-pencil"
                   v-tooltip.bottom="'Редактировать пользователя'"
-                  @click="handleEdit(data)"
+                  @click="toggleModal(data)"
                   severity="success"
                 ></Button>
                 <Button
@@ -85,7 +105,12 @@
                           size="small"
                           text
                         ></Button>
-                        <Button label="Удалить" @click="acceptCallback" size="small" severity="danger"></Button>
+                        <Button
+                          label="Удалить"
+                          @click="acceptCallback"
+                          size="small"
+                          severity="danger"
+                        ></Button>
                       </div>
                     </div>
                   </template>
@@ -96,6 +121,41 @@
         </DataTable>
       </template>
     </Card>
+
+    <Dialog v-model:visible="editVisible" header="Редактировать пользователя" modal>
+      <div class="flex items-center gap-4 mb-4">
+        <label for="email" class="font-semibold w-24">Email</label>
+        <InputText id="email" class="flex-auto" v-model="editInfo.email" autocomplete="off" />
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <label for="password" class="font-semibold w-24">New Password</label>
+        <Password
+          v-model="editInfo.password"
+          toggleMask
+          :feedback="false"
+          inputId="password"
+          variant="outlined"
+        />
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <label for="imageUrl" class="font-semibold w-24">Image URL</label>
+        <InputText id="imageUrl" v-model="editInfo.image_url" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex justify-end gap-2">
+        <Button
+          type="button"
+          label="Закрыть"
+          severity="secondary"
+          @click="
+            () => {
+              editVisible = false
+              editInfo = {}
+            }
+          "
+        ></Button>
+        <Button type="button" label="Сохранить" @click="handleEdit(editInfo)"></Button>
+      </div>
+    </Dialog>
   </div>
 </template>
 
@@ -111,16 +171,29 @@ const username = ref('')
 const password = ref('')
 const email = ref('')
 
+const editInfo = ref<{
+  id?: number,
+  email?: string,
+  password?: string,
+  image_url?: string
+}>()
+
 const users = ref<User[]>([])
 const tableLoading = ref<boolean>(true)
+const editVisible = ref<boolean>(false)
 const toast = useToast()
 
 const getItems = async () => {
   const { data: usersData } = await api.get<any>('/users/get')
-    if (usersData) {
-      users.value = usersData.data
-      tableLoading.value = false
-    }
+  if (usersData) {
+    users.value = usersData.data
+    tableLoading.value = false
+  }
+}
+
+const toggleModal = (data: User) => {
+  editVisible.value = !editVisible.value
+  editInfo.value = {...data}
 }
 
 const confirm = useConfirm()
@@ -164,8 +237,31 @@ const handleCreate = async () => {
   }
 }
 
-const handleEdit = (userData: User): void => {
-  console.log(userData.username)
+const handleEdit = async (userData: Partial<User>) => {
+  const { data, error } = await api.patch<any>(`/users/update/${userData.id}`, {
+    email: editInfo.value.email.toString(),
+    password: editInfo.value.password,
+    image_url: editInfo.value.image_url,
+    roles: ['user'],
+  })
+  if (data) {
+    toast.add({
+      severity: 'success',
+      summary: 'Успешно!',
+      detail: 'Пользователь успешно изменен!',
+      life: 3000,
+    })
+    editInfo.value = undefined
+    editVisible.value = false
+    await getItems()
+  } else {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: error?.message || 'Ошибка при редактировании пользователя!',
+      life: 3000,
+    })
+  }
 }
 
 const handleDelete = async (userData: User) => {
@@ -175,7 +271,7 @@ const handleDelete = async (userData: User) => {
     toast.add({
       severity: 'success',
       summary: 'Успешно!',
-      detail: `Пользователь ${userData.username} помечен как удаленный`, 
+      detail: `Пользователь ${userData.username} помечен как удаленный`,
       life: 3000,
     })
     await getItems()
