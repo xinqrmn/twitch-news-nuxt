@@ -1,50 +1,63 @@
 <template>
-  <div class="space-y-6">
-    <Card class="w-96">
-      <template #title>
-        <div class="flex items-center justify-between mb-4">
-          <h3>Создание пользователя</h3>
-        </div>
-      </template>
-      <template #content>
-        <div class="p-fluid">
-          <form @submit.prevent="handleCreate">
-            <FloatLabel variant="on" class="mb-8 login-input">
-              <InputText v-model="username" class="w-full" inputId="username" variant="outlined" />
-              <label class="auth-label" id="loginLabel" for="username">Логин</label>
-            </FloatLabel>
-            <FloatLabel variant="on" class="mb-8 login-input">
-              <InputText
-                v-model="email"
-                class="w-full"
-                inputId="email"
-                variant="outlined"
-                type="email"
-              />
-              <label class="auth-label" id="loginLabel" for="email">Email</label>
-            </FloatLabel>
-            <FloatLabel variant="on" class="mb-8 w-full login-input">
-              <Password
-                v-model="password"
-                toggleMask
-                :feedback="false"
-                inputId="password"
-                variant="outlined"
-              />
-              <label class="auth-label" id="loginLabel" for="password">Пароль</label>
-            </FloatLabel>
-            <Button type="submit" prevent label="Создать пользователя" class="w-full" />
-          </form>
-        </div>
-      </template>
-    </Card>
+  <div class="space-y-6 h-full">
+    <!--    <Card class="w-96">-->
+    <!--      <template #title>-->
+    <!--        <div class="flex items-center justify-between mb-4">-->
+    <!--          <h3>Создание пользователя</h3>-->
+    <!--        </div>-->
+    <!--      </template>-->
+    <!--      <template #content>-->
+    <!--        <div class="p-fluid">-->
+    <!--          <form @submit.prevent="handleCreate">-->
+    <!--            <FloatLabel variant="on" class="mb-8 login-input">-->
+    <!--              <InputText v-model="username" class="w-full" inputId="username" variant="outlined" />-->
+    <!--              <label class="auth-label" id="loginLabel" for="username">Логин</label>-->
+    <!--            </FloatLabel>-->
+    <!--            <FloatLabel variant="on" class="mb-8 login-input">-->
+    <!--              <InputText-->
+    <!--                v-model="email"-->
+    <!--                class="w-full"-->
+    <!--                inputId="email"-->
+    <!--                variant="outlined"-->
+    <!--                type="email"-->
+    <!--              />-->
+    <!--              <label class="auth-label" id="loginLabel" for="email">Email</label>-->
+    <!--            </FloatLabel>-->
+    <!--            <FloatLabel variant="on" class="mb-8 w-full login-input">-->
+    <!--              <Password-->
+    <!--                v-model="password"-->
+    <!--                toggleMask-->
+    <!--                :feedback="false"-->
+    <!--                inputId="password"-->
+    <!--                variant="outlined"-->
+    <!--              />-->
+    <!--              <label class="auth-label" id="loginLabel" for="password">Пароль</label>-->
+    <!--            </FloatLabel>-->
+    <!--            <Button type="submit" prevent label="Создать пользователя" class="w-full" />-->
+    <!--          </form>-->
+    <!--        </div>-->
+    <!--      </template>-->
+    <!--    </Card>-->
 
     <Card>
       <template #title>
-        <h3>Список пользователей</h3>
+        <h2>Список пользователей</h2>
       </template>
       <template #content>
-        <DataTable :value="users" tableStyle="min-width: 50rem" :loading="tableLoading">
+        <DataTable
+          :value="users"
+          paginator
+          :rows="5"
+          :rowsPerPageOptions="[5, 10, 20, 50]"
+          tableStyle="min-width: 50rem h-full"
+          :loading="tableLoading"
+        >
+          <template #paginatorstart>
+            <Button type="button" icon="pi pi-refresh" text />
+          </template>
+          <template #paginatorend>
+            <Button type="button" icon="pi pi-download" text />
+          </template>
           <Column field="id" header="ID"></Column>
           <Column field="username" header="Имя пользователя">
             <template #body="{ data }">
@@ -139,7 +152,12 @@
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="imageUrl" class="font-semibold w-24">Image URL</label>
-        <InputText id="imageUrl" v-model="editInfo.image_url" class="flex-auto" autocomplete="off" />
+        <InputText
+          id="imageUrl"
+          v-model="editInfo.image_url"
+          class="flex-auto"
+          autocomplete="off"
+        />
       </div>
       <div class="flex justify-end gap-2">
         <Button
@@ -172,9 +190,9 @@ const password = ref('')
 const email = ref('')
 
 const editInfo = ref<{
-  id?: number,
-  email?: string,
-  password?: string,
+  id?: number
+  email?: string
+  password?: string
   image_url?: string
 }>()
 
@@ -193,7 +211,7 @@ const getItems = async () => {
 
 const toggleModal = (data: User) => {
   editVisible.value = !editVisible.value
-  editInfo.value = {...data}
+  editInfo.value = { ...data }
 }
 
 const confirm = useConfirm()

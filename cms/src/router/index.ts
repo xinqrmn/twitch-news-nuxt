@@ -1,21 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import AppLayout from '@/layout/AppLayout.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', redirect: '/login' },
+    {
+      path: '/',
+      component: AppLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '/',
+          component: () => import('@/pages/Dashboard.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: '/users',
+          component: () => import('@/pages/Users.vue'),
+          meta: { requiresAuth: true },
+        },
+      ],
+    },
     { path: '/login', component: () => import('@/pages/Login.vue') },
-    {
-      path: '/dashboard',
-      component: () => import('@/pages/Dashboard.vue'),
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/users',
-      component: () => import('@/pages/Users.vue'),
-      meta: { requiresAuth: true },
-    },
   ],
 })
 

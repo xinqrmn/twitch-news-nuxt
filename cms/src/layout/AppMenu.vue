@@ -8,9 +8,9 @@ const model = ref([
     items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }],
   },
   {
-    label: 'UI Components',
+    label: 'Main',
     items: [
-      { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/' },
+      { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users' },
       { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/' },
       { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/', class: 'rotated-icon' },
       { label: 'Table', icon: 'pi pi-fw pi-table', to: '/' },

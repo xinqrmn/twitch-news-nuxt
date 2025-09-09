@@ -20,7 +20,7 @@ const handleLogin = async () => {
       detail: 'Авторизация успешна!',
       life: 3000,
     })
-    router.push('/dashboard')
+    router.push('/')
   } else {
     toast.add({
       severity: 'error',
