@@ -1,23 +1,11 @@
 import axios, { AxiosError } from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import router from '../router'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'
 
 let axiosInstance: AxiosInstance | null = null
 let onUnauthorized: (() => void) | null = null
-
-function getToken(): string | null {
-  try {
-    return localStorage.getItem('access_token')
-  } catch {
-    return null
-  }
-}
-
-export function setToken(token: string | null): void {
-  if (token) localStorage.setItem('access_token', token)
-  else localStorage.removeItem('access_token')
-}
 
 function createClient(): AxiosInstance {
   const instance = axios.create({
@@ -26,27 +14,16 @@ function createClient(): AxiosInstance {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    withCredentials: false,
+    withCredentials: true,
     timeout: 30000,
   })
 
-  instance.interceptors.request.use((config) => {
-    const token = getToken()
-    if (token) {
-      config.headers = config.headers ?? {}
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  })
+  instance.interceptors.request.use((config) => config)
 
   instance.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    async (error: AxiosError) => {
-      const status = error.response?.status
-      if (status === 401) {
-        setToken(null)
-        if (onUnauthorized) onUnauthorized()
-      }
+    (res: AxiosResponse) => res,
+    (error: AxiosError) => {
+      if (error.response?.status === 401) router.push('/login')
       return Promise.reject(error)
     }
   )
@@ -74,7 +51,9 @@ function toApiError(e: unknown): ApiError {
   return { code, message, status }
 }
 
-export async function requestHandler<T = unknown>(config: AxiosRequestConfig): Promise<ApiResult<T>> {
+export async function requestHandler<T = unknown>(
+  config: AxiosRequestConfig
+): Promise<ApiResult<T>> {
   const client = getClient()
   try {
     const response = await client.request<T>(config)
