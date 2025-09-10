@@ -136,12 +136,12 @@
     </Card>
 
     <Dialog v-model:visible="editVisible" header="Редактировать пользователя" modal>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="email" class="font-semibold w-24">Email</label>
+      <FloatLabel class="flex items-center gap-4 mb-4">
+        <label id="loginLabel" for="email" class="font-semibold w-24">Email</label>
         <InputText id="email" class="flex-auto" v-model="editInfo.email" autocomplete="off" />
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="password" class="font-semibold w-24">New Password</label>
+      </FloatLabel>
+      <FloatLabel class="flex items-center gap-4 mb-4 login-input">
+        <label id="loginLabel" for="password" class="font-semibold w-24">New Password</label>
         <Password
           v-model="editInfo.password"
           toggleMask
@@ -149,16 +149,16 @@
           inputId="password"
           variant="outlined"
         />
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="imageUrl" class="font-semibold w-24">Image URL</label>
+      </FloatLabel>
+      <FloatLabel class="flex items-center gap-4 mb-4 login-input">
+        <label id="loginLabel" for="imageUrl" class="font-semibold w-24">Image URL</label>
         <InputText
           id="imageUrl"
           v-model="editInfo.image_url"
           class="flex-auto"
           autocomplete="off"
         />
-      </div>
+      </FloatLabel>
       <div class="flex justify-end gap-2">
         <Button
           type="button"
@@ -171,23 +171,21 @@
             }
           "
         ></Button>
-        <Button type="button" label="Сохранить" @click="handleEdit(editInfo)"></Button>
+        <Button type="button" label="Сохранить" @click="authStore.handleEdit(editInfo)"></Button>
       </div>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-// import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { ref, onMounted } from 'vue'
-import { api } from '../utils/requestHandler'
+import { api } from '@/utils/requestHandler'
 import type { User } from 'src/types/user'
 import { useConfirm } from 'primevue'
+import { useAuthStore } from '@/stores/auth'
 
-const username = ref('')
-const password = ref('')
-const email = ref('')
+const authStore = useAuthStore()
 
 const editInfo = ref<{
   id?: number
@@ -221,88 +219,10 @@ const requireConfirmation = (event, data: User) => {
     group: 'headless',
     message: `Вы уверены что хотите удалить пользователя ${data.username}?`,
     accept: () => {
-      handleDelete(data)
+      authStore.handleDelete(data)
     },
     reject: () => {},
   })
-}
-
-const handleCreate = async () => {
-  const { data, error } = await api.post<any>('/users/createWithRoles', {
-    email: email.value.toString(),
-    password: password.value,
-    username: username.value,
-    roles: ['user'],
-  })
-  if (data) {
-    toast.add({
-      severity: 'success',
-      summary: 'Успешно!',
-      detail: 'Пользователь успешно создан!',
-      life: 3000,
-    })
-    username.value = ''
-    email.value = ''
-    password.value = ''
-    await getItems()
-  } else {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: error?.message || 'Ошибка при создании пользователя!',
-      life: 3000,
-    })
-  }
-}
-
-const handleEdit = async (userData: Partial<User>) => {
-  const { data, error } = await api.patch<any>(`/users/update/${userData.id}`, {
-    email: editInfo.value.email.toString(),
-    password: editInfo.value.password,
-    image_url: editInfo.value.image_url,
-    roles: ['user'],
-  })
-  if (data) {
-    toast.add({
-      severity: 'success',
-      summary: 'Успешно!',
-      detail: 'Пользователь успешно изменен!',
-      life: 3000,
-    })
-    editInfo.value = undefined
-    editVisible.value = false
-    await getItems()
-  } else {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: error?.message || 'Ошибка при редактировании пользователя!',
-      life: 3000,
-    })
-  }
-}
-
-const handleDelete = async (userData: User) => {
-  const { data, error } = await api.delete<any>(`/users/delete/${userData.id}`)
-
-  if (data) {
-    toast.add({
-      severity: 'success',
-      summary: 'Успешно!',
-      detail: `Пользователь ${userData.username} помечен как удаленный`,
-      life: 3000,
-    })
-    await getItems()
-  }
-
-  if (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Произошла ошибка при удалении пользователя!',
-      life: 3000,
-    })
-  }
 }
 
 const getRoleTag = (role: string): string => {
