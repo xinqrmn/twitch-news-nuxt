@@ -7,3 +7,15 @@ export type User = {
   created_at?: string
   updated_at?: string
 }
+
+export interface CreateUserDto {
+  email: string
+  password: string
+  roles: string[]
+}
+
+export interface UpdateUserDto {
+  email?: string
+  password?: string
+  roles?: string[]
+}

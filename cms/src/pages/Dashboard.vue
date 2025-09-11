@@ -7,9 +7,9 @@ import Card from 'primevue/card'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const logout = () => {
-  authStore.logout()
-  router.push('/login')
+const logout = async () => {
+  await authStore.logoutAction()
+  await router.push('/login')
 }
 </script>
 

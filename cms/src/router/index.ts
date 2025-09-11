@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '@/layout/AppLayout.vue'
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,12 +11,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
-          path: '/',
+          path: '',
           component: () => import('@/pages/Dashboard.vue'),
           meta: { requiresAuth: true },
         },
         {
-          path: '/users',
+          path: 'users',
           component: () => import('@/pages/Users.vue'),
           meta: { requiresAuth: true },
         },
@@ -28,14 +28,17 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
-  await auth.ensureAuthChecked()
+
+  if (!auth.isInitialized) {
+    await auth.initializeAuth()
+  }
 
   if (to.meta?.requiresAuth && !auth.isAuthenticated) {
     return { path: '/login' }
   }
 
   if (to.path === '/login' && auth.isAuthenticated) {
-    return { path: '/dashboard' }
+    return { path: '/' }
   }
 
   return true

@@ -12,7 +12,7 @@ const authStore = useAuthStore()
 const toast = useToast()
 
 const handleLogin = async () => {
-  const res = await authStore.login(username.value, password.value)
+  const res = await authStore.loginAction(username.value, password.value)
   if (res) {
     toast.add({
       severity: 'success',
