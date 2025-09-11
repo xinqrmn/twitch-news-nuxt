@@ -1,28 +1,31 @@
 import { ApiPropertyOptional, ApiResponseProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, Max, IsEmpty } from 'class-validator';
 
+
+type SortDirection = 'ASC' | 'DESC'
+type SortCriteria = [string, SortDirection]
 export class FindOptions {
   @ApiPropertyOptional({ type: Number, default: 20 })
   @IsOptional()
   @IsInt()
   @Max(100)
-  public readonly limit?: number;
+  public readonly itemsPerPage?: number
 
   @ApiPropertyOptional({ type: Number, default: 1 })
   @IsOptional()
   @IsInt()
-  public readonly page?: number;
+  public readonly currentPage?: number
 
-  @ApiPropertyOptional({ type: String, default: 'GAME' })
+  @ApiPropertyOptional({ type: Number, default: 1 })
   @IsOptional()
-  public readonly type?: string;
+  @IsInt()
+  public readonly totalPages?: number
 
-  @ApiPropertyOptional({ type: String, default: 'Name' })
+  @ApiPropertyOptional({ type: Array, default: [] })
   @IsOptional()
-  public readonly name?: string;
+  public readonly sortBy?: SortCriteria[]
 
-  // Only in response
-  @ApiResponseProperty({ type: Number })
-  @IsEmpty()
-  public readonly count: number;
+  @ApiPropertyOptional({ type: Number })
+  @IsInt()
+  public readonly totalItems?: number
 }

@@ -41,12 +41,41 @@
 
     <Card>
       <template #title>
-        <h3>Список пользователей</h3>
+        <h2>Список пользователей</h2>
+        <div class="flex justify-end">
+            <IconField>
+                <InputIcon>
+                    <i class="pi pi-search" />
+                </InputIcon>
+                <InputText v-model="tableSearch" @input="searchDebounce()" placeholder="Keyword Search" />
+            </IconField>
+        </div>
       </template>
       <template #content>
-        <DataTable :value="users" tableStyle="min-width: 50rem" :loading="tableLoading">
-          <Column field="id" header="ID"></Column>
-          <Column field="username" header="Имя пользователя">
+        <DataTable
+          :value="users"
+          ref="tableRef"
+          lazy
+          removableSort
+          paginator
+          :totalRecords="totalRecords"
+          :rows="table.rows"
+          :first="first"
+          :rowsPerPageOptions="[5, 10, 20, 50]"
+          @update:rows="(val) => (table.rows = val)"
+          @sort="getItems"
+          @page="onPage"
+          tableStyle="min-width: 50rem h-full"
+          :loading="tableLoading"
+        >
+          <template #paginatorstart>
+            <Button type="button" icon="pi pi-refresh" text />
+          </template>
+          <template #paginatorend>
+            <Button type="button" icon="pi pi-download" text />
+          </template>
+          <Column sortable field="id" header="ID"></Column>
+          <Column sortable field="username" header="Имя пользователя">
             <template #body="{ data }">
               <div class="flex items-center">
                 <Avatar
@@ -65,19 +94,20 @@
               </div>
             </template>
           </Column>
-          <Column field="email" header="E-mail"></Column>
+          <Column sortable field="email" header="E-mail"></Column>
           <Column field="roles" header="Роли">
             <template #body="slotProps">
               <Tag
+                class="mr-1"
                 v-for="role in slotProps.data.roles"
-                :value="role"
-                :severity="getRoleTag(role)"
+                :value="role.name"
+                :severity="getRoleTag(role.name)"
                 :key="role.name"
               />
             </template>
           </Column>
-          <Column field="created_at" header="Дата создания"></Column>
-          <Column field="updated_at" (header="Дата посл. редактирования"></Column>
+          <Column sortable field="created_at" header="Дата создания"></Column>
+          <Column sortable field="updated_at" header="Дата посл. редактирования"></Column>
           <Column class="w-24 !text-end">
             <template #body="{ data }">
               <div class="flex flex-row gap-2">
@@ -160,8 +190,7 @@
 </template>
 
 <script setup lang="ts">
-// import { useRouter } from 'vue-router'
-import { useToast } from 'primevue/usetoast'
+import { useToast } from 'primevue'
 import { ref, onMounted } from 'vue'
 import { api } from '../utils/requestHandler'
 import type { User } from 'src/types/user'
@@ -171,6 +200,14 @@ const username = ref('')
 const password = ref('')
 const email = ref('')
 
+const table = ref<{
+  rows: number
+  currentPage: number
+}>({
+  rows: 20,
+  currentPage: 1,
+})
+
 const editInfo = ref<{
   id?: number,
   email?: string,
@@ -179,16 +216,41 @@ const editInfo = ref<{
 }>()
 
 const users = ref<User[]>([])
-const tableLoading = ref<boolean>(true)
-const editVisible = ref<boolean>(false)
 const toast = useToast()
 
-const getItems = async () => {
-  const { data: usersData } = await api.get<any>('/users/get')
+const first = ref(0)
+const totalRecords = ref<number>(0)
+const tableLoading = ref<boolean>(true)
+const tableSearch = ref<string>('')
+const editVisible = ref<boolean>(false)
+
+
+const getItems = async (sort = null) => {
+  tableLoading.value = true
+  const { data: usersData } = await api.get<any>('/users/get', {
+    currentPage: table.value.currentPage,
+    limit: table.value.rows,
+    sortBy: sort?.sortField && [[sort.sortField, sort.sortOrder === 1 ? 'ASC' : 'DESC']],
+    search: tableSearch.value.trim(),
+  })
   if (usersData) {
     users.value = usersData.data
+    totalRecords.value = usersData.pagination?.totalItems ?? 0
     tableLoading.value = false
   }
+}
+
+let searchTimeout
+const searchDebounce = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => getItems(), 350)
+}
+
+const onPage = (event: any) => {
+  first.value = event.first
+  table.value.currentPage = event.page + 1
+  table.value.rows = event.rows
+  getItems()
 }
 
 const toggleModal = (data: User) => {

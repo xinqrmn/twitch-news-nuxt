@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import router from '../router'
+import type { Pagination } from '../types/pagination'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'
 
@@ -51,12 +52,40 @@ function toApiError(e: unknown): ApiError {
   return { code, message, status }
 }
 
+export type PaginationParams = {
+  limit?: number
+  currentPage?: number
+  sortBy?: [string, 'ASC' | 'DESC'][]
+  filter?: Record<string, any>
+  search?: string
+}
+
+function appendPaginationParamsToConfig(
+  config: AxiosRequestConfig,
+  pagination?: PaginationParams
+): AxiosRequestConfig {
+  if (!pagination) return config
+
+  const params = { ...(config.params || {}) }
+
+  if (pagination.limit !== undefined) params.limit = pagination.limit
+  if (pagination.currentPage !== undefined) params.page = pagination.currentPage
+  if (pagination.sortBy && pagination.sortBy.length > 0) {
+    params.sortBy = pagination.sortBy.map((sortItem) => `${sortItem[0]}:${sortItem[1]}`).join(',')
+  }
+  if (pagination.search !== undefined) params.search = pagination.search
+
+  return { ...config, params }
+}
+
 export async function requestHandler<T = unknown>(
-  config: AxiosRequestConfig
+  config: AxiosRequestConfig,
+  pagination?: PaginationParams
 ): Promise<ApiResult<T>> {
   const client = getClient()
   try {
-    const response = await client.request<T>(config)
+    const finalConfig = appendPaginationParamsToConfig(config, pagination)
+    const response = await client.request<T>(finalConfig)
     return { data: response.data }
   } catch (e) {
     return { error: toApiError(e) }
@@ -64,10 +93,14 @@ export async function requestHandler<T = unknown>(
 }
 
 export const api = {
-  get: <T = unknown>(url: string, config: AxiosRequestConfig = {}) =>
-    requestHandler<T>({ ...config, url, method: 'GET' }),
-  post: <T = unknown>(url: string, data?: unknown, config: AxiosRequestConfig = {}) =>
-    requestHandler<T>({ ...config, url, data, method: 'POST' }),
+  get: <T = unknown>(url: string, pagination?: PaginationParams, config: AxiosRequestConfig = {}) =>
+    requestHandler<T>({ ...config, url, method: 'GET' }, pagination),
+  post: <T = unknown>(
+    url: string,
+    data?: unknown,
+    pagination?: PaginationParams,
+    config: AxiosRequestConfig = {}
+  ) => requestHandler<T>({ ...config, url, data, method: 'POST' }, pagination),
   put: <T = unknown>(url: string, data?: unknown, config: AxiosRequestConfig = {}) =>
     requestHandler<T>({ ...config, url, data, method: 'PUT' }),
   patch: <T = unknown>(url: string, data?: unknown, config: AxiosRequestConfig = {}) =>

@@ -4,28 +4,28 @@ import { FindOptions } from './find-options';
 
 export class Respond<T = any> {
   @ApiResponseProperty({ type: Boolean })
-  public readonly success: boolean;
+  public readonly success: boolean
 
   @ApiResponseProperty({ type: String })
-  public readonly status: HttpStatus;
+  public readonly status: HttpStatus
 
   @ApiResponseProperty({ type: Object })
-  public readonly data?: T;
+  public readonly data?: T
 
   @ApiResponseProperty({ type: Object })
-  public readonly findOptions?: FindOptions;
+  public readonly pagination?: FindOptions
 
   constructor(success: boolean, status: HttpStatus, message?: string, data?: T) {
-    this.success = success;
-    this.status = status;
-    this.data = data;
+    this.success = success
+    this.status = status
+    this.data = data
   }
 
   static ok(): Respond {
     return {
       success: true,
       status: HttpStatus.OK,
-    };
+    }
   }
 
   static one<T>(data: T): Respond<T> {
@@ -33,7 +33,7 @@ export class Respond<T = any> {
       success: true,
       status: HttpStatus.OK,
       data,
-    };
+    }
   }
 
   static many<T>(data: T, findOptions: FindOptions): Respond<T> {
@@ -41,7 +41,7 @@ export class Respond<T = any> {
       success: true,
       status: HttpStatus.OK,
       data,
-      findOptions,
-    };
+      pagination: findOptions,
+    }
   }
 }

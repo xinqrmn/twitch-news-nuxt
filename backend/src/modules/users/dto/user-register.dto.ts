@@ -53,7 +53,7 @@ export class userRegisterDto {
   })
   @IsOptional()
   @IsString()
-  @IsUrl()
   @MaxLength(2048)
+  @IsUrl()
   image_url?: string
 }
