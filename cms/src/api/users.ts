@@ -25,13 +25,13 @@ export async function getUsers() {
 }
 
 export async function createUser(data: CreateUserDto) {
-  return api.post<User>(API_URL, data)
+  return api.post<User>(`${API_URL}/createWithRoles`, data)
 }
 
 export async function updateUser(id: number, data: UpdateUserDto) {
-  return api.patch<User>(`${API_URL}/${id}`, data)
+  return api.patch<User>(`${API_URL}/update/${id}`, data)
 }
 
 export async function deleteUser(id: number) {
-  return api.delete(`${API_URL}/${id}`)
+  return api.delete(`${API_URL}/delete/${id}`)
 }

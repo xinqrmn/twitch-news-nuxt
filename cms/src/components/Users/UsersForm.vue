@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { CreateUserDto } from '@/types/user'
 
 const emit = defineEmits<{
@@ -10,12 +10,25 @@ const emit = defineEmits<{
 const form = ref<CreateUserDto>({
   email: '',
   password: '',
+  username: '',
   roles: [],
 })
 
 function handleSubmit() {
   emit('submit', form.value)
 }
+
+const handleEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') emit('close')
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleEscape)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleEscape)
+})
 </script>
 
 <template>
@@ -24,6 +37,10 @@ function handleSubmit() {
       <div class="field">
         <label>Email</label>
         <InputText v-model="form.email" />
+      </div>
+      <div class="field">
+        <label>Username</label>
+        <InputText v-model="form.username" />
       </div>
       <div class="field">
         <label>Password</label>
@@ -35,7 +52,7 @@ function handleSubmit() {
       </div>
     </div>
     <template #footer>
-      <Button label="Cancel" severity="secondary" @click="emit('cancel')" />
+      <Button label="Cancel" severity="secondary" @click="emit('close')" />
       <Button label="Save" @click="handleSubmit" />
     </template>
   </Dialog>

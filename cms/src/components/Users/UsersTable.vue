@@ -1,11 +1,47 @@
 <script setup lang="ts">
 import { useUsersStore } from '@/stores/users'
-import { onMounted } from 'vue'
+import { useConfirm } from 'primevue';
+import { UpdateUserDto, User } from 'src/types/user';
+import { onBeforeMount } from 'vue'
 
 const usersStore = useUsersStore()
 
-onMounted(() => {
-  usersStore.fetchUsers()
+const emit = defineEmits<{
+  showDialog,
+  userDelete: [id: number]
+}>()
+
+const getRoleTag = (role: string): string => {
+  switch (role) {
+    case 'admin': 
+      return 'danger'
+    case 'user':
+      return 'success'
+    
+    default:
+      return null
+  }
+}
+
+const handleEdit = (data: UpdateUserDto) => {
+  emit('showDialog', data)
+}
+
+const confirm = useConfirm()
+const requireConfirmation = (event, data: Partial<User>) => {
+  confirm.require({
+    target: event.currentTarget,
+    group: 'headless',
+    message: `Вы уверены что хотите удалить пользователя ${data.username}?`,
+    accept: () => {
+      emit('userDelete', data.id)
+    },
+    reject: () => {},
+  })
+}
+
+onBeforeMount(async () => {
+  await usersStore.fetchUsers()
 })
 </script>
 
@@ -16,12 +52,12 @@ onMounted(() => {
     </template>
     <template #content>
       <DataTable
-        :value="users"
+        :value="usersStore.list"
         paginator
         :rows="5"
         :rowsPerPageOptions="[5, 10, 20, 50]"
         tableStyle="min-width: 50rem h-full"
-        :loading="tableLoading"
+        :loading="usersStore.loading"
       >
         <template #paginatorstart>
           <Button type="button" icon="pi pi-refresh" text />
@@ -61,14 +97,14 @@ onMounted(() => {
           </template>
         </Column>
         <Column field="created_at" header="Дата создания"></Column>
-        <Column field="updated_at" (header="Дата посл. редактирования"></Column>
+        <Column field="updated_at" header="Дата посл. редактирования"></Column>
         <Column class="w-24 !text-end">
           <template #body="{ data }">
             <div class="flex flex-row gap-2">
               <Button
                 icon="pi pi-pencil"
                 v-tooltip.bottom="'Редактировать пользователя'"
-                @click="toggleModal(data)"
+                @click="handleEdit({id: data.id, email: data.email, image_url: data.image_url})"
                 severity="success"
               ></Button>
               <Button

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getUsers, createUser } from '@/api/users'
+import { getUsers, createUser, updateUser, deleteUser } from '@/api/users'
 import type { User, CreateUserDto, UpdateUserDto } from '@/types/user'
 
 export const useUsersStore = defineStore('users', () => {
@@ -11,7 +11,7 @@ export const useUsersStore = defineStore('users', () => {
     loading.value = true
     try {
       const res = await getUsers()
-      list.value = res.data
+      list.value = res.data?.data
     } catch (err) {
       console.error('Ошибка получения списка пользователй: ', err)
     } finally {
@@ -21,20 +21,23 @@ export const useUsersStore = defineStore('users', () => {
 
   const createUserAction = async (data: CreateUserDto) => {
     const res = await createUser(data)
-    list.value.push(res.data)
+    if (res.data.success) await fetchUsers()
+    // list.value.push(res.data)
   }
 
   const updateUserAction = async (id: number, data: UpdateUserDto) => {
     const res = await updateUser(id, data)
-    const index = list.value.findIndex((u) => u.id === id)
-    if (index !== -1) {
-      list.value[index] = res.data
-    }
+    if (res.data.success) await fetchUsers()
+    // const index = list.value.findIndex((u) => u.id === id)
+    // if (index !== -1) {
+    //   list.value[index] = res.data
+    // }
   }
 
   const deleteUserAction = async (id: number) => {
-    await deleteUser(id)
-    list.value.filter(u => u.id !== id)
+    const res = await deleteUser(id)
+    if (res.data.success) await fetchUsers()
+    // list.value.filter((u) => u.id !== id)
   }
 
   return {
@@ -43,6 +46,6 @@ export const useUsersStore = defineStore('users', () => {
     fetchUsers,
     createUserAction,
     updateUserAction,
-    deleteUserAction
+    deleteUserAction,
   }
 })
