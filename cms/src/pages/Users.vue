@@ -1,18 +1,29 @@
 <template>
-  <div class="space-y-6 h-full">
-    <Button label="Add User" icon="pi pi-plus" @click="showForm = true" />
-    <UsersForm v-if="showForm" @submit="handleCreate" @close="showForm = false" />
-    <UsersTable
-      @showDialog="
-        (data) => {
-          editData = data
-          showDialog = true
-        }
-      "
-      @userDelete="handleDelete"
-    ></UsersTable>
-    <UsersDialog v-model:visible="showDialog" :userData="editData" @handleEdit="(data) => handleEdit(data.id, data)" />
-  </div>
+  <Card class="space-y-6 h-full">
+    <template #title>
+      <div class="flex items-center justify-between">
+        <h2>Список пользователей</h2>
+        <Button label="Add User" variant="text" icon="pi pi-plus" @click="showForm = true" />
+      </div>
+    </template>
+    <template #content>
+      <UsersForm v-if="showForm" @submit="handleCreate" v-model="showForm" />
+      <UsersTable
+        @showDialog="
+          (data) => {
+            editData = data
+            showDialog = true
+          }
+        "
+        @userDelete="handleDelete"
+      ></UsersTable>
+    </template>
+  </Card>
+  <UsersDialog
+    v-model:visible="showDialog"
+    :userData="editData"
+    @handleEdit="(data) => handleEdit(data.id, data)"
+  />
 </template>
 
 <script setup lang="ts">

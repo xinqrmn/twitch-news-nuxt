@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, defineProps, defineEmits } from 'vue'
 import type { CreateUserDto } from '@/types/user'
 
+const props = defineProps<{
+  modelValue: boolean
+}>()
+
 const emit = defineEmits<{
-  (e: 'submit', data: CreateUserDto): void
-  (e: 'close'): void
+  submit: [data: CreateUserDto]
+  'update:modelValue': [value: boolean]
 }>()
 
 const form = ref<CreateUserDto>({
@@ -16,10 +20,11 @@ const form = ref<CreateUserDto>({
 
 function handleSubmit() {
   emit('submit', form.value)
+  emit('update:modelValue', false)
 }
 
 const handleEscape = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') emit('close')
+  if (e.key === 'Escape') emit('update:modelValue', false)
 }
 
 onMounted(() => {
@@ -32,28 +37,70 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Dialog header="User Form" visible modal>
-    <div class="p-fluid">
+  <Dialog
+    header="Создание пользователя"
+    :visible="props.modelValue"
+    modal
+    style="min-width: 450px"
+    @update:visible="emit('update:modelValue', $event)"
+  >
+    <form class="p-fluid space-y-4" @submit.prevent="handleSubmit">
       <div class="field">
-        <label>Email</label>
-        <InputText v-model="form.email" />
+        <label for="email">Email</label>
+        <InputText v-model="form.email" id="email" type="email" placeholder="Введите email" />
       </div>
+
       <div class="field">
-        <label>Username</label>
-        <InputText v-model="form.username" />
+        <label for="username">Username</label>
+        <InputText v-model="form.username" id="username" placeholder="Введите логин" />
       </div>
+
+      <div class="field" id="pass-input">
+        <label for="password">Password</label>
+        <Password
+          v-model="form.password"
+          id="password"
+          toggleMask
+          placeholder="Введите пароль"
+          feedback
+        />
+      </div>
+
       <div class="field">
-        <label>Password</label>
-        <Password v-model="form.password" toggleMask />
+        <label for="roles">Roles</label>
+        <MultiSelect
+          v-model="form.roles"
+          id="roles"
+          :options="['admin', 'user']"
+          placeholder="Выберите одну или несколько ролей"
+          display="chip"
+        />
       </div>
-      <div class="field">
-        <label>Roles</label>
-        <MultiSelect v-model="form.roles" :options="['admin','user']" />
-      </div>
-    </div>
+    </form>
+
     <template #footer>
-      <Button label="Cancel" severity="secondary" @click="emit('close')" />
-      <Button label="Save" @click="handleSubmit" />
+      <div class="flex gap-2 justify-end w-full">
+        <Button
+          label="Отменить"
+          severity="secondary"
+          class="p-button-outlined w-28"
+          @click="emit('update:modelValue', false)"
+        />
+        <Button label="Сохранить" class="w-28" @click="handleSubmit" />
+      </div>
     </template>
   </Dialog>
 </template>
+
+<style lang="scss">
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-weight: 600;
+  }
+}
+</style>
