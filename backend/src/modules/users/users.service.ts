@@ -96,9 +96,15 @@ export class UsersService implements OnModuleInit {
 
       const roles: Role[] = []
       for (const roleName of dto.roles) {
-        let role = await m.findOne(Role, { where: { name: roleName } })
+        if (roleName.toLowerCase() === 'admin')
+          throw new HttpException(
+            'Нельзя создать пользователя с ролью "Администратор"!',
+            HttpStatus.FORBIDDEN
+          )
+        const role = await m.findOne(Role, { where: { name: roleName.toLowerCase() } })
         if (!role) {
-          role = await m.save(Role, { name: roleName })
+          throw new HttpException('Роль не найдена!', HttpStatus.NOT_FOUND)
+          // role = await m.save(Role, { name: roleName })
         }
         roles.push(role)
       }
