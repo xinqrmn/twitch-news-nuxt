@@ -28,11 +28,14 @@ export const useAuthStore = defineStore('auth', () => {
 
 
   const loginAction = async (email: string, password: string) => {
-    await login({ email, password })
-    await fetchMe()
-    if (isAuthenticated.value) {
-      await router.push('/')
-    }
+    const res = await login({ email, password })
+    if (res.data && res.data.success) {
+      await fetchMe()
+      if (isAuthenticated.value) {
+        await router.push('/')
+      }
+      return true
+    } else return false
   }
 
   const logoutAction = async () => {

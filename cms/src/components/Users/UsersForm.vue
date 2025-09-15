@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, defineProps, defineEmits } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { CreateUserDto } from '@/types/user'
 
 const props = defineProps<{
@@ -59,8 +59,8 @@ onBeforeUnmount(() => {
         <label for="password">Password</label>
         <Password
           v-model="form.password"
-          id="password"
           toggleMask
+          id="password"
           placeholder="Введите пароль"
           feedback
         />
@@ -101,6 +101,10 @@ onBeforeUnmount(() => {
 
   label {
     font-weight: 600;
+  }
+
+  .p-password-input{
+    width: 100%;
   }
 }
 </style>

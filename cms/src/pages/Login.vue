@@ -7,7 +7,6 @@ import { useToast } from 'primevue/usetoast'
 
 const username = ref('')
 const password = ref('')
-const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 
@@ -20,7 +19,6 @@ const handleLogin = async () => {
       detail: 'Авторизация успешна!',
       life: 3000,
     })
-    await router.push('/')
   } else {
     toast.add({
       severity: 'error',
@@ -68,6 +66,12 @@ const { isDarkTheme, toggleDarkMode } = useLayout()
       </template>
     </Card>
   </div>
+  <Toast
+    :pt="{
+      summary: 'font-bold',
+      messageIcon: 'scale-[90%]',
+    }"
+  />
 </template>
 
 <style lang="scss">

@@ -22,7 +22,7 @@ export async function register(data: RegisterDto) {
 }
 
 export async function logout() {
-  return api.post(`${API_URL}/logout`)
+  return api.get(`${API_URL}/logout`)
 }
 
 export async function getMe() {

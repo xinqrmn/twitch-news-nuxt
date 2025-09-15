@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UpdateUserDto } from '@/types/user'
-import { ref, defineModel, defineProps, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
   userData: UpdateUserDto | null
