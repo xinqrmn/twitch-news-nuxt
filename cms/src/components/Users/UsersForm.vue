@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { CreateUserDto } from '@/types/user'
+import { useRolesStore } from '@/stores/roles';
+
+const rolesStore = useRolesStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -27,8 +30,9 @@ const handleEscape = (e: KeyboardEvent) => {
   if (e.key === 'Escape') emit('update:modelValue', false)
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('keydown', handleEscape)
+  await rolesStore.fetchRoles()
 })
 
 onBeforeUnmount(() => {
@@ -71,7 +75,10 @@ onBeforeUnmount(() => {
         <MultiSelect
           v-model="form.roles"
           id="roles"
-          :options="['admin', 'user']"
+          :options="rolesStore.roles"
+          optionLabel="name"
+          optionValue="name"
+          :loading="rolesStore.loading"
           placeholder="Выберите одну или несколько ролей"
           display="chip"
         />

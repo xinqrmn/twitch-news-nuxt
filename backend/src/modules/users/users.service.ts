@@ -19,11 +19,6 @@ export class UsersService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const adminRole = await this.connection.manager.findOne(Role, { where: { name: 'admin' } })
-    if (!adminRole) {
-      await this.connection.manager.save(Role, { name: 'admin' })
-    }
-
     const adminUser = await this.connection.manager.findOne(User, {
       where: { email: 'admin@cms.com' },
     })
