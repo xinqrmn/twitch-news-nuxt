@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:9000/api/roles'
 export interface Role {
   id: number
   name: string
+  cyrillic: string
 }
 
 export async function getRoles() {

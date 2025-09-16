@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { UpdateUserDto } from '@/types/user'
-import { ref, watchEffect } from 'vue'
+import { useRolesStore } from '@/stores/roles';
+import { onMounted, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
   userData: UpdateUserDto | null
 }>()
 
 const emit = defineEmits<{
-  handleEdit: [data: UpdateUserDto]
+  handleEdit: [data: UpdateUserDto],
+  close
 }>()
+
+const rolesStore = useRolesStore()
 
 const visible = defineModel<boolean>()
 
@@ -24,6 +28,10 @@ function handleSubmit() {
   emit('handleEdit', editData.value)
   visible.value = false
 }
+
+onMounted(async () => {
+  await rolesStore.fetchRoles()
+})
 </script>
 
 <template>
@@ -54,11 +62,26 @@ function handleSubmit() {
         <label for="imageUrl">Image URL</label>
         <InputText id="imageUrl" v-model="editData.image_url" autocomplete="off" />
       </div>
+
+      <div class="field">
+        <label for="roles">Роли</label>
+        <MultiSelect
+          v-model="editData.roles"
+          id="roles"
+          :options="rolesStore.roles"
+          optionLabel="cyrillic"
+          optionValue="name"
+          :showToggleAll="false"
+          :loading="rolesStore.loading"
+          placeholder="Выберите одну или несколько ролей"
+          display="chip"
+        />
+      </div>
     </form>
 
     <template #footer>
       <div class="flex gap-2 justify-end w-full">
-        <Button label="Закрыть" severity="secondary" class="p-button-outlined w-28" @click="visible = false" />
+        <Button label="Закрыть" severity="secondary" class="p-button-outlined w-28" @click="emit('close')"/>
         <Button label="Сохранить" class="w-28" @click="handleSubmit" />
       </div>
     </template>

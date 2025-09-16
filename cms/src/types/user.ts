@@ -19,4 +19,5 @@ export interface UpdateUserDto {
   email?: string
   password?: string
   image_url?: string
+  roles?: string[]
 }

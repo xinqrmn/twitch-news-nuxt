@@ -55,12 +55,12 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="field">
-        <label for="username">Username</label>
+        <label for="username">Имя пользователя</label>
         <InputText v-model="form.username" id="username" placeholder="Введите логин" />
       </div>
 
       <div class="field" id="pass-input">
-        <label for="password">Password</label>
+        <label for="password">Пароль</label>
         <Password
           v-model="form.password"
           toggleMask
@@ -71,13 +71,14 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="field">
-        <label for="roles">Roles</label>
+        <label for="roles">Роли</label>
         <MultiSelect
           v-model="form.roles"
           id="roles"
           :options="rolesStore.roles"
-          optionLabel="name"
+          optionLabel="cyrillic"
           optionValue="name"
+          :showToggleAll="false"
           :loading="rolesStore.loading"
           placeholder="Выберите одну или несколько ролей"
           display="chip"

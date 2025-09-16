@@ -3,7 +3,7 @@
     <template #title>
       <div class="flex items-center justify-between">
         <h2>Список пользователей</h2>
-        <Button label="Add User" variant="text" icon="pi pi-plus" @click="showForm = true" />
+        <Button label="Добавить пользователя" variant="text" icon="pi pi-plus" @click="showForm = true" />
       </div>
     </template>
     <template #content>
@@ -23,6 +23,7 @@
     v-model:visible="showDialog"
     :userData="editData"
     @handleEdit="(data) => handleEdit(data.id, data)"
+    @close="showDialog = false"
   />
 </template>
 
