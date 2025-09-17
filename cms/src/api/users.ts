@@ -1,4 +1,5 @@
 import { api } from '@/utils/requestHandler'
+import type { PaginationParams } from '@/utils/requestHandler'
 
 const API_URL = 'http://localhost:9000/api/users'
 
@@ -20,8 +21,8 @@ export interface UpdateUserDto {
   roles?: string[]
 }
 
-export async function getUsers() {
-  return api.get<User[]>(`${API_URL}/get`)
+export async function getUsers(pagination?: PaginationParams) {
+  return api.get<any>(`${API_URL}/get`, pagination)
 }
 
 export async function createUser(data: CreateUserDto) {

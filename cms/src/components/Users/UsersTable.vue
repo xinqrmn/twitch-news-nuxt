@@ -2,7 +2,7 @@
 import { useUsersStore } from '@/stores/users'
 import { useConfirm } from 'primevue'
 import { UpdateUserDto, User } from '@/types/user'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { formatTime } from '@/utils/timeFormatter'
 
 const usersStore = useUsersStore()
@@ -49,6 +49,33 @@ const requireConfirmation = (event, data: Partial<User>) => {
   })
 }
 
+const tableSearch = ref('')
+const first = ref(0)
+
+let searchTimeout
+const onSearch = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => usersStore.fetchUsers({ search: tableSearch.value.trim() }), 350)
+}
+
+const onPage = async (event: any) => {
+  first.value = event.first
+  await usersStore.fetchUsers({
+    currentPage: event.page + 1,
+    limit: event.rows,
+    search: tableSearch.value.trim(),
+  })
+}
+
+const onSort = async (event: any) => {
+  const sortField = event.sortField
+  const sortOrder = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  await usersStore.fetchUsers({
+    sortBy: sortField ? [[sortField, sortOrder]] : undefined,
+    search: tableSearch.value.trim(),
+  })
+}
+
 onBeforeMount(async () => {
   await usersStore.fetchUsers()
 })
@@ -57,20 +84,42 @@ onBeforeMount(async () => {
 <template>
   <DataTable
     :value="usersStore.list"
+    lazy
     paginator
-    :rows="5"
+    :totalRecords="usersStore.totalItems"
+    :rows="usersStore.pagination?.limit ?? 5"
+    :first="first"
     :rowsPerPageOptions="[5, 10, 20, 50]"
     tableStyle="min-width: 50rem h-full"
     :loading="usersStore.loading"
+    @page="onPage"
+    @sort="onSort"
+    :pt="{
+      header: 'p-0',
+    }"
+    removableSort
   >
+    <template #header>
+      <div class="flex justify-between items-center gap-4">
+        <p>Записей: <span class="font-semibold">{{ usersStore.totalItems }}</span></p>
+        <div>
+          <IconField>
+            <InputIcon>
+              <i class="pi pi-search" />
+            </InputIcon>
+            <InputText v-model="tableSearch" @input="onSearch()" placeholder="Найти..." />
+          </IconField>
+        </div>
+      </div>
+    </template>
     <template #paginatorstart>
-      <Button type="button" icon="pi pi-refresh" text @click="usersStore.fetchUsers()"/>
+      <Button type="button" icon="pi pi-refresh" text @click="usersStore.fetchUsers()" />
     </template>
     <template #paginatorend>
       <Button type="button" icon="pi pi-download" text />
     </template>
-    <Column field="id" header="ID"></Column>
-    <Column field="username" header="Имя пользователя">
+    <Column field="id" sortable header="ID"></Column>
+    <Column field="username" sortable header="Имя пользователя">
       <template #body="{ data }">
         <div class="flex items-center">
           <Avatar
@@ -84,7 +133,7 @@ onBeforeMount(async () => {
         </div>
       </template>
     </Column>
-    <Column field="email" header="E-mail"></Column>
+    <Column field="email" sortable header="E-mail"></Column>
     <Column field="roles" header="Роли">
       <template #body="slotProps">
         <div class="flex flex-wrap gap-1">
@@ -97,12 +146,12 @@ onBeforeMount(async () => {
         </div>
       </template>
     </Column>
-    <Column field="created_at" header="Дата создания (МСК)">
+    <Column field="created_at" sortable header="Дата создания (МСК)">
       <template #body="slotProps">
         {{ formatTime(slotProps.data.created_at) }}
       </template>
     </Column>
-    <Column field="updated_at" header="Дата посл. редактирования (МСК)">
+    <Column field="updated_at" sortable header="Дата посл. редактирования (МСК)">
       <template #body="slotProps">
         {{ formatTime(slotProps.data.updated_at) }}
       </template>
@@ -113,7 +162,14 @@ onBeforeMount(async () => {
           <Button
             icon="pi pi-pencil"
             v-tooltip.bottom="'Редактировать пользователя'"
-            @click="handleEdit({ id: data.id, email: data.email, image_url: data.image_url, roles: data.roles.map((r) => r.name) })"
+            @click="
+              handleEdit({
+                id: data.id,
+                email: data.email,
+                image_url: data.image_url,
+                roles: data.roles.map((r) => r.name),
+              })
+            "
             severity="success"
           ></Button>
           <Button

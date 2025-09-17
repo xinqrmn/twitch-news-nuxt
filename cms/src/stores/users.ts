@@ -1,17 +1,23 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getUsers, createUser, updateUser, deleteUser } from '@/api/users'
+import type { PaginationParams } from '@/utils/requestHandler'
 import type { User, CreateUserDto, UpdateUserDto } from '@/types/user'
 
 export const useUsersStore = defineStore('users', () => {
   const list = ref<User[]>([])
   const loading = ref(false)
 
-  const fetchUsers = async () => {
+  const pagination = ref<PaginationParams>({ limit: 20, currentPage: 1 })
+
+  const totalItems = ref<number>(0)
+
+  const fetchUsers = async (override?: PaginationParams) => {
     loading.value = true
     try {
-      const res = await getUsers()
+      const res = await getUsers({ ...pagination.value, ...(override || {}) })
       list.value = res.data?.data
+      totalItems.value = res.data?.pagination?.totalItems ?? 0
     } catch (err) {
       console.error('Ошибка получения списка пользователй: ', err)
     } finally {
@@ -43,6 +49,8 @@ export const useUsersStore = defineStore('users', () => {
   return {
     list,
     loading,
+    pagination,
+    totalItems,
     fetchUsers,
     createUserAction,
     updateUserAction,

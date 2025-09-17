@@ -16,7 +16,7 @@
           }
         "
         @userDelete="handleDelete"
-      ></UsersTable>
+      />
     </template>
   </Card>
   <UsersDialog
@@ -40,7 +40,7 @@ const showForm = ref(false)
 const showDialog = ref(false)
 const editData = ref<UpdateUserDto | null>(null)
 
-const handleEdit = (id: number, userData) => {
+const handleEdit = (id: number, userData: UpdateUserDto) => {
   usersStore.updateUserAction(id, userData)
   showDialog.value = false
 }

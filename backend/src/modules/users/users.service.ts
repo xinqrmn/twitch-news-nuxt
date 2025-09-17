@@ -5,6 +5,7 @@ import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity
 import { User } from './users.entity'
 import { Role } from '../roles/roles.entity'
 import * as bcrypt from 'bcrypt'
+import { Paginate, PaginateQuery, paginate, Paginated } from 'nestjs-paginate'
 import { userRegisterDto } from './dto/user-register.dto'
 import { userRegisterWithRolesDto } from './dto/user-register-with-roles.dto'
 import { userUpdateDto } from './dto/user-update.dto'
@@ -171,37 +172,28 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-  async getAllUsers(): Promise<
-    {
-      id: number
-      email: string
-      username: string
-      image_url: string | null
-      created_at: Date
-      updated_at: Date
-      roles: { name: string; cyrillic: string }[]
-    }[]
-  > {
-    const users = await this.userRepo.find({
+  async getAllUsers(query: PaginateQuery): Promise<Paginated<User>> {
+    const paginated = await paginate(query, this.userRepo, {
       relations: ['roles'],
-      select: ['id', 'email', 'username', 'image_url', 'created_at', 'updated_at'],
+      select: [
+        'id',
+        'email',
+        'username',
+        'image_url',
+        'roles.cyrillic',
+        'roles.name',
+        'created_at',
+        'updated_at',
+      ],
       where: { del: 0 },
+      sortableColumns: ['id', 'email', 'username', 'created_at', 'updated_at'],
+      searchableColumns: ['id', 'email', 'username', 'created_at', 'updated_at'],
+      filterableColumns: {
+        email: [],
+        username: [],
+      },
     })
-
-    return users.map((user) => ({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      image_url: user.image_url ?? null,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-      roles: user.roles
-        ? user.roles.map((role: { name: string; cyrillic: string }) => ({
-            name: role.name,
-            cyrillic: role.cyrillic,
-          }))
-        : [],
-    }))
+    return paginated
   }
 
   async softDeleteUserById(

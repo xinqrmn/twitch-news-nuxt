@@ -20,6 +20,7 @@ import { AuthGuard } from '@nestjs/passport'
 import { userRegisterWithRolesDto } from 'src/modules/users/dto/user-register-with-roles.dto'
 import { Request } from 'express'
 import { Respond } from 'src/common/response/response'
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
 
 @ApiTags('Users')
 @Controller('users')
@@ -83,13 +84,18 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
   @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async getAllUsers(@Req() req: Request & { user?: { roles?: string[] } }) {
+  async getAllUsers(
+    @Paginate() query: PaginateQuery,
+    @Req() req: Request & { user?: { roles?: string[] } }
+  ) {
     const roles: string[] = req.user?.roles ?? []
     if (!roles.includes('admin')) {
       throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
     }
-    const users = await this.usersService.getAllUsers()
-    return Respond.one(users)
+    const { data, meta } = await this.usersService.getAllUsers(query)
+    return Respond.many(data, meta)
+    // const data = await this.usersService.getAllUsers(query)
+    // return data
   }
 
   @Get('get/:id')
@@ -111,8 +117,8 @@ export class UsersController {
     if (!roles.includes('admin')) {
       throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
     }
-    const users = await this.usersService.getUserById(id)
-    return Respond.one(users)
+    const user = await this.usersService.getUserById(id)
+    return Respond.one(user)
   }
 
   @Get('profile/:username')
