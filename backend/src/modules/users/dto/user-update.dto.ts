@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsUrl,
   MaxLength,
+  IsArray,
 } from 'class-validator'
 
 export class userUpdateDto {
@@ -44,4 +45,14 @@ export class userUpdateDto {
   @IsUrl()
   @MaxLength(2048)
   image_url?: string
+
+  @ApiProperty({
+    type: [String],
+    required: false,
+    description: 'Названия ролей для назначения пользователю',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  roles?: string[]
 }

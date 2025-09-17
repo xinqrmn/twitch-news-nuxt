@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, EntityManager, Repository } from 'typeorm'
+import { DataSource, EntityManager, Repository, In } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { User } from './users.entity'
 import { Role } from '../roles/roles.entity'
@@ -19,11 +19,6 @@ export class UsersService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const adminRole = await this.connection.manager.findOne(Role, { where: { name: 'admin' } })
-    if (!adminRole) {
-      await this.connection.manager.save(Role, { name: 'admin' })
-    }
-
     const adminUser = await this.connection.manager.findOne(User, {
       where: { email: 'admin@cms.com' },
     })
@@ -38,7 +33,7 @@ export class UsersService implements OnModuleInit {
         roles: [role!],
       })
       console.log('Admin user created: admin@cms.com / admin123')
-    }
+    } else console.log('Admin already exists!')
   }
 
   async findByEmail(email: string) {
@@ -96,9 +91,15 @@ export class UsersService implements OnModuleInit {
 
       const roles: Role[] = []
       for (const roleName of dto.roles) {
-        let role = await m.findOne(Role, { where: { name: roleName } })
+        if (roleName.toLowerCase() === 'admin')
+          throw new HttpException(
+            'Нельзя создать пользователя с ролью "Администратор"!',
+            HttpStatus.FORBIDDEN
+          )
+        const role = await m.findOne(Role, { where: { name: roleName.toLowerCase() } })
         if (!role) {
-          role = await m.save(Role, { name: roleName })
+          throw new HttpException('Роль не найдена!', HttpStatus.NOT_FOUND)
+          // role = await m.save(Role, { name: roleName })
         }
         roles.push(role)
       }
@@ -124,7 +125,7 @@ export class UsersService implements OnModuleInit {
     image_url: string | null
     created_at: Date
     updated_at: Date
-    roles: string[]
+    roles: { name: string; cyrillic: string }[]
   }> {
     const user = await this.userRepo.findOne({
       relations: ['roles'],
@@ -140,7 +141,12 @@ export class UsersService implements OnModuleInit {
       image_url: user.image_url ?? null,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      roles: user.roles ? user.roles.map((role: { name: string }) => role.name) : [],
+      roles: user.roles
+        ? user.roles.map((role: { name: string; cyrillic: string }) => ({
+            name: role.name,
+            cyrillic: role.cyrillic,
+          }))
+        : [],
     }
   }
 
@@ -156,7 +162,12 @@ export class UsersService implements OnModuleInit {
       id: user.id,
       username: user.username,
       image_url: user.image_url ?? null,
-      roles: user.roles ? user.roles.map((role: { name: string }) => role.name) : [],
+      roles: user.roles
+        ? user.roles.map((role: { name: string; cyrillic: string }) => ({
+            name: role.name,
+            cyrillic: role.cyrillic,
+          }))
+        : [],
     }
   }
 
@@ -168,14 +179,9 @@ export class UsersService implements OnModuleInit {
       image_url: string | null
       created_at: Date
       updated_at: Date
-      roles: string[]
+      roles: { name: string; cyrillic: string }[]
     }[]
   > {
-    type role = {
-      id: number
-      name: string
-    }
-
     const users = await this.userRepo.find({
       relations: ['roles'],
       select: ['id', 'email', 'username', 'image_url', 'created_at', 'updated_at'],
@@ -189,7 +195,12 @@ export class UsersService implements OnModuleInit {
       image_url: user.image_url ?? null,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      roles: user.roles ? user.roles.map((role: role) => role.name) : [],
+      roles: user.roles
+        ? user.roles.map((role: { name: string; cyrillic: string }) => ({
+            name: role.name,
+            cyrillic: role.cyrillic,
+          }))
+        : [],
     }))
   }
 
@@ -254,11 +265,35 @@ export class UsersService implements OnModuleInit {
         updatePayload.image_url = dto.image_url
       }
 
-      if (Object.keys(updatePayload).length === 0) {
-        return
+      let rolesToAssign: Role[] = []
+      if (dto.roles !== undefined) {
+        if (!isAdmin) {
+          throw new HttpException('Недостаточно прав для изменения ролей', HttpStatus.FORBIDDEN)
+        }
+
+        const normalizedRoleNames = (dto.roles ?? []).map((r) => r.toLowerCase())
+        if (normalizedRoleNames.includes('admin')) {
+          throw new HttpException('Нельзя назначить роль "Администратор"!', HttpStatus.FORBIDDEN)
+        }
+
+        rolesToAssign = await m.find(Role, { where: { name: In(normalizedRoleNames) } })
+        if (rolesToAssign.length !== normalizedRoleNames.length) {
+          throw new HttpException('Роль не найдена!', HttpStatus.NOT_FOUND)
+        }
+        console.info(rolesToAssign.length)
       }
 
-      await m.update(User, { id: userId }, updatePayload)
+      if (Object.keys(updatePayload).length > 0) {
+        await m.update(User, { id: userId }, updatePayload)
+      }
+
+      if (rolesToAssign.length) {
+        await m
+          .createQueryBuilder()
+          .relation(User, 'roles')
+          .of(userId)
+          .addAndRemove(rolesToAssign, user.roles ?? [])
+      }
 
       return
     })

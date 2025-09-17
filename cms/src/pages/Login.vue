@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useLayout } from '@/layout/composables/layout.ts'
 import { useToast } from 'primevue/usetoast'
 
 const username = ref('')
 const password = ref('')
-const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 
 const handleLogin = async () => {
-  const res = await authStore.login(username.value, password.value)
+  // await authStore.loginAction(username.value, password.value)
+  const res = await authStore.loginAction(username.value, password.value)
   if (res) {
     toast.add({
       severity: 'success',
@@ -20,15 +19,15 @@ const handleLogin = async () => {
       detail: 'Авторизация успешна!',
       life: 3000,
     })
-    router.push('/dashboard')
-  } else {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Неверный логин или пароль!',
-      life: 3000,
-    })
-  }
+  } 
+  // else {
+  //   toast.add({
+  //     severity: 'error',
+  //     summary: 'Ошибка',
+  //     detail: 'Неверный логин или пароль!',
+  //     life: 3000,
+  //   })
+  // }
 }
 
 const { isDarkTheme, toggleDarkMode } = useLayout()
@@ -68,6 +67,12 @@ const { isDarkTheme, toggleDarkMode } = useLayout()
       </template>
     </Card>
   </div>
+  <Toast
+    :pt="{
+      summary: 'font-bold',
+      messageIcon: 'scale-[90%]',
+    }"
+  />
 </template>
 
 <style lang="scss">

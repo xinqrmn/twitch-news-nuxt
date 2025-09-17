@@ -2,6 +2,7 @@ import App from './App.vue'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router'
+import { useAuthStore } from '@/stores/auth'
 
 import { definePreset } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
@@ -32,17 +33,22 @@ const MyPreset = definePreset(Aura, {
 })
 
 const pinia = createPinia()
-createApp(App)
-  .use(router)
-  .use(pinia)
-  .use(PrimeVue, {
-    theme: {
-      preset: MyPreset,
-      options: {
-        darkModeSelector: '.app-dark',
-      },
+
+const app = createApp(App)
+app.use(router)
+app.use(pinia)
+app.use(PrimeVue, {
+  theme: {
+    preset: MyPreset,
+    options: {
+      darkModeSelector: '.app-dark',
     },
-  })
-  .use(ConfirmationService)
-  .use(ToastService)
-  .mount('#app')
+  },
+})
+app.use(ConfirmationService)
+app.use(ToastService)
+
+const authStore = useAuthStore()
+authStore.initializeAuth().then(() => {
+  app.mount('#app')
+})

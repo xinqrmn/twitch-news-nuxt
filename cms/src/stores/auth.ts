@@ -1,52 +1,73 @@
 import { defineStore } from 'pinia'
+import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
-import { api } from '../utils/requestHandler'
-import router from '../router'
+import { login, logout, getMe } from '@/api/auth'
+import type { User } from '../types/user'
 
 export const useAuthStore = defineStore('auth', () => {
-  type Me = { email?: string; roles?: string[]; username?: string }
+  const user = ref<User | null>(null)
+  const loading = ref(false)
+  const isAuthenticated = ref(false)
+  const isAdmin = computed(() => user.value?.roles.includes('admin') ?? false)
+  const isInitialized = ref(false)
 
-  const me = ref<Me | null>(null)
-  const status = ref<'unknown' | 'authenticated' | 'unauthenticated'>('unknown')
+  const router = useRouter()
 
-  const isAuthenticated = computed(() => status.value === 'authenticated')
+  const initializeAuth = async () => {
+    try {
+      await fetchMe()
+    } catch (error) {
+      console.error('Ошибка при восстановлении сессии:', error)
+      isAuthenticated.value = false
+      user.value = null
+    } finally {
+      isInitialized.value = true
+    }
+  }
 
-  async function ensureAuthChecked(force = false): Promise<boolean> {
-    if (!force && status.value !== 'unknown') return isAuthenticated.value
-    const { data } = await api.get<{ success: boolean; data?: Me }>('/auth/me')
-    if (data?.success && data.data) {
-      me.value = data.data
-      status.value = 'authenticated'
+
+
+  const loginAction = async (email: string, password: string) => {
+    const res = await login({ email, password })
+    if (res.data && res.data.success) {
+      await fetchMe()
+      if (isAuthenticated.value) {
+        await router.push('/')
+      }
       return true
-    }
-    status.value = 'unauthenticated'
-    me.value = null
-    return false
+    } else return false
   }
 
-  async function login(username: string, password: string): Promise<boolean> {
-    const { data, error } = await api.post<any>('/auth/login', {
-      email: username.toString(),
-      password,
-    })
-    if (error) {
-      return false
-    }
-    if (data?.success) {
-      await ensureAuthChecked(true)
-      return true
-    }
-    return false
+  const logoutAction = async () => {
+    await logout()
+    isAuthenticated.value = false
+    user.value = null
   }
 
-  async function logout() {
-    const { data } = await api.post<any>('/auth/logout')
-    if (data?.success) {
-      status.value = 'unauthenticated'
-      me.value = null
+  const fetchMe = async () => {
+    loading.value = true
+    try {
+      const res = await getMe()
+      user.value = res.data.data
+      isAuthenticated.value = true
+    } catch (e) {
+      console.error('Ошибка запроса данных пользователя: ', e)
+      user.value = null
+      isAuthenticated.value = false
+    } finally {
+      loading.value = false
     }
-    router.push('/login')
   }
 
-  return { me, status, isAuthenticated, ensureAuthChecked, login, logout }
+  return {
+    user,
+    loading,
+    isAuthenticated,
+    isInitialized,
+    isAdmin,
+    initializeAuth,
+    loginAction,
+    logoutAction,
+    fetchMe,
+  }
 })

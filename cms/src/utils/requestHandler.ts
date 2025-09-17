@@ -5,7 +5,7 @@ import router from '../router'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'
 
 let axiosInstance: AxiosInstance | null = null
-let onUnauthorized: (() => void) | null = null
+const onUnauthorized: (() => void) | null = null
 
 function createClient(): AxiosInstance {
   const instance = axios.create({
@@ -48,6 +48,14 @@ function toApiError(e: unknown): ApiError {
     (err.response?.data && (err.response.data.message || err.response.data.error)) ||
     undefined
   const message = serverMessage || err.message || 'Request failed'
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('api-error', {
+        detail: { message, status, code },
+      })
+    )
+  }
+
   return { code, message, status }
 }
 
