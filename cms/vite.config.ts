@@ -15,7 +15,7 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    noDiscovery: true,
+    include: ['debug'],
   },
   resolve: {
     alias: {

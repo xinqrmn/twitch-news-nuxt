@@ -13,6 +13,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@milkdown/crepe": "^7.16.0",
+    "@milkdown/kit": "^7.16.0",
+    "@milkdown/theme-nord": "^7.16.0",
+    "@milkdown/vue": "^7.16.0",
     "@primeuix/themes": "^1.2.3",
     "@tailwindcss/vite": "^4.1.12",
     "axios": "^1.11.0",

@@ -24,6 +24,8 @@ declare module 'vue' {
     InputIcon: typeof import('primevue/inputicon')['default']
     InputMask: typeof import('primevue/inputmask')['default']
     InputText: typeof import('primevue/inputtext')['default']
+    MilkdownEditor: typeof import('./src/components/Milkdown/MilkdownEditor.vue')['default']
+    MilkdownEditorWrapper: typeof import('./src/components/Milkdown/MilkdownEditorWrapper.vue')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
     Password: typeof import('primevue/password')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
