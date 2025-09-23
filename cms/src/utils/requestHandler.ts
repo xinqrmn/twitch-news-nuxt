@@ -1,12 +1,10 @@
 import axios, { AxiosError } from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import router from '../router'
-import type { Pagination } from '../types/pagination'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'
 
 let axiosInstance: AxiosInstance | null = null
-const onUnauthorized: (() => void) | null = null
 
 function createClient(): AxiosInstance {
   const instance = axios.create({

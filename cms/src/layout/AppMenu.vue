@@ -11,7 +11,7 @@ const model = ref([
     label: 'Main',
     items: [
       { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users' },
-      { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/' },
+      { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/editor' },
       { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/', class: 'rotated-icon' },
       { label: 'Table', icon: 'pi pi-fw pi-table', to: '/' },
       { label: 'List', icon: 'pi pi-fw pi-list', to: '/' },
