@@ -15,7 +15,12 @@ async function bootstrap() {
     }),
   })
 
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      disableErrorMessages: process.env.NODE_ENV === 'production',
+    })
+  )
 
   app.enableCors({
     origin: 'http://localhost:5173',
