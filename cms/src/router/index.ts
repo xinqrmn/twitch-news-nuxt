@@ -25,6 +25,16 @@ const router = createRouter({
           component: () => import('@/pages/Editor.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: 'streamers',
+          component: () => import('@/pages/streamers/Streamers.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'streamers/editor',
+          component: () => import('@/pages/streamers/Editor.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
     { path: '/login', component: () => import('@/pages/Login.vue') },

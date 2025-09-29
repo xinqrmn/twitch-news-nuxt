@@ -11,31 +11,22 @@ const model = ref([
     label: 'Main',
     items: [
       { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users' },
-      { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/editor' },
-      { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/', class: 'rotated-icon' },
-      { label: 'Table', icon: 'pi pi-fw pi-table', to: '/' },
-      { label: 'List', icon: 'pi pi-fw pi-list', to: '/' },
-      { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/' },
-      { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/' },
-      { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/' },
-      { label: 'Media', icon: 'pi pi-fw pi-image', to: '/' },
-      { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/' },
-      { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/' },
-      { label: 'File', icon: 'pi pi-fw pi-file', to: '/' },
-      { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/' },
-      { label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/' },
+      { label: 'Post List', icon: 'pi pi-fw pi-list', to: '/editor' },
+      { label: 'Post Editor', icon: 'pi pi-fw pi-pen-to-square', to: '/editor' },
+      { label: 'Streamers Table', icon: 'pi pi-fw pi-table', to: '/streamers' },
+      { label: 'Streamers Editor', icon: 'pi pi-fw pi-twitch', to: '/streamers/editor', class: 'rotated-icon' },
       { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/' },
     ],
   },
   {
     label: 'Pages',
     icon: 'pi pi-fw pi-briefcase',
-    to: '/',
+    to: '/test',
     items: [
       {
         label: 'Landing',
         icon: 'pi pi-fw pi-globe',
-        to: '/',
+        to: '/test1',
       },
       {
         label: 'Auth',
@@ -44,81 +35,81 @@ const model = ref([
           {
             label: 'Login',
             icon: 'pi pi-fw pi-sign-in',
-            to: '/',
+            to: '/test2',
           },
           {
             label: 'Error',
             icon: 'pi pi-fw pi-times-circle',
-            to: '/',
+            to: '/test3',
           },
           {
             label: 'Access Denied',
             icon: 'pi pi-fw pi-lock',
-            to: '/',
+            to: '/test4',
           },
         ],
       },
       {
         label: 'Crud',
         icon: 'pi pi-fw pi-pencil',
-        to: '/',
+        to: '/test5',
       },
       {
         label: 'Not Found',
         icon: 'pi pi-fw pi-exclamation-circle',
-        to: '/',
+        to: '/test6',
       },
       {
         label: 'Empty',
         icon: 'pi pi-fw pi-circle-off',
-        to: '/',
+        to: '/test7',
       },
     ],
   },
-  {
-    label: 'Hierarchy',
-    items: [
-      {
-        label: 'Submenu 1',
-        icon: 'pi pi-fw pi-bookmark',
-        items: [
-          {
-            label: 'Submenu 1.1',
-            icon: 'pi pi-fw pi-bookmark',
-            items: [
-              { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-              { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-              { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' },
-            ],
-          },
-          {
-            label: 'Submenu 1.2',
-            icon: 'pi pi-fw pi-bookmark',
-            items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }],
-          },
-        ],
-      },
-      {
-        label: 'Submenu 2',
-        icon: 'pi pi-fw pi-bookmark',
-        items: [
-          {
-            label: 'Submenu 2.1',
-            icon: 'pi pi-fw pi-bookmark',
-            items: [
-              { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-              { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' },
-            ],
-          },
-          {
-            label: 'Submenu 2.2',
-            icon: 'pi pi-fw pi-bookmark',
-            items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }],
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   label: 'Hierarchy',
+  //   items: [
+  //     {
+  //       label: 'Submenu 1',
+  //       icon: 'pi pi-fw pi-bookmark',
+  //       items: [
+  //         {
+  //           label: 'Submenu 1.1',
+  //           icon: 'pi pi-fw pi-bookmark',
+  //           items: [
+  //             { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
+  //             { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
+  //             { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' },
+  //           ],
+  //         },
+  //         {
+  //           label: 'Submenu 1.2',
+  //           icon: 'pi pi-fw pi-bookmark',
+  //           items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       label: 'Submenu 2',
+  //       icon: 'pi pi-fw pi-bookmark',
+  //       items: [
+  //         {
+  //           label: 'Submenu 2.1',
+  //           icon: 'pi pi-fw pi-bookmark',
+  //           items: [
+  //             { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
+  //             { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' },
+  //           ],
+  //         },
+  //         {
+  //           label: 'Submenu 2.2',
+  //           icon: 'pi pi-fw pi-bookmark',
+  //           items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   {
     label: 'Get Started',
     items: [
