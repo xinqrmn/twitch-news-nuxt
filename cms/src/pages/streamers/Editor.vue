@@ -46,28 +46,28 @@ const news = ref<any[]>([])
 
         <TabPanels>
           <TabPanel value="0">
-            <div class="field">
-              <label>Дата рождения</label>
+            <div class="flex items-center justify-between w-full mb-8">
+              <label class="font-bold min-w-[170px]">Дата рождения</label>
               <DatePicker class="w-full" v-model="birthday" dateFormat="dd.mm.yy" showIcon />
             </div>
-            <div class="field">
-              <label>Основная игра</label>
-              <InputText v-model="mainGame" />
+            <div class="flex items-center justify-between w-full mb-8">
+              <label class="font-bold min-w-[170px]">Основная игра</label>
+              <InputText class="w-full" v-model="mainGame" />
             </div>
-            <div class="field">
-              <label>Вес (кг)</label>
+            <div class="flex items-center justify-between w-full mb-8">
+              <label class="font-bold min-w-[170px]">Вес (кг)</label>
               <InputNumber class="w-full" v-model="weight" />
             </div>
-            <div class="field">
-              <label>Страна</label>
-              <InputText v-model="country" />
+            <div class="flex items-center justify-between w-full mb-8">
+              <label class="font-bold min-w-[170px]">Страна</label>
+              <InputText class="w-full" v-model="country" />
             </div>
-            <div class="field">
-              <label>Город</label>
-              <InputText v-model="city" />
+            <div class="flex items-center justify-between w-full mb-8">
+              <label class="font-bold min-w-[170px]">Город</label>
+              <InputText class="w-full" v-model="city" />
             </div>
-            <div class="field">
-              <label>Рост (см)</label>
+            <div class="flex items-center justify-between w-full">
+              <label class="font-bold min-w-[170px]">Рост (см)</label>
               <InputNumber class="w-full" v-model="height" />
             </div>
           </TabPanel>
@@ -85,12 +85,12 @@ const news = ref<any[]>([])
           </TabPanel>
 
           <TabPanel value="3">
-            <div v-for="(s, idx) in socials" :key="idx" class="field">
-              <Dropdown
+            <div v-for="(s, idx) in socials" :key="idx" class="flex items-center gap-4 w-full mb-6">
+              <Select
                 v-model="socials[idx].type"
                 :options="['telegram', 'steam', 'twitch', 'instagram', 'kick', 'tiktok', 'vk']"
               />
-              <InputText v-model="socials[idx].url" placeholder="https://..." />
+              <InputText class="flex-1" v-model="socials[idx].url" placeholder="https://..." />
               <Button icon="pi pi-times" severity="danger" @click="socials.splice(idx, 1)" />
             </div>
             <Button
@@ -117,18 +117,21 @@ const news = ref<any[]>([])
 <style  lang="scss">
 .streamer-editor {
   .field {
+    width: 100%;
     margin-bottom: 2rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 1rem;
 
     label {
-      min-width: 150px;
+      min-width: 130px;
       font-weight: 600;
     }
 
     input,
     textarea,
+    .p-datepicker,
     .p-dropdown {
       flex: 1;
     }
