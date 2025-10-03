@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import UsersTable from '@/components/Users/UsersTable.vue'
 </script>
 
@@ -24,6 +23,4 @@ import UsersTable from '@/components/Users/UsersTable.vue'
   </Card>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

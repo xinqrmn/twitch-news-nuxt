@@ -25,8 +25,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-
-
   const loginAction = async (email: string, password: string) => {
     const res = await login({ email, password })
     if (res.data && res.data.success) {

@@ -7,8 +7,8 @@ export function useApiToasts() {
   const handleApiError = (event: CustomEvent) => {
     const status = event.detail.status
     let message = event.detail.message
-    
-    if (status === 400) message = "Проверьте введенные данные!"
+
+    if (status === 400) message = 'Проверьте введенные данные!'
 
     toast.add({
       severity: 'error',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { CreateUserDto } from '@/types/user'
-import { useRolesStore } from '@/stores/roles';
+import { useRolesStore } from '@/stores/roles'
 
 const rolesStore = useRolesStore()
 
@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
     font-weight: 600;
   }
 
-  .p-password-input{
+  .p-password-input {
     width: 100%;
   }
 }

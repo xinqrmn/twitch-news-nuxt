@@ -3,7 +3,12 @@
     <template #title>
       <div class="flex items-center justify-between">
         <h2>Список пользователей</h2>
-        <Button label="Добавить пользователя" variant="text" icon="pi pi-plus" @click="showForm = true" />
+        <Button
+          label="Добавить пользователя"
+          variant="text"
+          icon="pi pi-plus"
+          @click="showForm = true"
+        />
       </div>
     </template>
     <template #content>

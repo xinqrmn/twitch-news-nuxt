@@ -101,7 +101,9 @@ onBeforeMount(async () => {
   >
     <template #header>
       <div class="flex justify-between items-center gap-4">
-        <p>Записей: <span class="font-semibold">{{ usersStore.totalItems }}</span></p>
+        <p>
+          Записей: <span class="font-semibold">{{ usersStore.totalItems }}</span>
+        </p>
         <div>
           <IconField>
             <InputIcon>
