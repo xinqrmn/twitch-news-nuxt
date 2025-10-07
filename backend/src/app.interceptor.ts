@@ -40,7 +40,9 @@ export class AppLoggerMiddleware implements NestMiddleware {
   private safeStringify(data: any): string {
     try {
       let str = typeof data === 'string' ? data : JSON.stringify(data)
-      if (str.length > this.MAX_LOG_BODY_LENGTH) {
+      if (!str) {
+        str = 'none'
+      } else if (str.length > this.MAX_LOG_BODY_LENGTH) {
         str = str.substring(0, this.MAX_LOG_BODY_LENGTH) + '... [truncated]'
       }
       return str

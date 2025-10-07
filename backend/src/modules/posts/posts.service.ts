@@ -237,16 +237,4 @@ export class PostsService {
       return
     })
   }
-
-  // async addComment(
-  //   data: Partial<Comment>,
-  //   manager: EntityManager = this.connection.manager
-  // ): Promise<void> {
-  //   return manager.transaction(async (m: EntityManager) => {
-  //     const entity = m.create(Comment, data)
-  //     await m.save(Comment, entity)
-  //   })
-  // }
-
-  // // comments moved to CommentsModule
 }
