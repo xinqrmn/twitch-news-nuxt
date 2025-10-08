@@ -1,59 +1,61 @@
-import {
-  IsString,
-  IsOptional,
-  IsDateString,
-  IsInt,
-  IsArray,
-  ValidateNested,
-  IsUrl,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsOptional, IsString, IsInt, IsDateString, IsArray, ValidateNested } from 'class-validator'
+import { Type } from 'class-transformer'
 
 class SocialDto {
+  @ApiProperty({ example: 'twitch' })
   @IsString()
-  type: string;
+  type: string
 
-  @IsUrl({}, { message: 'Некорректная ссылка' })
-  url: string;
+  @ApiProperty({ example: 'https://twitch.tv/streamer' })
+  @IsString()
+  url: string
 }
 
 export class CreateStreamerBioDto {
+  @ApiProperty({ example: '1999-04-12', required: false })
+  @IsOptional()
   @IsDateString()
-  @IsOptional()
-  birthday?: string;
+  birthday?: string
 
+  @ApiProperty({ example: 'CS:GO', required: false })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  mainGame?: string;
+  mainGame?: string
 
+  @ApiProperty({ example: 75, required: false })
+  @IsOptional()
   @IsInt()
-  @IsOptional()
-  weight?: number;
+  weight?: number
 
+  @ApiProperty({ example: 'Россия', required: false })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  country?: string;
+  country?: string
 
+  @ApiProperty({ example: 'Москва', required: false })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  city?: string;
+  city?: string
 
+  @ApiProperty({ example: 182, required: false })
+  @IsOptional()
   @IsInt()
-  @IsOptional()
-  height?: number;
+  height?: number
 
+  @ApiProperty({ example: 'Известный стример...', required: false })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  bio?: string;
+  bio?: string
 
-  @IsArray()
+  @ApiProperty({ example: ['https://example.com/img1.jpg'], required: false })
   @IsOptional()
-  @IsUrl({}, { each: true, message: 'Каждый элемент gallery должен быть URL' })
-  gallery?: string[];
-
   @IsArray()
+  gallery?: string[]
+
+  @ApiProperty({ type: [SocialDto], required: false })
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => SocialDto)
-  @IsOptional()
-  socials?: SocialDto[];
+  socials?: SocialDto[]
 }

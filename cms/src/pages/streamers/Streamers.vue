@@ -10,15 +10,7 @@ import UsersTable from '@/components/Users/UsersTable.vue'
       </div>
     </template>
     <template #content>
-      <UsersTable
-        @showDialog="
-          (data) => {
-            editData = data
-            showDialog = true
-          }
-        "
-        @userDelete="handleDelete"
-      />
+      <UsersTable />
     </template>
   </Card>
 </template>

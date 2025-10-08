@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 const bio = ref('')
-const birthday = ref('')
+const birthday = ref<Date | Date[]>()
 const mainGame = ref('')
 const weight = ref<number | null>(null)
 const country = ref('')
@@ -15,8 +15,6 @@ const socials = ref<{ type: string; url: string }[]>([
   { type: 'telegram', url: '' },
   { type: 'instagram', url: '' },
 ])
-
-const news = ref<any[]>([])
 </script>
 
 <template>
@@ -83,7 +81,7 @@ const news = ref<any[]>([])
           </TabPanel>
 
           <TabPanel value="2">
-            <div v-for="(img, idx) in gallery" :key="idx" class="field">
+            <div v-for="(_, idx) in gallery" :key="idx" class="field">
               <InputText v-model="gallery[idx]" placeholder="Ссылка на фото" />
               <Button icon="pi pi-times" severity="danger" @click="gallery.splice(idx, 1)" />
             </div>

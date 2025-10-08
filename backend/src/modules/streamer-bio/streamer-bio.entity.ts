@@ -1,45 +1,39 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
-import { Streamer } from '../streamers/streamer.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm'
+import { Streamer } from '../streamers/streamer.entity'
 
 @Entity('streamer_bio')
 export class StreamerBio {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ type: 'date', nullable: true })
-  birthday: Date;
+  birthday: Date
 
   @Column({ nullable: true })
-  mainGame: string;
+  mainGame: string
 
   @Column({ type: 'int', nullable: true })
-  weight: number;
+  weight: number
 
   @Column({ nullable: true })
-  country: string;
+  country: string
 
   @Column({ nullable: true })
-  city: string;
+  city: string
 
   @Column({ type: 'int', nullable: true })
-  height: number;
+  height: number
 
   @Column({ type: 'text', nullable: true })
-  bio: string;
+  bio: string
 
   @Column('simple-array', { nullable: true })
-  gallery: string[];
+  gallery: string[]
 
   @Column('json', { nullable: true })
-  socials: { type: string; url: string }[];
+  socials: { type: string; url: string }[]
 
   @OneToOne(() => Streamer, (streamer) => streamer.bio, { onDelete: 'CASCADE' })
   @JoinColumn()
-  streamer: Streamer;
+  streamer: Streamer
 }

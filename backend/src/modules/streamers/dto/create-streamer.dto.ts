@@ -1,22 +1,27 @@
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsArray, IsOptional, IsString } from 'class-validator'
 
 export class CreateStreamerDto {
+  @ApiProperty()
   @IsString()
-  username: string;
+  username: string
 
+  @ApiProperty()
   @IsString()
-  displayName: string;
+  displayName: string
 
-  @IsString()
+  @ApiProperty({ required: false })
   @IsOptional()
-  avatarUrl?: string;
-
   @IsString()
-  @IsOptional()
-  status?: string;
+  avatarUrl?: string
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  status?: string
+
+  @ApiProperty({ required: false, type: [String] })
+  @IsOptional()
   @IsArray()
-  @IsOptional()
-  languages?: string[];
+  languages?: string[]
 }
-

@@ -1,64 +1,82 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 import { StreamerBio } from './streamer-bio.entity'
-import { CreateStreamerBioDto } from './dto/create-streamer-bio.dto'
 import { Streamer } from '../streamers/streamer.entity'
+import { CreateStreamerBioDto } from './dto/create-streamer-bio.dto'
+import { PaginateQuery, paginate, Paginated } from 'nestjs-paginate'
 
 @Injectable()
 export class StreamerBioService {
   constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(StreamerBio)
-    private bioRepo: Repository<StreamerBio>,
+    private readonly bioRepo: Repository<StreamerBio>,
     @InjectRepository(Streamer)
-    private streamerRepo: Repository<Streamer>
+    private readonly streamerRepo: Repository<Streamer>
   ) {}
-
-  async create(streamerId: number, dto: CreateStreamerBioDto) {
-    const streamer = await this.streamerRepo.findOne({ where: { id: streamerId } })
-    if (!streamer) throw new NotFoundException('Streamer not found')
-
-    const bio = this.bioRepo.create({ ...dto, streamer: { id: streamerId } })
-    return this.bioRepo.save(bio)
-  }
-
-  async update(streamerId: number, dto: CreateStreamerBioDto) {
-    const bio = await this.bioRepo.findOne({
-      where: { streamer: { id: streamerId } },
-      relations: ['streamer'],
-    })
-    if (!bio) throw new NotFoundException('Bio not found')
-
-    Object.assign(bio, dto)
-    return this.bioRepo.save(bio)
-  }
-
-  async findOne(streamerId: number) {
-    return this.bioRepo.findOne({
-      where: { streamer: { id: streamerId } },
-      relations: ['streamer']
-    })
-  }
 
   async findByStreamerId(streamerId: number) {
     return this.bioRepo.findOne({
       where: { streamer: { id: streamerId } },
       relations: ['streamer'],
-    });
+    })
   }
 
-  async createOrUpdate(streamerId: number, dto: CreateStreamerBioDto) {
-    let bio = await this.bioRepo.findOne({ where: { streamer: { id: streamerId } } });
+  async create(streamerId: number, dto: CreateStreamerBioDto) {
+    return this.dataSource.transaction(async (manager) => {
+      const streamer = await manager.findOne(Streamer, { where: { id: streamerId } })
+      if (!streamer) throw new Error('Streamer not found')
 
-    if (bio) {
-      await this.bioRepo.update(bio.id, dto);
-      return this.bioRepo.findOne({ where: { id: bio.id }, relations: ['streamer'] });
-    } else {
-      const newBio = this.bioRepo.create({
+      const newBio = manager.create(StreamerBio, {
         ...dto,
-        streamer: { id: streamerId },
-      });
-      return this.bioRepo.save(newBio);
-    }
+        streamer,
+      })
+
+      return manager.save(newBio)
+    })
+  }
+
+  async update(streamerId: number, dto: CreateStreamerBioDto) {
+    return this.dataSource.transaction(async (manager) => {
+      const bio = await manager.findOne(StreamerBio, {
+        where: { streamer: { id: streamerId } },
+        relations: ['streamer'],
+      })
+      if (!bio) throw new Error('Bio not found')
+
+      manager.merge(StreamerBio, bio, dto)
+      return manager.save(bio)
+    })
+  }
+
+  async getAllBioList(query: PaginateQuery): Promise<Paginated<StreamerBio>> {
+    const paginated = await paginate(query, this.bioRepo, {
+      relations: ['streamer'],
+      select: [
+        'id',
+        'birthday',
+        'mainGame',
+        'weight',
+        'country',
+        'city',
+        'height',
+        'bio',
+        'gallery',
+        'socials',
+      ],
+      where: { del: 0 },
+      sortableColumns: ['id', 'birthday', 'mainGame', 'country'],
+      searchableColumns: ['id', 'birthday', 'mainGame', 'country'],
+      filterableColumns: {
+        id: [],
+        birthday: [],
+      },
+    })
+    return paginated
+  }
+
+  async delete(id: number) {
+    return this.bioRepo.delete(id)
   }
 }
