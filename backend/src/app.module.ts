@@ -10,6 +10,10 @@ import { AuthModule } from './modules/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { RolesModule } from './modules/roles/roles.module'
 import { AppLoggerMiddleware } from './app.interceptor'
+import { TagsModule } from './modules/tags/tags.module'
+import { BadgesModule } from './modules/badges/badges.module'
+import { PostsModule } from './modules/posts/posts.module'
+import { CommentsModule } from './modules/comments/comments.module'
 
 @Module({
   imports: [
@@ -54,6 +58,10 @@ import { AppLoggerMiddleware } from './app.interceptor'
     AuthModule,
     RolesModule,
     UsersModule,
+    TagsModule,
+    BadgesModule,
+    PostsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
