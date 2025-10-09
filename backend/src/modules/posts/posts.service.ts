@@ -130,6 +130,7 @@ export class PostsService {
         'title',
         'subtitle',
         'views',
+        'slug',
         'author.username',
         'author.image_url',
         'tags.id',
