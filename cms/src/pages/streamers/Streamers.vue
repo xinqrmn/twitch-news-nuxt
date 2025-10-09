@@ -18,7 +18,6 @@ import UsersTable from '@/components/Users/UsersTable.vue'
             showDialog = true
           }
         "
-        @userDelete="handleDelete"
       />
     </template>
   </Card>
