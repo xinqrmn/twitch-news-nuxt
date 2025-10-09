@@ -38,19 +38,22 @@ export class Post {
   @Column({ type: 'varchar', nullable: true })
   coverImageUrl: string
 
-  @ManyToOne(() => User, { nullable: false, eager: true })
+  @ManyToOne(() => User, { nullable: false })
   author: User
 
-  @ManyToMany(() => Tag, { eager: true })
+  @ManyToMany(() => Tag)
   @JoinTable()
   tags: Tag[]
 
-  @ManyToMany(() => Badge, { eager: true })
+  @ManyToMany(() => Badge)
   @JoinTable()
   badges: Badge[]
 
   @Column({ type: 'text' })
   content: string
+
+  @Column({ type: 'int', default: 0 })
+  views: number
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   created_at: Date
@@ -58,4 +61,3 @@ export class Post {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updated_at: Date
 }
-
