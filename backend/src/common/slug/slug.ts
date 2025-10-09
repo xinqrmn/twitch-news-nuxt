@@ -85,5 +85,10 @@ slug.defaults.modes["rfc3986"] = {
 };
 
 export function generateSlug(title: string): string {
-  return slug(title)
+  const clean = title
+    .replace(/\.{2,}/g, ' ') // replace multiple dots (...) with space
+    .replace(/[.?!,:;'"“”‘’()[\]{}]/g, ' ') // remove single punctuation marks
+    .replace(/\s+/g, ' ') // collapse whitespace
+    .trim()
+  return slug(clean)
 }

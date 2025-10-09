@@ -78,13 +78,58 @@ export class PostsService {
     })
   }
 
-  async getAllPosts(query: PaginateQuery): Promise<Paginated<Post>> {
+  async addView(id: number, manager: EntityManager = this.connection.manager): Promise<void> {
+    return manager.transaction(async (m: EntityManager) => {
+      await m.increment(Post, { id: id }, 'views', 1)
+    })
+  }
+
+  async getTopPosts(): Promise<Post[]> {
+    const now = new Date()
+    const sevenDaysAgo = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - 7,
+      0,
+      0,
+      0,
+      0
+    ).toISOString()
+
+    // First, get the top 5 post IDs by views
+    const topPostIds = await this.postRepository
+      .createQueryBuilder('post')
+      .select('post.id')
+      .where('post.created_at >= :days', { days: sevenDaysAgo })
+      .orderBy('post.views', 'DESC')
+      .limit(5)
+      .getMany()
+
+    const ids = topPostIds.map((post) => post.id)
+
+    // return await this.postRepository.find({
+    //   relations: ['tags'],
+    //   select: ['id', 'title', 'slug', 'tags.id', 'tags.name'],
+    //   where: { id: In(ids) },
+    //   order: { views: 'DESC' },
+    // })
+    return await this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.tags', 'tags')
+      .select(['post.id', 'post.title', 'post.slug', 'tags.id', 'tags.name'])
+      .where('post.id IN (:...topPostIds)', { topPostIds: ids })
+      .orderBy('post.views', 'DESC')
+      .getMany()
+  }
+
+  async getAllPosts(query: PaginateQuery): Promise<Paginated<Post & { comments: number }>> {
     const paginated = await paginate(query, this.postRepository, {
       relations: ['tags', 'badges', 'author'],
       select: [
         'id',
         'title',
         'subtitle',
+        'views',
         'author.username',
         'author.image_url',
         'tags.id',
@@ -107,65 +152,97 @@ export class PostsService {
       ],
       defaultSortBy: [['created_at', 'DESC']],
     })
-    return paginated
+
+    const postIds = paginated.data.map((post: Post) => post.id)
+
+    let commentsCountMap: Record<number, number> = {}
+    if (postIds.length > 0) {
+      const commentsRaw: Array<{ postId: number; count: string }> = await this.connection
+        .getRepository('comments')
+        .createQueryBuilder('comment')
+        .select('comment.post_id', 'postId')
+        .addSelect('COUNT(comment.id)', 'count')
+        .where('comment.post_id IN (:...postIds)', { postIds })
+        .groupBy('comment.post_id')
+        .getRawMany()
+
+      commentsCountMap = {}
+      for (const row of commentsRaw) {
+        commentsCountMap[Number(row.postId)] = Number(row.count)
+      }
+    }
+
+    const dataWithComments: Array<Post & { comments: number }> = paginated.data.map(
+      (post: Post) => ({
+        ...post,
+        comments: commentsCountMap[post.id] || 0,
+      })
+    )
+
+    return {
+      ...paginated,
+      data: dataWithComments,
+    }
   }
 
   async findOneById(id: number): Promise<Post | null> {
     return await this.postRepository
-    .createQueryBuilder('post')
-    .leftJoinAndSelect('post.author', 'author')
-    .leftJoinAndSelect('post.tags', 'tags')
-    .leftJoinAndSelect('post.badges', 'badges')
-    .select([
-      'post.id',
-      'post.title',
-      'post.subtitle',
-      'post.slug',
-      'post.metaDescription',
-      'post.metaOgDescription',
-      'post.metaOgTitle',
-      'post.coverImageUrl',
-      'post.content',
-      'post.created_at',
-      'post.updated_at',
-      'author.username',
-      'author.image_url',
-      'tags.id',
-      'tags.name',
-      'badges.id',
-      'badges.name',
-    ])
-    .where('post.id = :id', { id })
-    .getOne();
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.tags', 'tags')
+      .leftJoinAndSelect('post.badges', 'badges')
+      .select([
+        'post.id',
+        'post.title',
+        'post.subtitle',
+        'post.slug',
+        'post.metaDescription',
+        'post.metaOgDescription',
+        'post.metaOgTitle',
+        'post.coverImageUrl',
+        'post.content',
+        'post.views',
+        'post.created_at',
+        'post.updated_at',
+        'author.username',
+        'author.image_url',
+        'tags.id',
+        'tags.name',
+        'badges.id',
+        'badges.name',
+      ])
+      .where('post.id = :id', { id })
+      .getOne()
   }
 
   async findOneBySlug(slug: string): Promise<Post | null> {
     return await this.postRepository
-    .createQueryBuilder('post')
-    .leftJoinAndSelect('post.author', 'author')
-    .leftJoinAndSelect('post.tags', 'tags')
-    .leftJoinAndSelect('post.badges', 'badges')
-    .select([
-      'post.id',
-      'post.title',
-      'post.subtitle',
-      'post.slug',
-      'post.metaDescription',
-      'post.metaOgDescription',
-      'post.metaOgTitle',
-      'post.coverImageUrl',
-      'post.content',
-      'post.created_at',
-      'post.updated_at',
-      'author.username',
-      'author.image_url',
-      'tags.id',
-      'tags.name',
-      'badges.id',
-      'badges.name',
-    ])
-    .where('post.slug = :slug', { slug })
-    .getOne();
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.tags', 'tags')
+      .leftJoinAndSelect('post.badges', 'badges')
+      .select([
+        'post.id',
+        'post.title',
+        'post.subtitle',
+        'post.slug',
+        'post.views',
+        'post.metaDescription',
+        'post.metaOgDescription',
+        'post.metaOgTitle',
+        'post.coverImageUrl',
+        'post.content',
+        'post.created_at',
+        'post.updated_at',
+        'author.username',
+        'author.image_url',
+        'tags.id',
+        'tags.name',
+        'badges.id',
+        'badges.name',
+      ])
+      .where('post.slug = :slug', { slug })
+      .getOne()
   }
 
   async update(
@@ -221,7 +298,6 @@ export class PostsService {
         }
       }
 
-      // Only include slug in update if it is different than the existing one
       const updatePayload = { ...updateData }
       if (slug !== undefined) {
         updatePayload['slug'] = slug

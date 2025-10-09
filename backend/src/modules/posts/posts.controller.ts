@@ -83,6 +83,22 @@ export class PostsController {
     const post = await this.postsService.findOneById(Number(id))
     return Respond.one(post)
   }
+
+  @Get('view/:id')
+  @ApiOperation({
+    summary: 'Добавление просмотра на пост',
+    description: 'Добавление просмотра на пост по айди. Токен авторизации не требуется',
+  })
+  @ApiResponse({ status: 200, description: 'Просмотр добавлен' })
+  @ApiResponse({
+    status: 500,
+    description: 'Непредвиденная ошибка',
+  })
+  async addView(@Param('id') id: string) {
+    await this.postsService.addView(Number(id))
+    return Respond.ok()
+  }
+
   @Get('get/by-slug/:slug')
   @ApiOperation({
     summary: 'Получение поста по слагу',
@@ -96,6 +112,22 @@ export class PostsController {
   async findOneBySlug(@Param('slug') slug: string) {
     const post = await this.postsService.findOneBySlug(slug)
     return Respond.one(post)
+  }
+
+  @Get('top')
+  @ApiOperation({
+    summary: 'Получение топ 5 постов',
+    description:
+      'Получение топ 5 постов за неделю, отсортированных по просмотрам. Токен авторизации не требуется',
+  })
+  @ApiResponse({ status: 200, description: 'Посты получены' })
+  @ApiResponse({
+    status: 500,
+    description: 'Непредвиденная ошибка',
+  })
+  async getTopPosts() {
+    const posts = await this.postsService.getTopPosts()
+    return Respond.one(posts)
   }
 
   @Patch('update/:id')
