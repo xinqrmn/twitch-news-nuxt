@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  HttpException,
 } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { AuthGuard } from '@nestjs/passport'
@@ -18,14 +19,14 @@ import { StreamerBioService } from './streamer-bio.service'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { CreateStreamerBioDto } from './dto/create-streamer-bio.dto'
 
-@ApiTags('Streamer Bio')
+@ApiTags('StreamerBio')
 @Controller('streamer-bio')
 export class StreamerBioController {
   constructor(private readonly bioService: StreamerBioService) {}
 
   private static JwtAuthGuard = class extends AuthGuard('jwt') {}
 
-  @Post('create')
+  @Post('create/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Создать биографию стримера',
@@ -33,8 +34,8 @@ export class StreamerBioController {
   })
   @ApiResponse({ status: 200, description: 'Биография стримера успешно создана' })
   @ApiResponse({ status: 403, description: 'Биография для данного стримера уже существует' })
-  async create(@Body() dto: CreateStreamerBioDto) {
-    await this.bioService.create(+id, dto)
+  async create(@Param('id') streamerId: number, @Body() dto: CreateStreamerBioDto) {
+    await this.bioService.create(streamerId, dto)
     return Respond.ok()
   }
 
@@ -49,38 +50,35 @@ export class StreamerBioController {
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
   @ApiResponse({ status: 200, description: 'Недостаточно прав для получения данных' })
-  getAllBioList(
+  async getAllBioList(
     @Paginate() query: PaginateQuery,
     @Req() req: Request & { user?: { roles?: string[] } }
   ) {
     const roles: string[] = req.user?.roles ?? []
-    if (!roles.includes('admin' || 'streamer_bio_editor' || 'streamer_bio_author')) {
+    if (
+      !roles.includes('admin') ||
+      roles.includes('streamer_bio_editor') ||
+      roles.includes('streamer_bio_author')
+    ) {
       throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
     }
-    const { data, meta } = await this.bioService.getAllBioList()
+    const { data, meta } = await this.bioService.getAllBioList(query)
     return Respond.many(data, meta)
   }
 
   @Patch('update/:id')
-    @UseGuards(StreamerBioController.JwtAuthGuard)
+  @UseGuards(StreamerBioController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Обновить био стримера' })
   @ApiResponse({ status: 200, description: 'Updated' })
-  update(@Param('id') id: number, @Body() dto: CreateStreamerBioDto) {
+  async update(@Param('id') id: number, @Body() dto: CreateStreamerBioDto) {
     return this.bioService.update(+id, dto)
-  }
-
-  @ApiOperation({ summary: 'Создать био стримера' })
-  @ApiResponse({ status: 201, description: 'Created' })
-  @Post(':id')
-  create(@Param('id') id: number, @Body() dto: CreateStreamerBioDto) {
-    return this.bioService.create(+id, dto)
   }
 
   @ApiOperation({ summary: 'Удалить био по ID' })
   @ApiResponse({ status: 200, description: 'Deleted' })
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     return this.bioService.delete(+id)
   }
 }

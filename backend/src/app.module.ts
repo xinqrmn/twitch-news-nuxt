@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { RolesModule } from './modules/roles/roles.module'
 import { AppLoggerMiddleware } from './app.interceptor'
+import { StreamerBioModule } from './modules/streamer-bio/streamer-bio.module'
+import { StreamersModule } from './modules/streamers/streamers.module'
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { AppLoggerMiddleware } from './app.interceptor'
     AuthModule,
     RolesModule,
     UsersModule,
+    StreamersModule,
+    StreamerBioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

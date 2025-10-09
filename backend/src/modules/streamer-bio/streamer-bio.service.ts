@@ -65,7 +65,6 @@ export class StreamerBioService {
         'gallery',
         'socials',
       ],
-      where: { del: 0 },
       sortableColumns: ['id', 'birthday', 'mainGame', 'country'],
       searchableColumns: ['id', 'birthday', 'mainGame', 'country'],
       filterableColumns: {

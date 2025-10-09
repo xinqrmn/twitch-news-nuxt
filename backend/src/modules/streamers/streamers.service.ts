@@ -9,11 +9,9 @@ import { StreamerBio } from '../streamer-bio/streamer-bio.entity'
 @Injectable()
 export class StreamersService {
   constructor(
-    @InjectRepository(Streamer)
-    private readonly streamersRepo: Repository<Streamer>,
-    @InjectRepository(StreamerBio)
-    private readonly biosRepo: Repository<StreamerBio>,
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    @InjectRepository(Streamer) private readonly streamersRepo: Repository<Streamer>,
+    @InjectRepository(StreamerBio) private readonly biosRepo: Repository<StreamerBio>
   ) {}
 
   async create(dto: CreateStreamerDto): Promise<Streamer> {
