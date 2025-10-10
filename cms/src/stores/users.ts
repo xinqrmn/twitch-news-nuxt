@@ -19,7 +19,7 @@ export const useUsersStore = defineStore('users', () => {
       list.value = res.data?.data
       totalItems.value = res.data?.pagination?.totalItems ?? 0
     } catch (err) {
-      console.error('Ошибка получения списка пользователй: ', err)
+      console.error('Ошибка получения списка пользователей: ', err)
     } finally {
       loading.value = false
     }

@@ -11,8 +11,8 @@ const model = ref([
     label: 'Main',
     items: [
       { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users' },
-      { label: 'Post List', icon: 'pi pi-fw pi-list', to: '/editor' },
-      { label: 'Post Editor', icon: 'pi pi-fw pi-pen-to-square', to: '/editor' },
+      { label: 'Post List', icon: 'pi pi-fw pi-list', to: '/posts' },
+      { label: 'Post Editor', icon: 'pi pi-fw pi-pen-to-square', to: '/posts/editor' },
       { label: 'Streamers Table', icon: 'pi pi-fw pi-table', to: '/streamers' },
       { label: 'Streamers Editor', icon: 'pi pi-fw pi-twitch', to: '/streamers/editor', class: 'rotated-icon' },
       { label: 'Settings', icon: 'pi pi-fw pi-cog', to: '/settings' },

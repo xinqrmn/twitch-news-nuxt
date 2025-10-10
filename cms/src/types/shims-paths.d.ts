@@ -1,0 +1,8 @@
+declare module '@/layout/*'
+declare module '@/views/*'
+declare module '@/stores/*'
+declare module '@/components/*'
+declare module '@/utils/*'
+declare module '@/composables/*'
+declare module '@/api/*'
+declare module '@/assets/*'

@@ -12,42 +12,47 @@ const router = createRouter({
       children: [
         {
           path: '',
-          component: () => import('@/pages/Dashboard.vue'),
+          component: () => import('@/views/Dashboard.vue'),
           meta: { requiresAuth: true },
         },
         {
           path: 'users',
-          component: () => import('@/pages/Users.vue'),
+          component: () => import('@/views/Users.vue'),
           meta: { requiresAuth: true },
         },
         {
-          path: 'editor',
-          component: () => import('@/pages/Editor.vue'),
+          path: 'posts',
+          component: () => import('@/views/posts/Posts.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'posts/editor',
+          component: () => import('@/views/posts/Editor.vue'),
           meta: { requiresAuth: true },
         },
         {
           path: 'streamers',
-          component: () => import('@/pages/streamers/Streamers.vue'),
+          component: () => import('@/views/streamers/Streamers.vue'),
           meta: { requiresAuth: true },
         },
         {
           path: 'streamers/editor',
-          component: () => import('@/pages/streamers/Editor.vue'),
+          component: () => import('@/views/streamers/Editor.vue'),
           meta: { requiresAuth: true },
         },
         {
           path: 'settings',
-          component: () => import('@/pages/Settings.vue'),
+          component: () => import('@/views/Settings.vue'),
           meta: { requiresAuth: true },
         },
         {
           path: 'doc',
-          component: () => import('@/pages/Documentation.vue'),
+          component: () => import('@/views/Documentation.vue'),
           meta: { requiresAuth: true },
-        }
+        },
       ],
     },
-    { path: '/login', component: () => import('@/pages/Login.vue') },
+    { path: '/login', component: () => import('@/views/Login.vue') },
   ],
 })
 

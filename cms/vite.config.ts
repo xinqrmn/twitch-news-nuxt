@@ -1,4 +1,5 @@
-import { fileURLToPath, URL } from 'node:url'
+// import { fileURLToPath, URL } from 'node:url'
+import path from 'path'
 import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
@@ -19,7 +20,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': path.resolve(__dirname, './src'),
     },
   },
 })

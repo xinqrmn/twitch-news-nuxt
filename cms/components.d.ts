@@ -33,6 +33,7 @@ declare module 'vue' {
     MilkdownEditorWrapper: typeof import('./src/components/Milkdown/MilkdownEditorWrapper.vue')['default']
     MultiSelect: typeof import('primevue/multiselect')['default']
     Password: typeof import('primevue/password')['default']
+    PostsTable: typeof import('./src/components/Posts/PostsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Select: typeof import('primevue/select')['default']
