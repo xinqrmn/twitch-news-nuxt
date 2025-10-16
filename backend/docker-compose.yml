@@ -23,3 +23,27 @@ services:
       - ./docker/dbdata:/var/lib/POSTGRES/
     networks:
       - db-net
+
+  tn-nest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      .env
+    ports:
+      - $APP_PORT:$APP_PORT
+    networks:
+      - db-net
+    depends_on:
+      - postgres_db
+  parser:
+    build:
+      context: ./parser
+      dockerfile: Dockerfile
+    container_name: streamers-parser
+    restart: always
+    ports: 
+      - $PARSER_PORT:$PARSER_PORT
+    networks:
+      - db-net
