@@ -68,6 +68,10 @@ def process_streamers_data(streamers_rows: List[bs4.element.Tag],
             if streamer_info:
                 output_list.append(streamer_info)
 
+def clear_streamer_input(text: str) -> str:
+    if text in ["--", "", "null", "None"]:
+            text = "0"
+    return text
 
 def extract_streamer_info(row: bs4.element.Tag,
                           streamer_data: List[str]) -> Optional[Dict[str, str]]:
@@ -81,13 +85,13 @@ def extract_streamer_info(row: bs4.element.Tag,
         return {
             "logo": str(img_tag.get("src", "")),
             "displayName": str(streamer_data[1]),
-            "avgViewers": str(streamer_data[2]),
-            "timeStreamed": str(streamer_data[3]),
-            "allTimePeakViewers": str(streamer_data[4]),
-            "hoursWatched": str(streamer_data[5]),
-            "followersGained": str(streamer_data[7]),
-            "totalFollowers": str(streamer_data[8]),
-            "totalViews": str(streamer_data[9]),
+            "avgViewers": str(clear_streamer_input(streamer_data[2])),
+            "timeStreamed": str(streamer_data[3].replace('hours', '')),
+            "allTimePeakViewers": str(clear_streamer_input(streamer_data[4])),
+            "hoursWatched": str(clear_streamer_input(streamer_data[5])),
+            "followersGained": str(clear_streamer_input(streamer_data[7])),
+            "totalFollowers": str(clear_streamer_input(streamer_data[8])),
+            "totalViews": str(clear_streamer_input(streamer_data[9])),
         }
 
     except Exception as error:

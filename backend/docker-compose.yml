@@ -37,6 +37,7 @@ services:
       - db-net
     depends_on:
       - postgres_db
+
   parser:
     build:
       context: ./parser
@@ -45,5 +46,7 @@ services:
     restart: always
     ports: 
       - $PARSER_PORT:$PARSER_PORT
+    depends_on:
+      - postgres_db
     networks:
       - db-net

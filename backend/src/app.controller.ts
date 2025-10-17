@@ -9,9 +9,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello()
   }
-
-  @Get('/parse')
-  async callParser(): Promise<any> {
-    return await this.appService.getParser()
-  }
 }

@@ -14,6 +14,7 @@ import { TagsModule } from './modules/tags/tags.module'
 import { BadgesModule } from './modules/badges/badges.module'
 import { PostsModule } from './modules/posts/posts.module'
 import { CommentsModule } from './modules/comments/comments.module'
+import { ParserModule } from './modules/parser/parser.module'
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { CommentsModule } from './modules/comments/comments.module'
     BadgesModule,
     PostsModule,
     CommentsModule,
+    ParserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

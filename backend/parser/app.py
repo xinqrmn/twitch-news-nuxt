@@ -1,5 +1,4 @@
 import datetime
-from typing import List, Dict
 from flask import Flask, Response, jsonify
 from datetime import datetime
 
