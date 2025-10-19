@@ -41,7 +41,6 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document)
   }
 
-
   app.use(helmet())
   app.use(json())
   app.use(cookieParser())

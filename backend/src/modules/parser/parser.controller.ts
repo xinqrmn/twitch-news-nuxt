@@ -3,14 +3,10 @@ import { AuthGuard } from '@nestjs/passport'
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpException,
   HttpStatus,
-  Param,
-  Patch,
-  Post,
   Req,
   UseGuards,
 } from '@nestjs/common'
@@ -26,13 +22,20 @@ export class ParserController {
 
   @Get('force')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(ParserController.JwtAuthGuard)
   @ApiOperation({
     summary: 'Принудительный запуск парсера',
     description:
-      'Принудительный запуск парсера.`',
+      'Принудительный запуск парсера. Только пользователь с ролью `admin` может принудительно запускать парсинг',
   })
-  @ApiResponse({ status: 200, description: 'Комментарии получены' })
-  async forceStartParser() {
+  @ApiResponse({ status: 200, description: 'Парсинг успешен' })
+  @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
+  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
+  async forceStartParser(@Req() req: Request & { user?: { roles?: string[] } }) {
+    const roles: string[] = req.user?.roles ?? []
+    if (!roles.includes('admin')) {
+      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
     await this.parserService.parseStreamers()
     return Respond.ok()
   }

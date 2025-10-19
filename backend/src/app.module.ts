@@ -15,6 +15,7 @@ import { BadgesModule } from './modules/badges/badges.module'
 import { PostsModule } from './modules/posts/posts.module'
 import { CommentsModule } from './modules/comments/comments.module'
 import { ParserModule } from './modules/parser/parser.module'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ParserModule } from './modules/parser/parser.module'
         return await new DataSource(options!).initialize()
       },
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     RolesModule,
     UsersModule,

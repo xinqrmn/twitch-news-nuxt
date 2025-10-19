@@ -24,19 +24,19 @@ services:
     networks:
       - db-net
 
-  tn-nest:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    env_file:
-      .env
-    ports:
-      - $APP_PORT:$APP_PORT
-    networks:
-      - db-net
-    depends_on:
-      - postgres_db
+  # tn-nest:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   env_file:
+  #     .env
+  #   ports:
+  #     - $APP_PORT:$APP_PORT
+  #   networks:
+  #     - db-net
+  #   depends_on:
+  #     - postgres_db
 
   parser:
     build:
