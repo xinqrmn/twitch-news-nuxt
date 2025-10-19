@@ -47,11 +47,12 @@ export class ParserService {
     }
 
     return manager.transaction(async (m: EntityManager) => {
+      await m.clear(ParserData)
       const sliceSize = 100
       for (let i = 0; i < json.data.length; i += sliceSize) {
         const slice = json.data.slice(i, i + sliceSize)
         try {
-          await m.upsert(ParserData, slice, ['displayName'])
+          await m.insert(ParserData, slice)
           this.logger.log(
             `Обработан слайс ${i / sliceSize + 1}/${Math.ceil(json.data.length / sliceSize)}`
           )
