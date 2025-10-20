@@ -14,6 +14,8 @@ import { TagsModule } from './modules/tags/tags.module'
 import { BadgesModule } from './modules/badges/badges.module'
 import { PostsModule } from './modules/posts/posts.module'
 import { CommentsModule } from './modules/comments/comments.module'
+import { ParserModule } from './modules/parser/parser.module'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
   imports: [
@@ -34,9 +36,12 @@ import { CommentsModule } from './modules/comments/comments.module'
           legacySpatialSupport: false,
           cache: false,
           ssl: false,
-          migrationsRun: false,
+          migrationsRun: true,
           autoLoadEntities: true,
-          synchronize: true,
+          migrationsTableName: '_migraitons',
+          synchronize: false,
+          entities: ['dist/**/*.entity{.ts,.js}'],
+          migrations: ['src/migrations/{*.ts,.js}'],
           logging: ['error'],
           maxQueryExecutionTime: 10_000,
           requestTimeout: 30_000,
@@ -55,6 +60,7 @@ import { CommentsModule } from './modules/comments/comments.module'
         return await new DataSource(options!).initialize()
       },
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     RolesModule,
     UsersModule,
@@ -62,6 +68,7 @@ import { CommentsModule } from './modules/comments/comments.module'
     BadgesModule,
     PostsModule,
     CommentsModule,
+    ParserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

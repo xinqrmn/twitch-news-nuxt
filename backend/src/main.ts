@@ -31,13 +31,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api')
 
-  const documentationConfig = new DocumentBuilder()
-    .setTitle('Twitch-News-Nest')
-    .setDescription('API Twitch News')
-    .setVersion('3.0')
-    .build()
-  const document = SwaggerModule.createDocument(app, documentationConfig)
-  SwaggerModule.setup('docs', app, document)
+  if (process.env.NODE_ENV !== 'production') {
+    const documentationConfig = new DocumentBuilder()
+      .setTitle('Twitch-News-Nest')
+      .setDescription('API Twitch News')
+      .setVersion('3.0')
+      .build()
+    const document = SwaggerModule.createDocument(app, documentationConfig)
+    SwaggerModule.setup('docs', app, document)
+  }
 
   app.use(helmet())
   app.use(json())
