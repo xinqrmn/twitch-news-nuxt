@@ -175,16 +175,7 @@ export class UsersService implements OnModuleInit {
   async getAllUsers(query: PaginateQuery): Promise<Paginated<User>> {
     const paginated = await paginate(query, this.userRepo, {
       relations: ['roles'],
-      select: [
-        'id',
-        'email',
-        'username',
-        'image_url',
-        'roles.cyrillic',
-        'roles.name',
-        'created_at',
-        'updated_at',
-      ],
+      select: ['id', 'email', 'username', 'image_url', 'roles.*', 'created_at', 'updated_at'],
       where: { del: 0 },
       sortableColumns: ['id', 'email', 'username', 'created_at', 'updated_at'],
       searchableColumns: ['id', 'email', 'username', 'created_at', 'updated_at'],

@@ -15,7 +15,12 @@ async function bootstrap() {
     }),
   })
 
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      disableErrorMessages: process.env.NODE_ENV === 'production',
+    })
+  )
 
   app.enableCors({
     origin: 'http://localhost:5173',
@@ -26,13 +31,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api')
 
-  const documentationConfig = new DocumentBuilder()
-    .setTitle('Twitch-News-Nest')
-    .setDescription('API Twitch News')
-    .setVersion('3.0')
-    .build()
-  const document = SwaggerModule.createDocument(app, documentationConfig)
-  SwaggerModule.setup('docs', app, document)
+  if (process.env.NODE_ENV !== 'production') {
+    const documentationConfig = new DocumentBuilder()
+      .setTitle('Twitch-News-Nest')
+      .setDescription('API Twitch News')
+      .setVersion('3.0')
+      .build()
+    const document = SwaggerModule.createDocument(app, documentationConfig)
+    SwaggerModule.setup('docs', app, document)
+  }
 
   app.use(helmet())
   app.use(json())
