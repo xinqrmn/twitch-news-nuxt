@@ -1,10 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm'
-import { Streamer } from '../streamers/streamer.entity'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { ApiProperty } from '@nestjs/swagger'
 
 @Entity('streamer_bio')
 export class StreamerBio {
   @PrimaryGeneratedColumn()
   id: number
+
+  @ApiProperty({ example: 'xinqrmn' })
+  @Column({ unique: true, type: 'varchar' })
+  displayName: string
+
+  @ApiProperty({ example: 'xinqrmn' })
+  @Column({ type: 'varchar', nullable: true })
+  byname: string
 
   @Column({ type: 'date', nullable: true })
   birthday: Date
@@ -33,7 +41,12 @@ export class StreamerBio {
   @Column('json', { nullable: true })
   socials: { type: string; url: string }[]
 
-  @OneToOne(() => Streamer, (streamer) => streamer.bio, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  streamer: Streamer
+  @Column({ type: 'int', default: 0 })
+  del: number
+
+  @CreateDateColumn({ type: 'timestamp with time zone' })
+  created_at: Date
+
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  updated_at: Date
 }

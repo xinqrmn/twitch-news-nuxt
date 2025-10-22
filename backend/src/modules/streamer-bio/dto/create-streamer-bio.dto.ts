@@ -13,6 +13,14 @@ class SocialDto {
 }
 
 export class CreateStreamerBioDto {
+  @ApiProperty({ example: 'xinqrmn' })
+  @IsString()
+  displayName: string
+
+  @ApiProperty({ example: 'xinqrmn' })
+  @IsString()
+  byname: string
+
   @ApiProperty({ example: '1999-04-12', required: false })
   @IsOptional()
   @IsDateString()

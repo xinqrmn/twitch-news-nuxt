@@ -18,6 +18,7 @@ import { Respond } from 'src/common/response/response'
 import { StreamerBioService } from './streamer-bio.service'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { CreateStreamerBioDto } from './dto/create-streamer-bio.dto'
+import { UpdateStreamerBioDto } from './dto/update-streamer-bio.dto'
 
 @ApiTags('StreamerBio')
 @Controller('streamer-bio')
@@ -26,59 +27,81 @@ export class StreamerBioController {
 
   private static JwtAuthGuard = class extends AuthGuard('jwt') {}
 
-  @Post('create/:id')
+  @Post('/create')
+  @UseGuards(StreamerBioController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Создать биографию стримера',
-    description: 'Создание биографии для стримера по его id',
+    description: 'Создание новой биографии стримера',
   })
   @ApiResponse({ status: 200, description: 'Биография стримера успешно создана' })
-  @ApiResponse({ status: 403, description: 'Биография для данного стримера уже существует' })
-  async create(@Param('id') streamerId: number, @Body() dto: CreateStreamerBioDto) {
-    await this.bioService.create(streamerId, dto)
+  @ApiResponse({ status: 409, description: 'Биография с таким именем уже существует' })
+  @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
+  async create(@Body() dto: CreateStreamerBioDto) {
+    await this.bioService.create(dto)
     return Respond.ok()
   }
 
-  @Get('get')
+  @Get('/get')
   @UseGuards(StreamerBioController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Получить все биографии стримеров',
-    description:
-      'Требуется авторизация. Только пользователи с ролью streamer_bio_editor или streamer_bio_author могут получить список биографии для всех стримеров',
+    description: 'Получение списка всех биографий стримеров с пагинацией',
   })
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
-  @ApiResponse({ status: 200, description: 'Недостаточно прав для получения данных' })
-  async getAllBioList(
-    @Paginate() query: PaginateQuery,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !roles.includes('admin') ||
-      roles.includes('streamer_bio_editor') ||
-      roles.includes('streamer_bio_author')
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async getAllBioList(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.bioService.getAllBioList(query)
     return Respond.many(data, meta)
   }
 
-  @Patch('update/:id')
+  @Get(':displayName')
   @UseGuards(StreamerBioController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Обновить био стримера' })
-  @ApiResponse({ status: 200, description: 'Updated' })
-  async update(@Param('id') id: number, @Body() dto: CreateStreamerBioDto) {
-    return this.bioService.update(+id, dto)
+  @ApiOperation({
+    summary: 'Получить биографию по displayName',
+    description: 'Получение биографии конкретного стримера по display Name',
+  })
+  @ApiResponse({ status: 200, description: 'Биография найдена' })
+  @ApiResponse({ status: 404, description: 'Биография не найдена' })
+  @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
+  async getOneByDisplayName(@Param('displayName') dName: string) {
+    const bio = await this.bioService.findOneByDisplayName(dName)
+    if (!bio) {
+      throw new HttpException('Биография не найдена', HttpStatus.NOT_FOUND)
+    }
+    return Respond.one(bio)
   }
 
-  @ApiOperation({ summary: 'Удалить био по ID' })
-  @ApiResponse({ status: 200, description: 'Deleted' })
+  @Patch('/edit/:id')
+  @UseGuards(StreamerBioController.JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Обновить биографию стримера',
+    description: 'Обновление биографии стримера по ID',
+  })
+  @ApiResponse({ status: 200, description: 'Биография обновлена' })
+  @ApiResponse({ status: 404, description: 'Биография не найдена' })
+  @ApiResponse({ status: 409, description: 'Биография с таким именем уже существует' })
+  @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
+  async update(@Param('id') id: number, @Body() dto: UpdateStreamerBioDto) {
+    await this.bioService.update(+id, dto)
+    return Respond.ok()
+  }
+
   @Delete(':id')
+  @UseGuards(StreamerBioController.JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Удалить биографию по ID',
+    description: 'Мягкое удаление биографии стримера по ID',
+  })
+  @ApiResponse({ status: 200, description: 'Биография удалена' })
+  @ApiResponse({ status: 404, description: 'Биография не найдена' })
+  @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
   async remove(@Param('id') id: number) {
-    return this.bioService.delete(+id)
+    await this.bioService.softDelete(+id)
+    return Respond.ok()
   }
 }

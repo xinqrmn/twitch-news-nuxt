@@ -1,34 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm'
-import { StreamerBio } from '../streamer-bio/streamer-bio.entity'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('streamers')
 export class Streamer {
-  @ApiProperty({ example: 1 })
   @PrimaryGeneratedColumn()
   id: number
 
   @ApiProperty({ example: 'xinqrmn' })
-  @Column({ unique: true })
-  username: string
-
-  @ApiProperty({ example: 'Roman Galanov' })
-  @Column()
+  @Column({ unique: true, type: 'varchar' })
   displayName: string
 
-  @ApiProperty({ example: 'https://cdn.example.com/avatar.png', nullable: true })
-  @Column({ nullable: true })
-  avatarUrl: string
+  @ApiProperty({ example: 420691 })
+  @Column({ type: 'int', default: 0 })
+  allTimePeakViewers: number
 
-  @ApiProperty({ example: 'online', enum: ['online', 'offline', 'banned'] })
-  @Column({ default: 'offline' })
-  status: string
+  @ApiProperty({ example: 1245 })
+  @Column({ type: 'int', default: 0 })
+  hoursWatched: number
 
-  @ApiProperty({ example: ['English', 'Russian'], type: [String] })
-  @Column('simple-array', { nullable: true })
-  languages: string[]
+  @ApiProperty({ example: 'https://cdn.example.com/avatar.png' })
+  @Column({ type: 'varchar', default: 0 })
+  logo: number
 
-  @ApiProperty({ type: () => StreamerBio })
-  @OneToOne(() => StreamerBio, (bio) => bio.streamer, { cascade: true })
-  bio: StreamerBio
+  @ApiProperty({ example: '+14256' })
+  @Column({ type: 'varchar', default: 0 })
+  followersGained: string
+
+  @ApiProperty({ example: 42.6 })
+  @Column({ type: 'real', default: 0 })
+  timeStreamed: number
+
+  @ApiProperty({ example: 1245121 })
+  @Column({ type: 'int', default: 0 })
+  totalFollowers: number
+
+  @ApiProperty({ example: 124512 })
+  @Column({ type: 'int', default: 0 })
+  avgViewers: number
+
+  @ApiProperty({ example: 12412556 })
+  @Column({ type: 'int', default: 0 })
+  totalViews: number
 }
