@@ -76,13 +76,35 @@ export class StreamersService {
     }
   }
 
+  async getAllStreamersList(): Promise<{ id: number; displayName: string; has_bio: boolean }[]> {
+    const streamers = await this.streamersRepo.find({
+      select: ['id', 'displayName'],
+    })
+
+    const names = streamers.map((s) => s.displayName)
+
+    const bios = names.length
+      ? await this.biosRepo.find({
+          where: { displayName: In(names), del: 0 },
+          select: ['displayName'],
+        })
+      : []
+    const biosSet = new Set(bios.map((b) => b.displayName))
+
+    const result: { id: number; displayName: string; has_bio: boolean }[] = streamers.map((s) => ({
+      ...s,
+      has_bio: biosSet.has(s.displayName),
+    }))
+    return result
+  }
+
   async getOneByDisplayName(
     dName: string
   ): Promise<(Streamer & { bio: StreamerBio | null }) | null> {
     const streamer = await this.streamersRepo.findOne({ where: { displayName: dName } })
 
     if (!streamer) {
-      throw new HttpException('Streamer not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('Стример не найден!', HttpStatus.NOT_FOUND)
     }
 
     const bio = await this.biosRepo.findOne({
