@@ -2,7 +2,10 @@
   <div>
     <Card>
       <template #title>
-        <h2>Список постов</h2>
+        <div class="flex items-center justify-between">
+          <h2>Список постов</h2>
+          <Button @click="$router.push('/posts/new')">Создать новость</Button>
+        </div>
       </template>
       <template #content>
         <PostsTable></PostsTable>
@@ -12,16 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { usePostsStore } from '@/stores/posts'
 import PostsTable from '@/components/posts/PostsTable.vue'
-import { onMounted } from 'vue'
-
-const postsStore = usePostsStore()
-
-onMounted(async () => {
-  await postsStore.fetchPosts()
-  console.log('test')
-})
 </script>
 
 <style scoped></style>

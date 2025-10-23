@@ -12,14 +12,15 @@ const model = ref([
     items: [
       { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users' },
       { label: 'Post List', icon: 'pi pi-fw pi-list', to: '/posts' },
-      { label: 'Post Editor', icon: 'pi pi-fw pi-pen-to-square', to: '/posts/editor' },
+      { label: 'Categories list', icon: 'pi pi-fw pi-table', to: '/' },
+      { label: 'Tags list', icon: 'pi pi-fw pi-table', to: '/' },
       { label: 'Streamers Table', icon: 'pi pi-fw pi-table', to: '/streamers' },
       { label: 'Streamers Editor', icon: 'pi pi-fw pi-twitch', to: '/streamers/editor', class: 'rotated-icon' },
       { label: 'Settings', icon: 'pi pi-fw pi-cog', to: '/settings' },
     ],
   },
   {
-    label: 'Get Started',
+    label: 'Technic Block',
     items: [
       {
         label: 'Documentation',

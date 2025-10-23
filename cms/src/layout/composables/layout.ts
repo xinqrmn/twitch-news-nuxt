@@ -1,4 +1,6 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, onMounted, watchEffect } from 'vue'
+
+const THEME_KEY = 'app-theme'
 
 const layoutConfig = reactive({
   preset: 'Aura',
@@ -19,23 +21,40 @@ const layoutState = reactive({
 })
 
 export function useLayout() {
-  const setActiveMenuItem = (item) => {
-    layoutState.activeMenuItem = item.value || item
+  const initTheme = () => {
+    const savedTheme = localStorage.getItem(THEME_KEY)
+    if (savedTheme) {
+      layoutConfig.darkTheme = savedTheme === 'dark'
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      layoutConfig.darkTheme = prefersDark
+      localStorage.setItem(THEME_KEY, prefersDark ? 'dark' : 'light')
+    }
+
+    applyThemeClass()
+  }
+
+  const applyThemeClass = () => {
+    document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme)
+  }
+
+  const watchSystemTheme = () => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    media.addEventListener('change', (e) => {
+      layoutConfig.darkTheme = e.matches
+      localStorage.setItem(THEME_KEY, e.matches ? 'dark' : 'light')
+      applyThemeClass()
+    })
   }
 
   const toggleDarkMode = () => {
-    if (!document.startViewTransition) {
-      executeDarkModeToggle()
-
-      return
-    }
-
-    document.startViewTransition(() => executeDarkModeToggle(event))
+    layoutConfig.darkTheme = !layoutConfig.darkTheme
+    localStorage.setItem(THEME_KEY, layoutConfig.darkTheme ? 'dark' : 'light')
+    applyThemeClass()
   }
 
-  const executeDarkModeToggle = () => {
-    layoutConfig.darkTheme = !layoutConfig.darkTheme
-    document.documentElement.classList.toggle('app-dark')
+  const setActiveMenuItem = (item) => {
+    layoutState.activeMenuItem = item.value || item
   }
 
   const toggleMenu = () => {
@@ -53,12 +72,16 @@ export function useLayout() {
   const isSidebarActive = computed(
     () => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive
   )
-
   const isDarkTheme = computed(() => layoutConfig.darkTheme)
-
   const getPrimary = computed(() => layoutConfig.primary)
-
   const getSurface = computed(() => layoutConfig.surface)
+
+  onMounted(() => {
+    initTheme()
+    watchSystemTheme()
+  })
+
+  watchEffect(() => applyThemeClass())
 
   return {
     layoutConfig,

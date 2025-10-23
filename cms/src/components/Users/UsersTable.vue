@@ -101,7 +101,9 @@ onBeforeMount(async () => {
   >
     <template #header>
       <div class="flex justify-between items-center gap-4">
-        <p>Записей: <span class="font-semibold">{{ usersStore.totalItems }}</span></p>
+        <p>
+          Записей: <span class="font-semibold">{{ usersStore.totalItems }}</span>
+        </p>
         <div>
           <IconField>
             <InputIcon>
@@ -113,10 +115,10 @@ onBeforeMount(async () => {
       </div>
     </template>
     <template #paginatorstart>
-      <Button type="button" icon="pi pi-refresh" text @click="usersStore.fetchUsers()" />
+      <Button type="button" icon="pi pi-refresh" text @click="usersStore.fetchUsers()"></Button>
     </template>
     <template #paginatorend>
-      <Button type="button" icon="pi pi-download" text />
+      <Button type="button" icon="pi pi-download" text></Button>
     </template>
     <Column field="id" sortable header="ID"></Column>
     <Column field="username" sortable header="Имя пользователя">
