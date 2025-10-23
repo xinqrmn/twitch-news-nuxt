@@ -9,5 +9,5 @@ export interface Role {
 }
 
 export async function getRoles() {
-	return api.get<Role[]>(`${API_URL}/get`)
+  return api.get<Role[]>(`${API_URL}/get`)
 }

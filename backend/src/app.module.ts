@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { RolesModule } from './modules/roles/roles.module'
 import { AppLoggerMiddleware } from './app.interceptor'
+import { StreamerBioModule } from './modules/streamer-bio/streamer-bio.module'
+import { StreamersModule } from './modules/streamers/streamers.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { BadgesModule } from './modules/badges/badges.module'
 import { PostsModule } from './modules/posts/posts.module'
@@ -64,6 +66,8 @@ import { ScheduleModule } from '@nestjs/schedule'
     AuthModule,
     RolesModule,
     UsersModule,
+    StreamersModule,
+    StreamerBioModule,
     TagsModule,
     BadgesModule,
     PostsModule,

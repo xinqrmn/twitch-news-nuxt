@@ -31,12 +31,12 @@ export class ParserController {
   @ApiResponse({ status: 200, description: 'Парсинг успешен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
   @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async forceStartParser(@Req() req: Request & { user?: { roles?: string[] } }) {
+  async forceStartParser(@Req() req: Request & { user: { roles: string[]; username: string } }) {
     const roles: string[] = req.user?.roles ?? []
     if (!roles.includes('admin')) {
       throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
     }
-    await this.parserService.parseStreamers()
+    await this.parserService.parseStreamers(req.user.username)
     return Respond.ok()
   }
 }

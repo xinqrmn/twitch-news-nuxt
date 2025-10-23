@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UpdateUserDto } from '@/types/user'
-import { useRolesStore } from '@/stores/roles';
+import { useRolesStore } from '@/stores/roles'
 import { onMounted, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  handleEdit: [data: UpdateUserDto],
+  handleEdit: [data: UpdateUserDto]
   close
 }>()
 
@@ -81,7 +81,12 @@ onMounted(async () => {
 
     <template #footer>
       <div class="flex gap-2 justify-end w-full">
-        <Button label="Закрыть" severity="secondary" class="p-button-outlined w-28" @click="emit('close')"/>
+        <Button
+          label="Закрыть"
+          severity="secondary"
+          class="p-button-outlined w-28"
+          @click="emit('close')"
+        />
         <Button label="Сохранить" class="w-28" @click="handleSubmit" />
       </div>
     </template>

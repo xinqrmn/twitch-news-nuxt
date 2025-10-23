@@ -53,7 +53,7 @@ function saveNews() {
     </template>
 
     <template #content>
-      <div class="h-full overflow-hidden flex flex-col gap-4 ">
+      <div class="h-full overflow-hidden flex flex-col gap-4">
         <div>
           <label class="block mb-1 text-sm font-medium">Заголовок</label>
           <InputText v-model="title" class="w-full" placeholder="Введите заголовок" />
@@ -66,7 +66,11 @@ function saveNews() {
 
         <div>
           <label class="block mb-1 text-sm font-medium">URL обложки</label>
-          <InputText v-model="coverImage" class="w-full" placeholder="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/EBU_Colorbars_HD.svg/1600px-EBU_Colorbars_HD.svg.png" />
+          <InputText
+            v-model="coverImage"
+            class="w-full"
+            placeholder="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/EBU_Colorbars_HD.svg/1600px-EBU_Colorbars_HD.svg.png"
+          />
         </div>
 
         <div>

@@ -8,12 +8,13 @@ if (!nameArg) {
 }
 
 const args = [
+  './node_modules/ts-node/dist/bin.js',
   './node_modules/typeorm/cli.js',
   '-d',
   './src/common/data-source.ts',
   'migration:create',
   `./src/migrations/${nameArg}`,
-];
+]
 
 const result = spawnSync('node', args, { stdio: 'inherit', env: { ...process.env, NODE_ENV: 'development' } });
 process.exit(result.status ?? 0);

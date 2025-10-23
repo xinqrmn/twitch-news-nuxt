@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 const bio = ref('')
-const birthday = ref('')
+const birthday = ref<Date | Date[]>()
 const mainGame = ref('')
 const weight = ref<number | null>(null)
 const country = ref('')
@@ -15,8 +15,6 @@ const socials = ref<{ type: string; url: string }[]>([
   { type: 'telegram', url: '' },
   { type: 'instagram', url: '' },
 ])
-
-const news = ref<any[]>([])
 </script>
 
 <template>
@@ -73,15 +71,27 @@ const news = ref<any[]>([])
           </TabPanel>
 
           <TabPanel value="1">
-            <Textarea v-model="bio" class="w-full" rows="6" autoResize placeholder="Введите описание..." />
+            <Textarea
+              v-model="bio"
+              class="w-full"
+              rows="6"
+              autoResize
+              placeholder="Введите описание..."
+            />
           </TabPanel>
 
           <TabPanel value="2">
-            <div v-for="(img, idx) in gallery" :key="idx" class="field">
+            <div v-for="(_, idx) in gallery" :key="idx" class="field">
               <InputText v-model="gallery[idx]" placeholder="Ссылка на фото" />
               <Button icon="pi pi-times" severity="danger" @click="gallery.splice(idx, 1)" />
             </div>
-            <Button label="Добавить фото" variant="text" class="block w-full" icon="pi pi-plus" @click="gallery.push('')" />
+            <Button
+              label="Добавить фото"
+              variant="text"
+              class="block w-full"
+              icon="pi pi-plus"
+              @click="gallery.push('')"
+            />
           </TabPanel>
 
           <TabPanel value="3">
@@ -102,7 +112,10 @@ const news = ref<any[]>([])
 
           <TabPanel value="4">
             <p class="mb-2">Здесь можно будет прикреплять или создавать новости (TODO)</p>
-            <p class="mb-4 text-sm text-red-500">Чтобы увидеть здесь новости связанные с стримером, указываете в тегах displayName (например: Evelone а не evelone2004)</p>
+            <p class="mb-4 text-sm text-red-500">
+              Чтобы увидеть здесь новости связанные с стримером, указываете в тегах displayName
+              (например: Evelone а не evelone2004)
+            </p>
             <Button label="Добавить новость" icon="pi pi-plus" />
           </TabPanel>
         </TabPanels>
@@ -114,7 +127,7 @@ const news = ref<any[]>([])
   </Card>
 </template>
 
-<style  lang="scss">
+<style lang="scss">
 .streamer-editor {
   .field {
     width: 100%;

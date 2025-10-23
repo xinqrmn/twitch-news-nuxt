@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import UsersTable from '@/components/Users/UsersTable.vue'
 </script>
 
@@ -11,18 +10,9 @@ import UsersTable from '@/components/Users/UsersTable.vue'
       </div>
     </template>
     <template #content>
-      <UsersTable
-        @showDialog="
-          (data) => {
-            editData = data
-            showDialog = true
-          }
-        "
-      />
+      <UsersTable />
     </template>
   </Card>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
