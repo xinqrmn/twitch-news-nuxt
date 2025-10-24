@@ -32,11 +32,12 @@ export class BadgesService {
     manager: EntityManager = this.connection.manager,
   ): Promise<void> {
     return manager.transaction(async (m: EntityManager) => {
-      const badgeExists = await m.findOne(Badge, {
-        where: [{name : dto.name}]
+      const badgeExists = await m.find(Badge, {
+        where: [{ name: dto.name }],
       })
 
-      if (badgeExists) throw new HttpException('Бейдж уже существует!', HttpStatus.CONFLICT)
+      if (badgeExists.some((badge) => badge.del === 0))
+        throw new HttpException('Бейдж уже существует!', HttpStatus.CONFLICT)
 
       const badge = m.create(Badge, {
         name: dto.name

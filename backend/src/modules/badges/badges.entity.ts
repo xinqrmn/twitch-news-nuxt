@@ -5,10 +5,10 @@ export class Badge {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({unique: true, type: 'varchar'})
+  @Column({ type: 'varchar' })
   name: string
 
-  @Column({type: 'int', default: 0})
+  @Column({ type: 'int', default: 0 })
   del: number
 }
 
