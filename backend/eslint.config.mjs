@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'scripts/**', '**/*.cjs'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -18,6 +18,8 @@ export default tseslint.config(
       sourceType: 'commonjs',
       parserOptions: {
         projectService: true,
+        // Allow non-project files (e.g., .cjs in scripts/) to use a default program
+        allowDefaultProject: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },

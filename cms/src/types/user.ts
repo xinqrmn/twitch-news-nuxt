@@ -11,6 +11,7 @@ export type User = {
 export interface CreateUserDto {
   email: string
   password: string
+  username: string
   roles: string[]
 }
 

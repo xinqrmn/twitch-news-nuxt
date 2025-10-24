@@ -15,17 +15,19 @@ export const useAuthStore = defineStore(
 
     const router = useRouter()
 
-    const initializeAuth = async () => {
-      try {
-        await fetchMe()
-      } catch (error) {
-        console.error('Ошибка при восстановлении сессии:', error)
-        isAuthenticated.value = false
-        user.value = null
-      } finally {
-        isInitialized.value = true
-      }
+  const initializeAuth = async () => {
+    try {
+      await fetchMe()
+    } catch (error) {
+      console.error('Ошибка при восстановлении сессии:', error)
+      isAuthenticated.value = false
+      user.value = null
+    } finally {
+      isInitialized.value = true
     }
+  }
+
+
 
     const loginAction = async (email: string, password: string) => {
       const res = await login({ email, password })
