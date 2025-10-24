@@ -14,24 +14,24 @@ export class TagsService {
   ) {}
 
   async getAllTags(): Promise<Tag[]> {
-    const tags = await this.tagRepo.find({where: {del: 0}})
+    const tags = await this.tagRepo.find({ where: { del: 0 }, select: ['id', 'name'] })
 
     return tags
   }
 
   async createTag(
     dto: TagCreateDto,
-    manager: EntityManager = this.connection.manager,
+    manager: EntityManager = this.connection.manager
   ): Promise<void> {
     return manager.transaction(async (m: EntityManager) => {
       const tagExists = await m.findOne(Tag, {
-        where: [{name : dto.name}]
+        where: [{ name: dto.name }],
       })
 
       if (tagExists) throw new HttpException('Тег уже существует!', HttpStatus.CONFLICT)
 
       const tag = m.create(Tag, {
-        name: dto.name
+        name: dto.name,
       })
 
       await m.save(Tag, tag)
@@ -63,12 +63,12 @@ export class TagsService {
     manager: EntityManager = this.connection.manager
   ): Promise<void> {
     return manager.transaction(async (m: EntityManager) => {
-      const tag = await m.findOne(Tag, {where: {id: tagId }})
-      if (!tag || tag.del === 1){
+      const tag = await m.findOne(Tag, { where: { id: tagId } })
+      if (!tag || tag.del === 1) {
         throw new HttpException('Тег не найден', HttpStatus.NOT_FOUND)
       }
 
-      const updatePayload: QueryDeepPartialEntity<Tag> = {name: dto.name}
+      const updatePayload: QueryDeepPartialEntity<Tag> = { name: dto.name }
 
       await m.update(Tag, { id: tagId }, updatePayload)
       return

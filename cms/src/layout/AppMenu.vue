@@ -12,8 +12,7 @@ const model = ref([
     items: [
       { label: 'Users', icon: 'pi pi-fw pi-users', to: '/users' },
       { label: 'Post List', icon: 'pi pi-fw pi-list', to: '/posts' },
-      { label: 'Categories list', icon: 'pi pi-fw pi-table', to: '/' },
-      { label: 'Tags list', icon: 'pi pi-fw pi-table', to: '/' },
+      { label: 'Taxonomy Management', icon: 'pi pi-fw pi-table', to: '/categories-and-tags' },
       { label: 'Streamers Table', icon: 'pi pi-fw pi-table', to: '/streamers' },
       {
         label: 'Streamers Editor',

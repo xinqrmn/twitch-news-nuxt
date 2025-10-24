@@ -4,7 +4,12 @@
       <template #title>
         <div class="flex items-center justify-between">
           <h2>Список постов</h2>
-          <Button @click="$router.push('/posts/new')">Создать новость</Button>
+          <Button
+            label="Создать новость"
+            variant="text"
+            icon="pi pi-plus"
+            @click="$router.push('/posts/new')"
+          ></Button>
         </div>
       </template>
       <template #content>

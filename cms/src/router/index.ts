@@ -41,6 +41,11 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: 'categories-and-tags',
+          component: () => import('@/views/CategoriesAndTags.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
           path: 'settings',
           component: () => import('@/views/Settings.vue'),
           meta: { requiresAuth: true },

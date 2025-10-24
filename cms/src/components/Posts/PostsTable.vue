@@ -50,7 +50,7 @@ onMounted(async () => {
       <Button type="button" icon="pi pi-upload" text @click="exportCSV($event)"></Button>
     </template>
 
-    <Column field="id" header="Id" />
+    <Column field="id" header="Id"></Column>
     <Column header="Author">
       <template #body="{ data }">
         <div class="flex items-center gap-2">

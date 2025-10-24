@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import type {} from '@/types/posts'
 import { reactive, ref } from 'vue'
 import type { CreatePostDto } from '@/api/posts'
 import { createPost, getPosts, getPostById, updatePost, deletePostById } from '@/api/posts'
@@ -22,7 +21,6 @@ export const usePostsStore = defineStore('posts', () => {
     } catch (err) {
       console.error('Ошибка получения постов: ', err)
     } finally {
-      console.log(list.value)
       loading.value = false
     }
   }
@@ -42,7 +40,6 @@ export const usePostsStore = defineStore('posts', () => {
   const createNewPost = async (data: CreatePostDto) => {
     try {
       const res = await createPost(data)
-      console.log('Создание поста:', res)
       if (res.data?.success) await fetchPosts()
     } catch (err) {
       console.error('Ошибка создания поста:', err)

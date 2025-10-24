@@ -17,6 +17,7 @@ import AppSidebar from '@/layout/AppSidebar.vue'
       messageIcon: 'scale-[90%]',
     }"
   />
+  <ConfirmDialog />
 </template>
 
 <style scoped lang="scss"></style>
