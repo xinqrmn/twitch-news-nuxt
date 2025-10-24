@@ -4,6 +4,7 @@ import { DataSource, EntityManager, Repository } from 'typeorm'
 import { Tag } from './tags.entity'
 import { TagCreateDto } from './dto/tag-create.dto'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity.js'
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 
 @Injectable()
 export class TagsService {
@@ -13,25 +14,33 @@ export class TagsService {
     @InjectRepository(Tag) private tagRepo: Repository<Tag>
   ) {}
 
-  async getAllTags(): Promise<Tag[]> {
-    const tags = await this.tagRepo.find({where: {del: 0}})
-
-    return tags
+  async getAllTags(query: PaginateQuery): Promise<Paginated<Tag>> {
+    const paginated = await paginate(query, this.tagRepo, {
+      select: ['id', 'name'],
+      where: { del: 0 },
+      sortableColumns: ['id', 'name'],
+      searchableColumns: ['id', 'name'],
+      filterableColumns: {
+        name: [],
+      },
+    })
+    return paginated
   }
 
   async createTag(
     dto: TagCreateDto,
-    manager: EntityManager = this.connection.manager,
+    manager: EntityManager = this.connection.manager
   ): Promise<void> {
     return manager.transaction(async (m: EntityManager) => {
-      const tagExists = await m.findOne(Tag, {
-        where: [{name : dto.name}]
+      const tagExists = await m.find(Tag, {
+        where: [{ name: dto.name }],
       })
 
-      if (tagExists) throw new HttpException('Тег уже существует!', HttpStatus.CONFLICT)
+      if (tagExists?.some((tag) => tag.del === 0))
+        throw new HttpException('Тег уже существует!', HttpStatus.CONFLICT)
 
       const tag = m.create(Tag, {
-        name: dto.name
+        name: dto.name,
       })
 
       await m.save(Tag, tag)
@@ -63,12 +72,12 @@ export class TagsService {
     manager: EntityManager = this.connection.manager
   ): Promise<void> {
     return manager.transaction(async (m: EntityManager) => {
-      const tag = await m.findOne(Tag, {where: {id: tagId }})
-      if (!tag || tag.del === 1){
+      const tag = await m.findOne(Tag, { where: { id: tagId } })
+      if (!tag || tag.del === 1) {
         throw new HttpException('Тег не найден', HttpStatus.NOT_FOUND)
       }
 
-      const updatePayload: QueryDeepPartialEntity<Tag> = {name: dto.name}
+      const updatePayload: QueryDeepPartialEntity<Tag> = { name: dto.name }
 
       await m.update(Tag, { id: tagId }, updatePayload)
       return
