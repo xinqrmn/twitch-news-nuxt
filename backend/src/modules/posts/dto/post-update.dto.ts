@@ -1,5 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsArray, IsInt, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator'
+import {
+  IsArray,
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from 'class-validator'
 
 export class PostUpdateDto {
   @ApiPropertyOptional({
@@ -95,6 +103,16 @@ export class PostUpdateDto {
   @IsArray()
   @IsInt({ each: true })
   badges?: number[]
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Дата и время публикации (ISO-8601). Если в прошлом или пусто — публикуем сразу',
+    required: false,
+    example: '2025-10-27T14:00:00.000Z',
+  })
+  @IsOptional()
+  @IsDateString()
+  publishAt?: string
 }
 
 

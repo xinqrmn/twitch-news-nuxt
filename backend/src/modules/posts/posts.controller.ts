@@ -56,7 +56,7 @@ export class PostsController {
   @Get('get')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Получение всех постов',
+    summary: 'Получение всех выложенных постов',
     description: 'Получение всех постов. Токен авторизации не требуется',
   })
   @ApiResponse({ status: 200, description: 'Посты получены' })
@@ -66,6 +66,33 @@ export class PostsController {
   })
   async getAllPosts(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.postsService.getAllPosts(query)
+    return Respond.many(data, meta)
+  }
+
+  @Get('get/all')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(PostsController.JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Получение всех постов (с невыложенными)',
+    description:
+      'Получение всех постов (с невыложенными). Требуется токен авторизации и роль `Администратор`, `Редактор новостей`, или `Автор новостей`',
+  })
+  @ApiResponse({ status: 200, description: 'Посты получены' })
+  @ApiResponse({
+    status: 500,
+    description: 'Увы(',
+  })
+  async getAllPostsWithUnpublished(
+    @Paginate() query: PaginateQuery,
+    @Req() req: Request & { user?: { username: string; roles?: string[] } }
+  ) {
+    const roles: string[] = req.user?.roles ?? []
+    if (
+      !(roles.includes('admin') || roles.includes('news_editor') || roles.includes('news_author'))
+    ) {
+      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+    const { data, meta } = await this.postsService.getAllPostsWithUnpublished(query)
     return Respond.many(data, meta)
   }
 
