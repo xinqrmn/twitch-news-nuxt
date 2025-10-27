@@ -37,7 +37,7 @@ export class PostsService {
         throw new HttpException('Пользователь не найден!', HttpStatus.NOT_FOUND)
       }
 
-      const { tags, badges, ...rest } = createPostDto
+      const { tags, badges, publishAt, ...rest } = createPostDto
 
       let tagEntities: any[] = []
       if (tags && tags.length > 0) {
@@ -65,11 +65,18 @@ export class PostsService {
         }
       }
 
+      const now = new Date()
+      const publishAtDate = publishAt ? new Date(publishAt) : null
+      const shouldPublishNow = !publishAtDate || publishAtDate <= now
+
       const post = m.create(Post, {
         slug,
         authorUsername: username,
         author: user,
         ...rest,
+        publishAt: publishAtDate && publishAtDate > now ? publishAtDate : null,
+        isPublished: shouldPublishNow,
+        publishedAt: shouldPublishNow ? now : null,
         tags: tagEntities,
         badges: badgeEntities,
       })
@@ -101,6 +108,7 @@ export class PostsService {
       .createQueryBuilder('post')
       .select('post.id')
       .where('post.created_at >= :days', { days: sevenDaysAgo })
+      .andWhere('post.is_published = :isPublished', { isPublished: true })
       .orderBy('post.views', 'DESC')
       .limit(5)
       .getMany()
@@ -140,7 +148,87 @@ export class PostsService {
         'created_at',
         'updated_at',
       ],
+      where: { isPublished: true },
       sortableColumns: ['id', 'title', 'subtitle', 'author.username', 'created_at', 'updated_at'],
+      searchableColumns: [
+        'id',
+        'title',
+        'subtitle',
+        'created_at',
+        'updated_at',
+        'author.username',
+        'tags.name',
+        'badges.name',
+      ],
+      defaultSortBy: [['created_at', 'DESC']],
+    })
+
+    const postIds = paginated.data.map((post: Post) => post.id)
+
+    let commentsCountMap: Record<number, number> = {}
+    if (postIds.length > 0) {
+      const commentsRaw: Array<{ postId: number; count: string }> = await this.connection
+        .getRepository('comments')
+        .createQueryBuilder('comment')
+        .select('comment.post_id', 'postId')
+        .addSelect('COUNT(comment.id)', 'count')
+        .where('comment.post_id IN (:...postIds)', { postIds })
+        .groupBy('comment.post_id')
+        .getRawMany()
+
+      commentsCountMap = {}
+      for (const row of commentsRaw) {
+        commentsCountMap[Number(row.postId)] = Number(row.count)
+      }
+    }
+
+    const dataWithComments: Array<Post & { comments: number }> = paginated.data.map(
+      (post: Post) => ({
+        ...post,
+        comments: commentsCountMap[post.id] || 0,
+      })
+    )
+
+    return {
+      ...paginated,
+      data: dataWithComments,
+    }
+  }
+
+  async getAllPostsWithUnpublished(
+    query: PaginateQuery
+  ): Promise<Paginated<Post & { comments: number }>> {
+    const paginated = await paginate(query, this.postRepository, {
+      relations: ['tags', 'badges', 'author'],
+      select: [
+        'id',
+        'title',
+        'subtitle',
+        'views',
+        'slug',
+        'author.username',
+        'author.image_url',
+        'tags.id',
+        'tags.name',
+        'badges.id',
+        'badges.name',
+        'created_at',
+        'updated_at',
+        'isPublished',
+        'publishAt',
+        'publishedAt',
+      ],
+      sortableColumns: [
+        'id',
+        'title',
+        'subtitle',
+        'author.username',
+        'created_at',
+        'updated_at',
+        'isPublished',
+        'publishAt',
+        'publishedAt',
+      ],
       searchableColumns: [
         'id',
         'title',
@@ -213,6 +301,7 @@ export class PostsService {
         'badges.name',
       ])
       .where('post.id = :id', { id })
+      .andWhere('post.is_published = :isPublished', { isPublished: true })
       .getOne()
   }
 
@@ -241,8 +330,10 @@ export class PostsService {
         'tags.name',
         'badges.id',
         'badges.name',
+        'comments.*',
       ])
       .where('post.slug = :slug', { slug })
+      .andWhere('post.is_published = :isPublished', { isPublished: true })
       .getOne()
   }
 
@@ -252,7 +343,7 @@ export class PostsService {
     manager: EntityManager = this.connection.manager
   ): Promise<void> {
     return manager.transaction(async (m: EntityManager) => {
-      const { tags, badges, ...updateData } = updatePostDto
+      const { tags, badges, publishAt, ...updateData } = updatePostDto
       let slug: string | undefined
       const post = await m.findOne(Post, { where: { id }, relations: ['tags', 'badges'] })
       if (!post) {
@@ -302,6 +393,16 @@ export class PostsService {
       const updatePayload = { ...updateData }
       if (slug !== undefined) {
         updatePayload['slug'] = slug
+      }
+
+      if (publishAt !== undefined) {
+        const now = new Date()
+        const publishAtDate = publishAt ? new Date(publishAt) : null
+        const shouldPublishNow = !publishAtDate || publishAtDate <= now
+
+        updatePayload['publishAt'] = publishAtDate && publishAtDate > now ? publishAtDate : null
+        updatePayload['isPublished'] = shouldPublishNow
+        updatePayload['publishedAt'] = shouldPublishNow ? now : null
       }
 
       await m.update(Post, { id }, updatePayload)

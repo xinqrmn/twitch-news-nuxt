@@ -60,4 +60,13 @@ export class Post {
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updated_at: Date
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  publishAt: Date | null
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  publishedAt: Date | null
+
+  @Column({ type: 'boolean', default: true })
+  isPublished: boolean
 }
