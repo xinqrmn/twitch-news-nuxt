@@ -31,14 +31,6 @@ Developed from scratch using **modern fullstack architecture** and **best practi
 
 ---
 
-## 🧠 What I Learned
-
-- Structuring large Nuxt + NestJS applications  
-- Designing scalable CMS systems  
-- Implementing multi-provider OAuth authentication
-
----
-
 ## 🔗 Links
 
 - **Repository:** [Twitch News on GitHub](https://github.com/xinqrmn/twitch-news-nuxt)
