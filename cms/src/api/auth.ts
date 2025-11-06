@@ -14,7 +14,7 @@ export interface RegisterDto {
 }
 
 export async function login(data: LoginDto) {
-  return api.post(`${API_URL}/login`, data)
+  return api.post(`${API_URL}/cms-login`, data)
 }
 
 export async function register(data: RegisterDto) {

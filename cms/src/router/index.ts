@@ -67,6 +67,11 @@ router.beforeEach(async (to) => {
     return { path: '/login' }
   }
 
+  if (to.meta?.requiresAuth && !auth.isAuthenticated && !auth.hasCMSAccess) {
+    await auth.logoutAction(true)
+    return { path: '/login' }
+  }
+
   if (to.path === '/login' && auth.isAuthenticated) {
     return { path: '/' }
   }

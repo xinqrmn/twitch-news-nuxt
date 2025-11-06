@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
-    "start:prod": "cross-env NODE_ENV=production node dist/main",
+    "start:prod": "nest build && cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "git": "npm run lint && npm run format",
     "typeorm": "cross-env NODE_ENV=development ts-node ./node_modules/typeorm/cli.js -d ./src/common/data-source.ts",

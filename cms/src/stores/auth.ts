@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import { login, logout, getMe } from '@/api/auth'
 import type { User } from '../types/user'
+import { useToast } from 'primevue'
 
 export const useAuthStore = defineStore(
   'auth',
@@ -12,22 +13,30 @@ export const useAuthStore = defineStore(
     const isAuthenticated = ref(false)
     const isAdmin = computed(() => user.value?.roles.includes('admin') ?? false)
     const isInitialized = ref(false)
+    const toast = useToast()
+
+    const cmsRoles = [
+      'admin',
+      'news_author',
+      'news_editor',
+      'streamer_bio_author',
+      'streamer_bio_editor',
+    ]
+    const hasCMSAccess = computed(() => user.value?.roles.some((r) => cmsRoles.includes(r)))
 
     const router = useRouter()
 
-  const initializeAuth = async () => {
-    try {
-      await fetchMe()
-    } catch (error) {
-      console.error('Ошибка при восстановлении сессии:', error)
-      isAuthenticated.value = false
-      user.value = null
-    } finally {
-      isInitialized.value = true
+    const initializeAuth = async () => {
+      try {
+        await fetchMe()
+      } catch (error) {
+        console.error('Ошибка при восстановлении сессии:', error)
+        isAuthenticated.value = false
+        user.value = null
+      } finally {
+        isInitialized.value = true
+      }
     }
-  }
-
-
 
     const loginAction = async (email: string, password: string) => {
       const res = await login({ email, password })
@@ -40,9 +49,17 @@ export const useAuthStore = defineStore(
       } else return false
     }
 
-    const logoutAction = async () => {
+    const logoutAction = async (noAccess: boolean | undefined) => {
       try {
         await logout()
+        if (noAccess) {
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка!',
+            detail: 'Недостаточно прав для доступа к CMS!',
+            life: 3000,
+          })
+        }
       } catch (e) {
         console.error("Ошибка logout'a: ", e)
       } finally {
@@ -73,6 +90,7 @@ export const useAuthStore = defineStore(
       isAuthenticated,
       isInitialized,
       isAdmin,
+      hasCMSAccess,
       initializeAuth,
       loginAction,
       logoutAction,
