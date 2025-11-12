@@ -50,6 +50,7 @@ declare module 'vue' {
     TabView: typeof import('primevue/tabview')['default']
     Tag: typeof import('primevue/tag')['default']
     TagsTable: typeof import('./src/components/Taxonomy/TagsTable.vue')['default']
+    TaxonomyDialog: typeof import('./src/components/Taxonomy/TaxonomyDialog.vue')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
     UsersDialog: typeof import('./src/components/Users/UsersDialog.vue')['default']

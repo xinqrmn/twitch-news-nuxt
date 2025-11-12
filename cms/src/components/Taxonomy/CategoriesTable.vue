@@ -77,11 +77,7 @@ onMounted(async () => {
     <Column>
       <template #body="{ data }">
         <div class="flex justify-end items-center gap-2">
-          <Button
-            icon="pi pi-pencil"
-            severity="success"
-            @click="console.log('edit categories')"
-          ></Button>
+          <Button icon="pi pi-pencil" severity="success" @click="console.log('asd')"></Button>
           <Button icon="pi pi-trash" severity="danger" @click="handleDelete(data.id)"></Button>
         </div>
       </template>

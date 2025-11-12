@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { useTagsStore } from '@/stores/tags'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, defineEmits } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 
+interface ChangeTag {
+  id: number | string
+  name: string
+  type: 'tag'
+}
+
 const tagsStore = useTagsStore()
+
 const dt = ref()
 const newTag = ref('')
 const visibleTag = ref<boolean>(false)
+
 const confirm = useConfirm()
+const emit = defineEmits<{
+  editTag: ChangeTag
+}>()
 
 const handleDelete = (id: number) => {
   confirm.require({
@@ -20,6 +31,10 @@ const handleDelete = (id: number) => {
       await tagsStore.deleteTagById(id)
     },
   })
+}
+
+const handleUpdate = (data) => {
+  emit('editTag', { ...data })
 }
 
 const exportCSV = () => {
@@ -52,7 +67,7 @@ onMounted(async () => {
   >
     <template #header>
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <h4 class="text-xl font-bold">Категории</h4>
+        <h4 class="text-xl font-bold">Тэги</h4>
         <Button
           label="Создать категорию"
           variant="text"
@@ -75,7 +90,13 @@ onMounted(async () => {
           <Button
             icon="pi pi-pencil"
             severity="success"
-            @click="console.log('edit categories')"
+            @click="
+              handleUpdate({
+                id: data.id,
+                name: data.name,
+                type: 'tag',
+              })
+            "
           ></Button>
           <Button icon="pi pi-trash" severity="danger" @click="handleDelete(data.id)"></Button>
         </div>
