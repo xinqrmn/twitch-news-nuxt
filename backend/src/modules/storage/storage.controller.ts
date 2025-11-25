@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -17,6 +19,7 @@ import { Respond } from 'src/common/response/response'
 import { ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { AuthGuard } from '@nestjs/passport'
 import { StorageDeleteDto } from './dto/storage-delete.dto'
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
 
 const ALLOWED_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mp3']
 
@@ -53,8 +56,12 @@ export class StorageController {
     description: 'Ошибка S3 хранилища',
   })
   @ApiResponse({
-    status: 400,
+    status: 415,
     description: 'Файл имеет запрещенное расширение',
+  })
+  @ApiResponse({
+    status: 406,
+    description: 'Файл не прикреплен',
   })
   @ApiResponse({
     status: 413,
@@ -71,19 +78,28 @@ export class StorageController {
     const roles: string[] = req.user?.roles ?? []
     if (
       !roles.some((r) => {
-          return [
-            'admin', 'news_author', 'news_editor', 'streamer_bio_author', 'streamer_bio_editor'
-          ].includes(r)
+        return [
+          'admin',
+          'news_author',
+          'news_editor',
+          'streamer_bio_author',
+          'streamer_bio_editor',
+        ].includes(r)
       })
     ) {
       throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
     }
+    if (!file) throw new HttpException('Файл не прикреплен!', HttpStatus.NOT_ACCEPTABLE)
+
     if (file.size > 5e6)
       throw new HttpException('Файл слишком большой', HttpStatus.PAYLOAD_TOO_LARGE)
 
     const [, fileExtension] = file.mimetype.split('/')
     if (!fileExtension || !ALLOWED_FILE_EXTENSIONS.includes(fileExtension))
-      throw new HttpException('Файл имеет запрещенное расширение', HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        'Файл имеет запрещенное расширение',
+        HttpStatus.UNSUPPORTED_MEDIA_TYPE
+      )
 
     const url = await this.storageService.uploadFile(file)
     return Respond.one({ url })
@@ -112,9 +128,7 @@ export class StorageController {
     const roles: string[] = req.user?.roles ?? []
     if (
       !roles.some((r) => {
-          return [
-            'admin', 'news_editor', 'streamer_bio_editor'
-          ].includes(r)
+        return ['admin', 'news_editor', 'streamer_bio_editor'].includes(r)
       })
     ) {
       throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
@@ -122,5 +136,34 @@ export class StorageController {
 
     await this.storageService.deleteFile(fileDeleteDto)
     return Respond.ok()
+  }
+
+  @Get('/get')
+  @UseGuards(StorageController.JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Получение списка всех файлов (с пагинацией)',
+    description:
+      'Получение списка всех файлов. Требуется токен авторизации и роль `Администратор`, `Редактор новостей`, `Редактор карточек стримера`',
+  })
+  @ApiResponse({ status: 200, description: 'Список получен' })
+  @ApiResponse({
+    status: 403,
+    description: 'Недостаточно прав',
+  })
+  async getStorageFiles(
+    @Req() req: Request & { user?: { username: string; roles?: string[] } },
+    @Paginate() query: PaginateQuery
+  ) {
+    const roles: string[] = req.user?.roles ?? []
+    if (
+      !roles.some((r) => {
+        return ['admin', 'news_editor', 'streamer_bio_editor'].includes(r)
+      })
+    ) {
+      throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
+    }
+
+    const { data, meta } = await this.storageService.getStorageFiles(query)
+    return Respond.many(data, meta)
   }
 }

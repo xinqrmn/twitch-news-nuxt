@@ -7,17 +7,13 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common'
 import { v4 as uuid } from 'uuid'
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-} from '@aws-sdk/client-s3'
-import { DataSource, EntityManager } from 'typeorm'
-import { InjectDataSource } from '@nestjs/typeorm'
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { DataSource, EntityManager, Repository } from 'typeorm'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { Storage } from './storage.entity'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StorageDeleteDto } from './dto/storage-delete.dto'
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
+import { transliterateCyrillic } from 'src/common/utils/transliterateCyrillic'
 
 @Injectable()
 export class StorageService {
@@ -25,7 +21,8 @@ export class StorageService {
   constructor(
     @InjectDataSource()
     private readonly connection: DataSource,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @InjectRepository(Storage) private readonly storageRepo: Repository<Storage>
   ) {
     this.s3Client = new S3Client({
       region: this.configService.get<string>('S3_REGION_NAME'),
@@ -37,16 +34,20 @@ export class StorageService {
     })
   }
 
-  async getFileEncodedUrl(key: string) {
-    const command = new GetObjectCommand({
-      Bucket: this.configService.get('S3_BUCKET_NAME'),
-      Key: key,
-    })
-    const url = await getSignedUrl(this.s3Client, command)
-    return url
+  private getFileAccessUrl(key: string): string {
+    return [this.configService.get('S3_FILE_ACCESS_DOMAIN'), key].join('/')
+  }
+
+  private clearFileName(name: string): string {
+    console.log(name)
+    return transliterateCyrillic(Buffer.from(name, 'ascii').toString('utf-8')).replace(
+      /[^a-zA-Z0-9-_.]/g,
+      ''
+    )
   }
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
+    file.originalname = this.clearFileName(file.originalname)
     const key = `${uuid()}-${file.originalname}`
     const command = new PutObjectCommand({
       Bucket: this.configService.get('S3_BUCKET_NAME'),
@@ -62,13 +63,13 @@ export class StorageService {
     })
     const uploadResult = await this.s3Client.send(command)
     if (uploadResult['$metadata'].httpStatusCode !== 200)
-      throw new InternalServerErrorException('Не удалось загрузить файл')
+      throw new HttpException('Не удалось загрузить файл', HttpStatus.INTERNAL_SERVER_ERROR)
     try {
       const res = await this.connection.manager.transaction(async (m: EntityManager) => {
         const createdFile = m.create(Storage, {
           uuid: key,
           name: file.originalname,
-          url: await this.getFileEncodedUrl(key),
+          url: this.getFileAccessUrl(key),
         })
 
         await m.save(Storage, createdFile)
@@ -93,5 +94,20 @@ export class StorageService {
     return this.connection.manager.transaction(async (m: EntityManager) => {
       await m.delete(Storage, { uuid: dto.key })
     })
+  }
+
+  async getStorageFiles(query: PaginateQuery): Promise<Paginated<Storage>> {
+    const paginated = await paginate(query, this.storageRepo, {
+      select: ['name', 'url', 'created_at'],
+      sortableColumns: ['name', 'created_at'],
+      searchableColumns: ['name', 'created_at'],
+      filterableColumns: {
+        name: [],
+        created_at: [],
+      },
+      defaultSortBy: [['created_at', 'DESC']],
+    })
+
+    return paginated
   }
 }
