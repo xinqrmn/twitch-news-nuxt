@@ -1,6 +1,5 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { TagsService } from './tags.service'
-import { AuthGuard } from '@nestjs/passport'
 import {
   Body,
   Controller,
@@ -18,42 +17,33 @@ import {
 import { Respond } from 'src/common/response/response'
 import { TagCreateDto } from './dto/tag-create.dto'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { Roles } from 'src/common/decorators/roles.decorator'
+import { JWTGuard } from '../auth/guards/jwt.guard'
 
 @ApiTags('Tags')
+@UseGuards(JWTGuard)
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
-  private static JwtAuthGuard = class extends AuthGuard('jwt') {}
-
   @Get('get')
-  @UseGuards(TagsController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Получение списка всех тегов (с пагинацией)',
     description:
       'Требуется токен авторизации. Только пользователи с ролью `Администратор`, `Редактор новостей` или `Автор новостей` могут получать список всех тегов',
   })
+  @Roles(['news_author', 'news_editor'])
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
   @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async getAllTags(
-    @Paginate() query: PaginateQuery,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !(roles.includes('admin') || roles.includes('news_editor') || roles.includes('news_author'))
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async getAllTags(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.tagsService.getAllTags(query)
     return Respond.many(data, meta)
   }
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(TagsController.JwtAuthGuard)
   @ApiOperation({
     summary: 'Создание нового тега',
     description:
@@ -81,7 +71,6 @@ export class TagsController {
   }
 
   @Delete('delete/:id')
-  @UseGuards(TagsController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Мягкое удаление тега (del=1)',
@@ -107,7 +96,6 @@ export class TagsController {
   }
 
   @Patch('update/:id')
-  @UseGuards(TagsController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Изменение тега',

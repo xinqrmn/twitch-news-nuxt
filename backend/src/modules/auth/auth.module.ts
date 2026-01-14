@@ -5,21 +5,21 @@ import { JwtStrategy } from './jwt.strategy'
 import { AuthController } from './auth.controller'
 import * as process from 'node:process'
 import { UsersModule } from '../users/users.module'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { JWTGuard } from './guards/jwt.guard'
+import { RolesGuard } from './guards/roles.guard'
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         secret: process.env.JWT_SECRET_KEY,
         signOptions: { expiresIn: '1h' },
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, JWTGuard, RolesGuard],
   controllers: [AuthController],
+  exports: [AuthService, JWTGuard, RolesGuard],
 })
 export class AuthModule {}

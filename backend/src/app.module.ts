@@ -19,6 +19,7 @@ import { CommentsModule } from './modules/comments/comments.module'
 import { ParserModule } from './modules/parser/parser.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { StorageModule } from './modules/storage/storage.module'
+import { AuthService } from './modules/auth/auth.service'
 
 @Module({
   imports: [
