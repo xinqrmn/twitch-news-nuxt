@@ -18,6 +18,7 @@ import { PostsModule } from './modules/posts/posts.module'
 import { CommentsModule } from './modules/comments/comments.module'
 import { ParserModule } from './modules/parser/parser.module'
 import { ScheduleModule } from '@nestjs/schedule'
+import { StorageModule } from './modules/storage/storage.module'
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { ScheduleModule } from '@nestjs/schedule'
     PostsModule,
     CommentsModule,
     ParserModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
