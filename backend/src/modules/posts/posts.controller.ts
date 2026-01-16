@@ -9,26 +9,26 @@ import {
   HttpCode,
   HttpStatus,
   Req,
-  HttpException,
   UseGuards,
 } from '@nestjs/common'
 import { PostsService } from './posts.service'
 import { PostCreateDto } from './dto/post-create.dto'
 import { PostUpdateDto } from './dto/post-update.dto'
-import { AuthGuard } from '@nestjs/passport'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { Respond } from 'src/common/response/response'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { Roles } from 'src/common/decorators/roles.decorator'
+import { JWTGuard } from '../auth/guards/jwt.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  private static JwtAuthGuard = class extends AuthGuard('jwt') {}
-
   @Post('create')
-  @UseGuards(PostsController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor', 'news_author'])
   @ApiOperation({
     summary: 'Создание нового поста',
     description:
@@ -39,16 +39,11 @@ export class PostsController {
     status: 409,
     description: 'Пост с таким slug уже существует',
   })
-  async create(
-    @Body() dto: PostCreateDto,
-    @Req() req: Request & { user?: { username: string; roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !(roles.includes('admin') || roles.includes('news_editor') || roles.includes('news_author'))
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  @ApiResponse({
+    status: 403,
+    description: 'Недостаточно прав',
+  })
+  async create(@Body() dto: PostCreateDto, @Req() req: Request & { user?: { username: string } }) {
     await this.postsService.create(dto, req.user?.username ?? '')
     return Respond.ok()
   }
@@ -71,7 +66,8 @@ export class PostsController {
 
   @Get('get/all')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(PostsController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Roles(['admin', 'news_editor', 'news_author'])
   @ApiOperation({
     summary: 'Получение всех постов (с невыложенными)',
     description:
@@ -79,19 +75,10 @@ export class PostsController {
   })
   @ApiResponse({ status: 200, description: 'Посты получены' })
   @ApiResponse({
-    status: 500,
-    description: 'Увы(',
+    status: 403,
+    description: 'Недостаточно прав',
   })
-  async getAllPostsWithUnpublished(
-    @Paginate() query: PaginateQuery,
-    @Req() req: Request & { user?: { username: string; roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !(roles.includes('admin') || roles.includes('news_editor') || roles.includes('news_author'))
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async getAllPostsWithUnpublished(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.postsService.getAllPostsWithUnpublished(query)
     return Respond.many(data, meta)
   }
@@ -158,8 +145,9 @@ export class PostsController {
   }
 
   @Patch('update/:id')
-  @UseGuards(PostsController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Редактирование поста по id',
     description:
@@ -171,25 +159,18 @@ export class PostsController {
     description: 'Пользователь не авторизован',
   })
   @ApiResponse({
-    status: 500,
+    status: 403,
     description: 'Недостаточно прав',
   })
-  async update(
-    @Param('id') id: string,
-    @Body() dto: PostUpdateDto,
-    @Req() req: Request & { user?: { username: string; roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async update(@Param('id') id: string, @Body() dto: PostUpdateDto) {
     await this.postsService.update(Number(id), dto)
     return Respond.ok()
   }
 
   @Delete('delete/:id')
-  @UseGuards(PostsController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Жесткое удаление поста по id',
     description:
@@ -201,17 +182,10 @@ export class PostsController {
     description: 'Пользователь не авторизован',
   })
   @ApiResponse({
-    status: 500,
+    status: 403,
     description: 'Недостаточно прав',
   })
-  async deleteById(
-    @Param('id') id: string,
-    @Req() req: Request & { user?: { username: string; roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async deleteById(@Param('id') id: string) {
     await this.postsService.deleteById(Number(id))
     return Respond.ok()
   }

@@ -17,18 +17,17 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import multer from 'multer'
 import { Respond } from 'src/common/response/response'
 import { ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger'
-import { AuthGuard } from '@nestjs/passport'
 import { StorageDeleteDto } from './dto/storage-delete.dto'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { Roles } from 'src/common/decorators/roles.decorator'
+import { JWTGuard } from '../auth/guards/jwt.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 const ALLOWED_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mp3']
 
-// @UseGuards(AuthGuard)
 @Controller('storage')
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
-
-  private static JwtAuthGuard = class extends AuthGuard('jwt') {}
 
   @Post('save')
   @ApiConsumes('multipart/form-data')
@@ -43,8 +42,9 @@ export class StorageController {
       },
     },
   })
-  @UseGuards(StorageController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @Roles(['admin', 'news_author', 'news_editor', 'streamer_bio_author', 'streamer_bio_editor'])
   @ApiOperation({
     summary: 'Загрузка в файла хранилище',
     description:
@@ -72,23 +72,9 @@ export class StorageController {
     description: 'Недостаточно прав',
   })
   async fileSave(
-    @Req() req: Request & { user?: { username: string; roles?: string[] } },
+    @Req() req: Request & { user?: { username: string } },
     @UploadedFile() file: Express.Multer.File
   ): Promise<Respond<{ url: string }>> {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !roles.some((r) => {
-        return [
-          'admin',
-          'news_author',
-          'news_editor',
-          'streamer_bio_author',
-          'streamer_bio_editor',
-        ].includes(r)
-      })
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
-    }
     if (!file) throw new HttpException('Файл не прикреплен!', HttpStatus.NOT_ACCEPTABLE)
 
     if (file.size > 5e6)
@@ -106,11 +92,12 @@ export class StorageController {
   }
 
   @Post('delete')
-  @UseGuards(StorageController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Roles(['admin', 'news_editor', 'streamer_bio_editor'])
   @ApiOperation({
     summary: 'Удаление файла из хранилища',
     description:
-      'Создание нового поста. Требуется токен авторизации и роль `Администратор`, `Редактор новостей`, `Редактор карточек стримера`',
+      'Удаление файла из хранилища. Требуется токен авторизации и роль `Администратор`, `Редактор новостей`, `Редактор карточек стримера`',
   })
   @ApiResponse({ status: 200, description: 'Файл успешно удален' })
   @ApiResponse({
@@ -121,25 +108,14 @@ export class StorageController {
     status: 403,
     description: 'Недостаточно прав',
   })
-  async fileDelete(
-    @Req() req: Request & { user?: { username: string; roles?: string[] } },
-    @Body() fileDeleteDto: StorageDeleteDto
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !roles.some((r) => {
-        return ['admin', 'news_editor', 'streamer_bio_editor'].includes(r)
-      })
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
-    }
-
+  async fileDelete(@Body() fileDeleteDto: StorageDeleteDto) {
     await this.storageService.deleteFile(fileDeleteDto)
     return Respond.ok()
   }
 
   @Get('/get')
-  @UseGuards(StorageController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Roles(['admin', 'news_editor', 'streamer_bio_editor'])
   @ApiOperation({
     summary: 'Получение списка всех файлов (с пагинацией)',
     description:
@@ -150,19 +126,7 @@ export class StorageController {
     status: 403,
     description: 'Недостаточно прав',
   })
-  async getStorageFiles(
-    @Req() req: Request & { user?: { username: string; roles?: string[] } },
-    @Paginate() query: PaginateQuery
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !roles.some((r) => {
-        return ['admin', 'news_editor', 'streamer_bio_editor'].includes(r)
-      })
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.FORBIDDEN)
-    }
-
+  async getStorageFiles(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.storageService.getStorageFiles(query)
     return Respond.many(data, meta)
   }

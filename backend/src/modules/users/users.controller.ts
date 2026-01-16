@@ -6,7 +6,6 @@ import {
   Post,
   Req,
   UseGuards,
-  HttpException,
   Get,
   Param,
   Delete,
@@ -16,18 +15,18 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UsersService } from './users.service'
 import { userRegisterDto } from './dto/user-register.dto'
 import { userUpdateDto } from './dto/user-update.dto'
-import { AuthGuard } from '@nestjs/passport'
 import { userRegisterWithRolesDto } from 'src/modules/users/dto/user-register-with-roles.dto'
 import { Request } from 'express'
 import { Respond } from 'src/common/response/response'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { Roles } from 'src/common/decorators/roles.decorator'
+import { JWTGuard } from '../auth/guards/jwt.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  private static JwtAuthGuard = class extends AuthGuard('jwt') {}
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
@@ -47,8 +46,9 @@ export class UsersController {
   }
 
   @Post('createWithRoles')
-  @UseGuards(UsersController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin'])
   @ApiOperation({
     summary: 'Создание нового пользователя с указанием ролей',
     description:
@@ -58,24 +58,17 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Создающий не авторизован' })
   @ApiResponse({
     status: 403,
-    description: 'Пользователь с таким username или email уже существует',
+    description: 'Пользователь с таким username или email уже существует или недостаточно прав',
   })
-  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async createWithRoles(
-    @Body() userRegisterWithRolesDto: userRegisterWithRolesDto,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!roles.includes('admin')) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async createWithRoles(@Body() userRegisterWithRolesDto: userRegisterWithRolesDto) {
     await this.usersService.createUserWithRoles(userRegisterWithRolesDto)
     return Respond.ok()
   }
 
   @Get('get')
-  @UseGuards(UsersController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin'])
   @ApiOperation({
     summary: 'Получение списка всех пользователей',
     description:
@@ -83,24 +76,16 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
-  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async getAllUsers(
-    @Paginate() query: PaginateQuery,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!roles.includes('admin')) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  async getAllUsers(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.usersService.getAllUsers(query)
     return Respond.many(data, meta)
-    // const data = await this.usersService.getAllUsers(query)
-    // return data
   }
 
   @Get('get/:id')
-  @UseGuards(UsersController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin'])
   @ApiOperation({
     summary: 'Получение информации о пользователе по id',
     description:
@@ -108,15 +93,8 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: 'Пользователь получен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
-  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async getUserById(
-    @Param('id') id: number,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!roles.includes('admin')) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  async getUserById(@Param('id') id: number) {
     const user = await this.usersService.getUserById(id)
     return Respond.one(user)
   }
@@ -135,7 +113,7 @@ export class UsersController {
   }
 
   @Delete('delete/:id')
-  @UseGuards(UsersController.JwtAuthGuard)
+  @UseGuards(JWTGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Мягкое удаление пользователя (del=1)',
@@ -159,7 +137,7 @@ export class UsersController {
   }
 
   @Patch('update/:id')
-  @UseGuards(UsersController.JwtAuthGuard)
+  @UseGuards(JWTGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Изменение данных пользователя',

@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Badge } from './badges.entity'
 import { BadgesService } from './badges.service'
 import { BadgesController } from './badges.controller'
+import { AuthModule } from '../auth/auth.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Badge])],
+  imports: [TypeOrmModule.forFeature([Badge]), AuthModule],
   exports: [BadgesService],
   providers: [BadgesService],
   controllers: [BadgesController],

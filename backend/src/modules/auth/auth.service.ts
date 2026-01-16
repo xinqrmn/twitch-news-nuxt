@@ -35,4 +35,9 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     }
   }
+
+  verify(token: string): object | boolean {
+    if (!token) return false
+    return this.jwtService.verify(token)
+  }
 }

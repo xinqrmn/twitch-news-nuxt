@@ -1,29 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-  HttpCode,
-  HttpStatus,
-  HttpException,
-  UseGuards,
-} from '@nestjs/common'
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, Param } from '@nestjs/common'
 import { StreamersService } from './streamers.service'
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { Respond } from 'src/common/response/response'
-import { AuthGuard } from '@nestjs/passport'
+import { Roles } from 'src/common/decorators/roles.decorator'
+import { JWTGuard } from '../auth/guards/jwt.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 @ApiTags('Streamers')
 @Controller('streamers')
 export class StreamersController {
   constructor(private readonly streamersService: StreamersService) {}
-
-  private static JwtAuthGuard = class extends AuthGuard('jwt') {}
 
   @Get('/get')
   @ApiOperation({ summary: 'Получить всех стримеров' })
@@ -49,30 +36,19 @@ export class StreamersController {
   }
 
   @Get('/get/list')
-  @ApiOperation({ summary: 'Получить displayName всех стримеров' })
   @HttpCode(HttpStatus.OK)
-  @UseGuards(StreamersController.JwtAuthGuard)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Roles(['admin', 'streamer_bio_editor', 'streamer_bio_author'])
   @ApiOperation({
     summary: 'Получить всех стримеров',
     description:
       'Получение списка displayName всех стримеров с признаком has_bio. Требуется роль `Администратор`, `Редактор карточек стримера` или `Автор карточек стримера`',
   })
   @ApiResponse({ status: 200, description: 'Список получен' })
-  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
-  async getAllStreamersList(@Req() req: Request & { user?: { roles?: string[] } }) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !(
-        roles.includes('admin') ||
-        roles.includes('streamer_bio_editor') ||
-        roles.includes('streamer_bio_author')
-      )
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async getAllStreamersList() {
     const data = await this.streamersService.getAllStreamersList()
-
     return Respond.one(data)
   }
 }
