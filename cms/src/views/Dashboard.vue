@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
+import MediaPicker from '@/components/MediaPicker/MediaPicker.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -17,6 +18,11 @@ const logout = async () => {
     <template #content>
       <p>Добро пожаловать в вашу CMS!</p>
       <Button label="Выйти" class="mt-4" @click="logout" />
+
+      <div class="bg-amber-50 p-1">
+
+        <MediaPicker />
+      </div>
     </template>
   </Card>
 </template>

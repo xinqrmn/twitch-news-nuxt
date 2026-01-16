@@ -117,9 +117,6 @@ onBeforeMount(async () => {
     <template #paginatorstart>
       <Button type="button" icon="pi pi-refresh" text @click="usersStore.fetchUsers()"></Button>
     </template>
-    <template #paginatorend>
-      <Button type="button" icon="pi pi-download" text></Button>
-    </template>
     <Column field="id" sortable header="ID"></Column>
     <Column field="username" sortable header="Имя пользователя">
       <template #body="{ data }">
