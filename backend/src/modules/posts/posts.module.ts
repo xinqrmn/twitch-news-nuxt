@@ -6,9 +6,10 @@ import { PostsService } from './posts.service'
 import { PostsController } from './posts.controller'
 import { Comment } from '../comments/comments.entity'
 import { PostsScheduler } from './posts.scheduler'
+import { AuthModule } from '../auth/auth.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post, Comment]), ScheduleModule],
+  imports: [TypeOrmModule.forFeature([Post, Comment]), ScheduleModule, AuthModule],
   providers: [PostsService, PostsScheduler],
   controllers: [PostsController],
   exports: [PostsService],

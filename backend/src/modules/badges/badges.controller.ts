@@ -1,34 +1,33 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { BadgesService } from './badges.service'
-import { AuthGuard } from '@nestjs/passport'
 import {
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
   Patch,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common'
 import { Respond } from 'src/common/response/response'
 import { BadgeCreateDto } from './dto/badge-create.dto'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { Roles } from 'src/common/decorators/roles.decorator'
+import { JWTGuard } from '../auth/guards/jwt.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 @ApiTags('Badges')
+@UseGuards(JWTGuard, RolesGuard)
 @Controller('badges')
 export class BadgesController {
   constructor(private readonly badgesService: BadgesService) {}
 
-  private static JwtAuthGuard = class extends AuthGuard('jwt') {}
-
   @Get('get')
-  @UseGuards(BadgesController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor', 'news_author'])
   @ApiOperation({
     summary: 'Получение списка всех бейджей (с пагинацией)',
     description:
@@ -36,24 +35,15 @@ export class BadgesController {
   })
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
-  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
-  async getAllBadges(
-    @Paginate() query: PaginateQuery,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (
-      !(roles.includes('admin') || roles.includes('news_editor') || roles.includes('news_author'))
-    ) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
+  async getAllBadges(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.badgesService.getAllBadges(query)
     return Respond.many(data, meta)
   }
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(BadgesController.JwtAuthGuard)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Создание нового бейджа',
     description:
@@ -65,24 +55,17 @@ export class BadgesController {
     description: 'Такой бейдж уже существует',
   })
   @ApiResponse({
-    status: 500,
+    status: 403,
     description: 'Недостаточно прав',
   })
-  async create(
-    @Body() badgeCreateDto: BadgeCreateDto,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async create(@Body() badgeCreateDto: BadgeCreateDto) {
     await this.badgesService.createBadge(badgeCreateDto)
     return Respond.ok()
   }
 
   @Delete('delete/:id')
-  @UseGuards(BadgesController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Мягкое удаление бейджа (del=1)',
     description:
@@ -92,23 +75,14 @@ export class BadgesController {
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Бейдж не найден' })
-  async deleteBadge(
-    @Param('id') id: number,
-    @Req() req: Request & { user: { roles: string[]; id: number } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-
+  async deleteBadge(@Param('id') id: number) {
     await this.badgesService.softDeleteBadge(id)
-
     return Respond.ok()
   }
 
   @Patch('update/:id')
-  @UseGuards(BadgesController.JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Изменение бейджа',
     description:
@@ -118,18 +92,8 @@ export class BadgesController {
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Бейдж не найден' })
-  async editBadgeById(
-    @Param('id') id: number,
-    @Body() badgeUpdateDto: BadgeCreateDto,
-    @Req() req: Request & { user: { roles: string[]; id: number } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-
+  async editBadgeById(@Param('id') id: number, @Body() badgeUpdateDto: BadgeCreateDto) {
     await this.badgesService.editBadgeById(badgeUpdateDto, id)
-
     return Respond.ok()
   }
 }

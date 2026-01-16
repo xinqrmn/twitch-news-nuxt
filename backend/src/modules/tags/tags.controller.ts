@@ -6,12 +6,10 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
   Patch,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common'
 import { Respond } from 'src/common/response/response'
@@ -19,9 +17,10 @@ import { TagCreateDto } from './dto/tag-create.dto'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { Roles } from 'src/common/decorators/roles.decorator'
 import { JWTGuard } from '../auth/guards/jwt.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 @ApiTags('Tags')
-@UseGuards(JWTGuard)
+@UseGuards(JWTGuard, RolesGuard)
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
@@ -36,7 +35,7 @@ export class TagsController {
   @Roles(['news_author', 'news_editor'])
   @ApiResponse({ status: 200, description: 'Список получен' })
   @ApiResponse({ status: 401, description: 'Пользователь, осуществивший запрос, не авторизован' })
-  @ApiResponse({ status: 500, description: 'Недостаточно прав' })
+  @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   async getAllTags(@Paginate() query: PaginateQuery) {
     const { data, meta } = await this.tagsService.getAllTags(query)
     return Respond.many(data, meta)
@@ -44,6 +43,7 @@ export class TagsController {
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Создание нового тега',
     description:
@@ -55,23 +55,17 @@ export class TagsController {
     description: 'Такой тег уже существует',
   })
   @ApiResponse({
-    status: 500,
+    status: 403,
     description: 'Недостаточно прав',
   })
-  async create(
-    @Body() tagCreateDto: TagCreateDto,
-    @Req() req: Request & { user?: { roles?: string[] } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+  async create(@Body() tagCreateDto: TagCreateDto) {
     await this.tagsService.createTag(tagCreateDto)
     return Respond.ok()
   }
 
   @Delete('delete/:id')
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Мягкое удаление тега (del=1)',
     description:
@@ -81,22 +75,14 @@ export class TagsController {
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Тег не найден' })
-  async deleteUser(
-    @Param('id') id: number,
-    @Req() req: Request & { user: { roles: string[]; id: number } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-
+  async deleteUser(@Param('id') id: number) {
     await this.tagsService.softDeleteTag(id)
-
     return Respond.ok()
   }
 
   @Patch('update/:id')
   @HttpCode(HttpStatus.OK)
+  @Roles(['admin', 'news_editor'])
   @ApiOperation({
     summary: 'Изменение тега',
     description:
@@ -106,18 +92,8 @@ export class TagsController {
   @ApiResponse({ status: 401, description: 'Пользователь не авторизован' })
   @ApiResponse({ status: 403, description: 'Недостаточно прав' })
   @ApiResponse({ status: 404, description: 'Тег не найден' })
-  async editUserById(
-    @Param('id') id: number,
-    @Body() tagUpdateDto: TagCreateDto,
-    @Req() req: Request & { user: { roles: string[]; id: number } }
-  ) {
-    const roles: string[] = req.user?.roles ?? []
-    if (!(roles.includes('admin') || roles.includes('news_editor'))) {
-      throw new HttpException('Недостаточно прав', HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-
+  async editUserById(@Param('id') id: number, @Body() tagUpdateDto: TagCreateDto) {
     await this.tagsService.editTagById(tagUpdateDto, id)
-
     return Respond.ok()
   }
 }

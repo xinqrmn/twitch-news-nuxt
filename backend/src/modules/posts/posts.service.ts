@@ -103,7 +103,6 @@ export class PostsService {
       0
     ).toISOString()
 
-    // First, get the top 5 post IDs by views
     const topPostIds = await this.postRepository
       .createQueryBuilder('post')
       .select('post.id')
@@ -115,17 +114,11 @@ export class PostsService {
 
     const ids = topPostIds.map((post) => post.id)
 
-    // return await this.postRepository.find({
-    //   relations: ['tags'],
-    //   select: ['id', 'title', 'slug', 'tags.id', 'tags.name'],
-    //   where: { id: In(ids) },
-    //   order: { views: 'DESC' },
-    // })
     return await this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.tags', 'tags')
       .select(['post.id', 'post.title', 'post.slug', 'tags.id', 'tags.name'])
-      .where('post.id IN (:...topPostIds)', { topPostIds: ids })
+      .where('post.id IN (:...topPostIds)', { topPostIds: ids.length ? ids : [0] })
       .orderBy('post.views', 'DESC')
       .getMany()
   }
