@@ -1,80 +1,54 @@
 <script setup lang="ts">
 import { MediaFile } from '@/types/mediaFile'
-import { ref } from 'vue'
+import { useStorageStore } from '@/stores/storage'
+import { PaginationParams } from '@/utils/requestHandler'
+import { onBeforeMount, onMounted, ref } from 'vue'
 
-const media = ref<MediaFile[]>([
-  {
-    uuid: '0c7111bb-b275-4c46-9763-35a253a171a4-gandonio-_uebische.jpg',
-    name: 'gandonio-_uebische.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/0c7111bb-b275-4c46-9763-35a253a171a4-gandonio-_uebische.jpg',
-    created_at: '2025-11-25T10:52:02.768Z',
-  },
-  {
-    uuid: '7469b216-9dff-4e2b-a32e-1c7372576fb7-gandonio-_uebische.jpg2',
-    name: 'gandonio-_uebische.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/7469b216-9dff-4e2b-a32e-1c7372576fb7-gandonio-_uebische.jpg',
-    created_at: '2025-11-25T10:49:31.256Z',
-  },
-  {
-    uuid: '3ce21737-fc83-4dce-8a4c-a2a1fd061c6c-yjz4ghz00p0z68ck2s45955kl0tkgau4_1_0_1748340072462.jpg3',
-    name: 'yjz4ghz00p0z68ck2s45955kl0tkgau4_1_0_1748340072462.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/3ce21737-fc83-4dce-8a4c-a2a1fd061c6c-yjz4ghz00p0z68ck2s45955kl0tkgau4_1_0_1748340072462.jpg',
-    created_at: '2025-11-25T10:43:30.382Z',
-  },
-  {
-    uuid: '8b482141-5f5e-448c-9593-5fef8e5fdd57-syrneke.jpg',
-    name: 'syrneke.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/8b482141-5f5e-448c-9593-5fef8e5fdd57-syrneke.jpg4',
-    created_at: '2025-11-25T10:42:19.648Z',
-  },
-  {
-    uuid: '0c7111bb-b275-4c46-9763-35a253a171a4-gandonio-_uebische.jpg5',
-    name: 'gandonio-_uebische.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/0c7111bb-b275-4c46-9763-35a253a171a4-gandonio-_uebische.jpg',
-    created_at: '2025-11-25T10:52:02.768Z',
-  },
-  {
-    uuid: '7469b216-9dff-4e2b-a32e-1c7372576fb7-gandonio-_uebische.jpg6',
-    name: 'gandonio-_uebische.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/7469b216-9dff-4e2b-a32e-1c7372576fb7-gandonio-_uebische.jpg',
-    created_at: '2025-11-25T10:49:31.256Z',
-  },
-  {
-    uuid: '3ce21737-fc83-4dce-8a4c-a2a1fd061c6c-yjz4ghz00p0z68ck2s45955kl0tkgau4_1_0_1748340072462.jpg7',
-    name: 'yjz4ghz00p0z68ck2s45955kl0tkgau4_1_0_1748340072462.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/3ce21737-fc83-4dce-8a4c-a2a1fd061c6c-yjz4ghz00p0z68ck2s45955kl0tkgau4_1_0_1748340072462.jpg',
-    created_at: '2025-11-25T10:43:30.382Z',
-  },
-  {
-    uuid: '8b482141-5f5e-448c-9593-5fef8e5fdd57-syrneke.jpg8',
-    name: 'syrneke.jpg',
-    url: 'https://db54213d-bfae-48a3-ae98-9605dab54e42.selstorage.ru/8b482141-5f5e-448c-9593-5fef8e5fdd57-syrneke.jpg',
-    created_at: '2025-11-25T10:42:19.648Z',
-  },
-])
+const storageStore = useStorageStore()
+const props = defineProps<{
+  items: string[]
+}>()
 
-const selectedMedia = ref<MediaFile[]>([])
+const selectedMedia = ref<string[]>(props.items)
 
 const selectorOptions = ['Все', 'Только выбранные']
 const onlySelected = ref<'Все' | 'Только выбранные'>('Все')
 
+
+//DataView methods
 const viewSearch = ref<string>()
 
+const first = ref(0)
 let searchTimeout
 const onSearch = () => {
   clearTimeout(searchTimeout)
-  // searchTimeout = setTimeout(() => usersStore.fetchUsers({ search: tableSearch.value.trim() }), 350)
+  searchTimeout = setTimeout(() => storageStore.fetchStorage({ search: viewSearch.value.trim() }), 350)
 }
+
+const onPage = async (event: any) => {
+  first.value = event.first
+  await storageStore.fetchStorage({
+    currentPage: event.page + 1,
+    limit: event.rows,
+    search: viewSearch.value.trim(),
+  })
+}
+
+onBeforeMount(async () => {
+  await storageStore.fetchStorage()
+})
 </script>
 
 <template>
   <div class="card h-full">
     <DataView
-      :value="onlySelected === 'Все' ? media : selectedMedia"
+      :value="onlySelected === 'Все' ? storageStore.urlList : selectedMedia"
       paginator
+      :first="first"
       layout="grid"
-      :totalRecords="media.length"
+      :totalRecords="storageStore.totalItems"
       :rows="20"
+      @page="onPage"
       :pt="{ root: 'flex flex-col h-full', content: 'h-full overflow-y-auto mx-2' }"
     >
       <template #header>
@@ -82,7 +56,7 @@ const onSearch = () => {
           <div class="flex">
             <SelectButton v-model="onlySelected" :options="selectorOptions" :allowEmpty="false" />
           </div>
-          <div class="ml-auto">
+          <div class="ml-auto" v-if="onlySelected === 'Все'">
             <IconField>
               <InputIcon>
                 <i class="pi pi-search" />
@@ -95,31 +69,30 @@ const onSearch = () => {
 
       <template #grid="slotProps">
         <div class="grid grid-cols-4 gap-2 py-2">
-          <div v-for="item in slotProps.items" :key="item.uuid">
+          <div v-for="item in slotProps.items" :key="item">
             <div
               class="p-2 relative border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col overflow-hidden"
             >
               <div class="absolute top-2 right-2">
-                <Checkbox v-model="selectedMedia" :inputId="item.uuid" :value="item" />
+                <Checkbox
+                  v-model="selectedMedia"
+                  :inputId="item"
+                  :value="item"
+                  style="z-index: 2"
+                />
               </div>
               <div class="rounded w-full h-[100px]">
                 <img
                   class="w-full h-full object-cover"
-                  :src="item.url"
-                  :alt="item.name"
+                  :src="item"
+                  :alt="item"
                   :value="item"
                 />
               </div>
               <div class="pt-1">
-                <div class="text-md font-medium overflow-ellipsis overflow-hidden mt-1">
-                  {{ item.name }}
+                <div class="text-md font-medium overflow-ellipsis overflow-hidden mt-1" :title="item.split('/').at(-1).slice(37)">
+                  {{ item.split('/').at(-1).slice(37) }}
                 </div>
-                <span class="text-[0.75rem] font-thin text-gray-400"
-                  >Добавлено:
-                  {{
-                    new Date(item.created_at).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })
-                  }}</span
-                >
               </div>
             </div>
           </div>
@@ -127,7 +100,12 @@ const onSearch = () => {
       </template>
       <template #paginatorend>
         <div class="flex gap-4 justify-end">
-          <Button label="Прикрепить" class="p-button-success" :disabled="selectedMedia.length === 0" @click="console.log('zxc')" />
+          <Button
+            label="Прикрепить"
+            class="p-button-success"
+            :disabled="selectedMedia.length === 0"
+            @click="console.log('zxc')"
+          />
         </div>
       </template>
     </DataView>
